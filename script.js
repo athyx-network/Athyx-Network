@@ -136,45 +136,48 @@ if (homeSearchInput) {
   });
 }
 
+// Base URL for jsDelivr CDN
+const JSDELIVR_BASE = 'https://cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/';
+
 // ==========================================
 // SETTINGS: TAB CLOAKING
 // ==========================================
 const cloakPresets = {
   google: {
     title: 'Google',
-    favicon: 'assets/cloak/google.ico'
+    favicon: `${JSDELIVR_BASE}assets/cloak/google.ico`
   },
   docs: {
     title: 'Google Docs',
-    favicon: 'assets/cloak/docs.ico'
+    favicon: `${JSDELIVR_BASE}assets/cloak/docs.ico`
   },
   drive: {
     title: 'Google Drive',
-    favicon: 'assets/cloak/drive.png'
+    favicon: `${JSDELIVR_BASE}assets/cloak/drive.png`
   },
   classroom: {
     title: 'Classes',
-    favicon: 'assets/cloak/classroom.png'
+    favicon: `${JSDELIVR_BASE}assets/cloak/classroom.png`
   },
   slides: {
     title: 'Google Slides',
-    favicon: 'assets/cloak/slides.ico'
+    favicon: `${JSDELIVR_BASE}assets/cloak/slides.ico`
   },
   gmail: {
     title: 'Gmail',
-    favicon: 'assets/cloak/gmail.ico'
+    favicon: `${JSDELIVR_BASE}assets/cloak/gmail.ico`
   },
   canvas: {
     title: 'Dashboard | Canvas',
-    favicon: 'assets/cloak/canvas.png'
+    favicon: `${JSDELIVR_BASE}assets/cloak/canvas.png`
   },
   desmos: {
     title: 'Desmos | Graphing Calculator',
-    favicon: 'assets/cloak/desmos.ico'
+    favicon: `${JSDELIVR_BASE}assets/cloak/desmos.ico`
   },
   classlink: {
     title: 'ClassLink LaunchPad',
-    favicon: 'assets/cloak/classlink.ico'
+    favicon: `${JSDELIVR_BASE}assets/cloak/classlink.ico`
   },
   reset: {
     title: 'Athyx Network',
@@ -472,8 +475,14 @@ function normalizeItem(raw, type) {
   
   // Icon file in assets/app_icons (for apps) or assets/game_icons (for games) or direct path/URL
   let image = raw.icon || raw.image || raw.icon_file || '';
-  if (image && !image.startsWith('http://') && !image.startsWith('https://') && !image.startsWith('data:') && !image.startsWith('/') && !image.startsWith('assets/')) {
-    image = type === 'app' ? `assets/app_icons/${image}` : `assets/game_icons/${image}`;
+  if (image && !image.startsWith('http://') && !image.startsWith('https://') && !image.startsWith('data:')) {
+    if (image.startsWith('assets/')) {
+      image = `${JSDELIVR_BASE}${image}`;
+    } else if (image.startsWith('/')) {
+      image = `${JSDELIVR_BASE}${image.slice(1)}`;
+    } else {
+      image = type === 'app' ? `${JSDELIVR_BASE}assets/app_icons/${image}` : `${JSDELIVR_BASE}assets/game_icons/${image}`;
+    }
   }
 
   return {
@@ -487,8 +496,11 @@ function normalizeItem(raw, type) {
 
 async function loadGames() {
   try {
-    const res = await fetch('games.json');
-    if (res.ok) {
+    let res = await fetch(`${JSDELIVR_BASE}games.json`).catch(() => null);
+    if (!res || !res.ok) {
+      res = await fetch('games.json');
+    }
+    if (res && res.ok) {
       const text = await res.text();
       if (text.trim().length > 0) {
         const json = JSON.parse(text);
@@ -505,8 +517,11 @@ async function loadGames() {
 
 async function loadApps() {
   try {
-    const res = await fetch('apps.json');
-    if (res.ok) {
+    let res = await fetch(`${JSDELIVR_BASE}apps.json`).catch(() => null);
+    if (!res || !res.ok) {
+      res = await fetch('apps.json');
+    }
+    if (res && res.ok) {
       const text = await res.text();
       if (text.trim().length > 0) {
         const json = JSON.parse(text);
@@ -641,8 +656,16 @@ function loadContentIntoIframe(iframe, rawUrl) {
           iframe.srcdoc = html;
         })
         .catch(err => {
-          console.warn('Direct code fetch fallback to relative src:', err);
-          iframe.src = localUrl;
+          // Fallback to jsDelivr CDN fetch for direct srcdoc execution
+          const cdnUrl = `${JSDELIVR_BASE}${encodeURI(cleanPath)}`;
+          fetch(cdnUrl)
+            .then(res => res.ok ? res.text() : Promise.reject())
+            .then(html => {
+              iframe.srcdoc = html;
+            })
+            .catch(() => {
+              iframe.src = localUrl;
+            });
         });
       return;
     }
@@ -652,7 +675,7 @@ function loadContentIntoIframe(iframe, rawUrl) {
   }
 
   // Fallback for file:// protocol when opened locally without a web server
-  iframe.src = `https://athyx-network.github.io/Athyx-Network/${encodeURI(cleanPath)}`;
+  iframe.src = `${JSDELIVR_BASE}${encodeURI(cleanPath)}`;
 }
 
 // Player Modal Controls
