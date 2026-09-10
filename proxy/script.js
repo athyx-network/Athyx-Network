@@ -1,3 +1,12 @@
+// Calculate base path immediately
+const basePath = (function() {
+    if (typeof location !== 'undefined' && location.pathname) {
+        return location.pathname.replace(/[^/]*$/, '');
+    }
+    return '/proxy/';
+})();
+window.basePath = basePath;
+
 if (typeof BareMux === 'undefined') {
     BareMux = {
         BareMuxConnection: class {
@@ -6,7 +15,7 @@ if (typeof BareMux === 'undefined') {
         }
     };
 }
-// Wrap everything in DOMContentLoaded to ensure DOM is ready
+
 const DEFAULT_SEARCH_ENGINES = {
     brave: { name: 'Brave Search', url: 'https://search.brave.com/search?q=' },
     duckduckgo: { name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=' },
@@ -18,43 +27,54 @@ const DEFAULT_SEARCH_ENGINES = {
 let scramjet;
 
 document.addEventListener('DOMContentLoaded', async function () {
-    if (typeof basePath === 'undefined') {
-        window.basePath = location.pathname.replace(/[^/]*$/, '');
+    try {
+        if (typeof $scramjetLoadController === 'function') {
+            const { ScramjetController } = $scramjetLoadController();
+            scramjet = new ScramjetController({
+                prefix: basePath + 'JS/scramjet/',
+                files: {
+                    wasm: basePath + 'JS/scramjet.wasm.wasm',
+                    all: basePath + 'JS/scramjet.all.js',
+                    sync: basePath + 'JS/scramjet.sync.js',
+                },
+            });
+            scramjet.init();
+        }
+    } catch (e) {
+        console.warn('Scramjet controller initialization error:', e);
     }
 
-    const { ScramjetController } = $scramjetLoadController();
-
-    // Configure Scramjet controller with the correct prefix
-    scramjet = new ScramjetController({
-        prefix: basePath + 'JS/scramjet/',
-        files: {
-            wasm: basePath + 'JS/scramjet.wasm.wasm',
-            all: basePath + 'JS/scramjet.all.js',
-            sync: basePath + 'JS/scramjet.sync.js',
-        },
-    });
-
-    scramjet.init();
     // Dynamic path calculation for subfolder hosting compatibility
-    await navigator.serviceWorker.register(basePath + 'sw.js', { scope: basePath });
-    // Send the WISP URL to the service worker once it's ready
-    navigator.serviceWorker.ready.then((registration) => {
-        registration.active.postMessage({
-            type: "config",
-            wispurl: localStorage.getItem("proxServer") || _CONFIG.wispurl,
-        });
-    });
+    if ('serviceWorker' in navigator) {
+        try {
+            await navigator.serviceWorker.register(basePath + 'sw.js', { scope: basePath });
+            navigator.serviceWorker.ready.then((registration) => {
+                if (registration.active) {
+                    registration.active.postMessage({
+                        type: "config",
+                        wispurl: localStorage.getItem("proxServer") || _CONFIG.wispurl,
+                    });
+                }
+            });
+        } catch (swErr) {
+            console.warn('SW registration warning:', swErr);
+        }
+    }
 });
 
 const connection = new BareMux.BareMuxConnection(`${basePath}B/worker.js`);
 const store = {
     url: "https://",
-    wispurl: localStorage.getItem("proxServer") || _CONFIG.wispurl,
-    bareurl: _CONFIG?.bareurl || (location.protocol === "https:" ? "https" : "http") + "://" + location.host + "/bare/"
+    wispurl: (typeof _CONFIG !== 'undefined' ? (localStorage.getItem("proxServer") || _CONFIG.wispurl) : "wss://lunarrr.eminescusm.ro/w/"),
+    bareurl: (typeof _CONFIG !== 'undefined' && _CONFIG?.bareurl) ? _CONFIG.bareurl : ((location.protocol === "https:" ? "https" : "http") + "://" + location.host + "/bare/")
 };
-connection.setTransport(`${basePath}Ep/index.mjs`, [{
-    wisp: store.wispurl
-}]);
+try {
+    connection.setTransport(`${basePath}Ep/index.mjs`, [{
+        wisp: store.wispurl
+    }]);
+} catch (e) {
+    console.warn('BareMux setTransport warning:', e);
+}
 
 // Monitor WISP connection health
 setInterval(testWispHealth, 60000); // Check every minute
