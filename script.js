@@ -625,17 +625,34 @@ function loadContentIntoIframe(iframe, rawUrl) {
   // Clean relative path (remove leading slashes / dots)
   const cleanPath = rawUrl.replace(/^\.?\/+/, '');
 
-  // If running on localhost or 127.0.0.1, use local dev server URL
-  if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+  // If running on any HTTP/HTTPS server or CDN (githubraw.com, localhost, GitHub Pages, custom domain, etc.)
+  if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) {
     const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-    iframe.src = `${window.location.origin}${basePath}${encodeURI(cleanPath)}`;
+    const localUrl = `${window.location.origin}${basePath}${encodeURI(cleanPath)}`;
+
+    // For HTML apps, directly fetch and execute the app code inside the iframe via srcdoc so it runs locally on the current CDN/host
+    if (cleanPath.startsWith('apps/') || cleanPath.endsWith('.html')) {
+      fetch(localUrl)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.text();
+        })
+        .then(html => {
+          iframe.srcdoc = html;
+        })
+        .catch(err => {
+          console.warn('Direct code fetch fallback to relative src:', err);
+          iframe.src = localUrl;
+        });
+      return;
+    }
+
+    iframe.src = localUrl;
     return;
   }
 
-  // Always route to GitHub Pages which serves Content-Type: text/html; charset=utf-8!
-  // This completely prevents jsDelivr text/plain rendering and avoids srcdoc null-origin restrictions
-  const targetUrl = `https://athyx-network.github.io/Athyx-Network/${encodeURI(cleanPath)}`;
-  iframe.src = targetUrl;
+  // Fallback for file:// protocol when opened locally without a web server
+  iframe.src = `https://athyx-network.github.io/Athyx-Network/${encodeURI(cleanPath)}`;
 }
 
 // Player Modal Controls
@@ -706,7 +723,7 @@ window.addEventListener('keydown', (e) => {
 const proxyIframeEl = document.getElementById('proxyIframe');
 if (proxyIframeEl) {
   proxyIframeEl.removeAttribute('srcdoc');
-  if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('jsdelivr')) {
+  if (window.location.protocol.startsWith('http')) {
     const currentFolder = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
     proxyIframeEl.src = `${window.location.origin}${currentFolder}proxy/index.html`;
   } else {
