@@ -109,7 +109,7 @@
     <!-- PROXY PAGE -->
     <section id="proxy-section" class="tab-panel">
       <div class="proxy-page-wrapper">
-        <iframe src="https://athyx-network.github.io/Athyx-Network/proxy/index.html" id="proxyIframe" class="proxy-iframe" title="Web Proxy" allow="clipboard-read; clipboard-write; fullscreen; encrypted-media; autoplay"></iframe>
+        <iframe src="https://athyx-network.github.io/Athyx-Network/proxy/index.html" id="proxyIframe" class="proxy-iframe" title="Web Proxy" allow="clipboard-read; clipboard-write; fullscreen; encrypted-media; autoplay; gamepad"></iframe>
       </div>
     </section>
 
@@ -297,12 +297,12 @@
         </div>
       </div>
       <div class="player-iframe-wrapper">
-        <iframe id="playerIframe" src="" allowfullscreen="allowfullscreen" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
+        <iframe id="playerIframe" src="" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write"></iframe>
       </div>
     </div>
   </div>
 
-  <script src="script.js?v=7"></script>
+  <script src="https://athyx-network.github.io/Athyx-Network/script.js?v=10"></script>
 </body>
 </html>
 </foreignObject>
