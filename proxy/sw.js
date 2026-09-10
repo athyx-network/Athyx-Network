@@ -43,52 +43,28 @@ self.addEventListener("fetch", (event) => {
     })());
 });
 
-let wispConfig = {};
-
-// Prevent Race Condition: Create a promise that resolves when the config message is received.
-let resolveConfigReady;
-const configReadyPromise = new Promise(resolve => {
-    resolveConfigReady = resolve;
-});
+let wispConfig = {
+    wispurl: "wss://lunarrr.eminescusm.ro/w/"
+};
 
 self.addEventListener("message", ({ data }) => {
-	if (data.type === "config" && data.wispurl) {
+	if (data && data.type === "config" && data.wispurl) {
 		wispConfig.wispurl = data.wispurl;
-        if (resolveConfigReady) {
-            resolveConfigReady();
-            resolveConfigReady = null; // Ensure it only resolves once
-        }
+        configureBareMux(data.wispurl);
 	}
 });
 
-// The main Scramjet listener where the proxying logic happens.
-scramjet.addEventListener("request", async (e) => {
-	e.response = (async () => {
-		// Use a single, persistent client instance on the scramjet object.
-		if (!scramjet.client) {
-            // Wait for the WISP URL to be sent from the main page.
-            await configReadyPromise;
+let transportReady = false;
+async function configureBareMux(wispUrl) {
+    try {
+        const targetWisp = wispUrl || wispConfig.wispurl;
+        const connection = new BareMux.BareMuxConnection(`${basePath}B/worker.js`);
+        await connection.setTransport(`${basePath}Ep/index.mjs`, [{ wisp: targetWisp }]);
+        transportReady = true;
+    } catch (err) {
+        console.warn("SW BareMux transport config warning:", err);
+    }
+}
 
-            if (!wispConfig.wispurl) {
-                 console.error("WISP URL is missing. Cannot configure BareMux.");
-                 return new Response("WISP URL configuration failed in SW.", { status: 500, statusText: "Internal Server Error" });
-            }
-
-            const connection = new BareMux.BareMuxConnection(`${basePath}B/worker.js`);
-			await connection.setTransport(`${basePath}Ep/index.mjs`, [{ wisp: wispConfig.wispurl }]);
-			scramjet.client = connection;
-		}
-
-		// Simplified fetch logic without the inspector parts for clarity
-		return await scramjet.client.fetch(e.url, {
-            method: e.method,
-            body: e.body,
-            headers: e.requestHeaders,
-            credentials: "omit",
-            mode: e.mode === "cors" ? e.mode : "same-origin",
-            cache: e.cache,
-            redirect: "manual",
-            duplex: "half",
-        });
-	})();
-});
+// Initial configuration
+configureBareMux(wispConfig.wispurl);

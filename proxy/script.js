@@ -42,10 +42,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Dynamic path calculation for subfolder hosting compatibility
     if ('serviceWorker' in navigator) {
         try {
-            await navigator.serviceWorker.register(basePath + 'sw.js', { scope: basePath });
+            await navigator.serviceWorker.register(basePath + 'sw.js?v=11', { scope: basePath });
             navigator.serviceWorker.ready.then((registration) => {
-                if (registration.active) {
-                    registration.active.postMessage({
+                const sw = registration.active || registration.installing || registration.waiting || navigator.serviceWorker.controller;
+                if (sw) {
+                    sw.postMessage({
                         type: "config",
                         wispurl: localStorage.getItem("proxServer") || _CONFIG.wispurl,
                     });
@@ -81,6 +82,10 @@ let sortableInstance = null;
 
 function createTab(makeActive = true) {
     const frame = scramjet.createFrame();
+    if (frame && frame.frame) {
+        frame.frame.setAttribute("allow", "autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated");
+        frame.frame.setAttribute("allowfullscreen", "");
+    }
     const tab = {
         id: nextTabId++,
         title: "Loading...",
@@ -342,13 +347,14 @@ function toggleDevTools() {
         };
         frameWindow.document.body.appendChild(script);
     }
-}
 window.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'navigate' && event.data.url) {
-        getActiveTab()?.frame.go(event.data.url);
+        const activeTab = getActiveTab() || (tabs.length > 0 ? tabs[0] : null);
+        if (activeTab && activeTab.frame) {
+            activeTab.frame.go(event.data.url);
+        }
     }
-}
-);
+});
 // Check for hash parameters after initialization
 async function initializeBrowser() {
     const root = document.getElementById("app");
