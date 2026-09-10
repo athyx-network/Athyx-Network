@@ -609,54 +609,33 @@ if (appsSearchInput) {
   appsSearchInput.addEventListener('input', filterApps);
 }
 
-// Helper to load HTML into iframes via srcdoc (bypasses jsDelivr text/plain content-type)
-async function loadContentIntoIframe(iframe, url) {
-  if (!iframe || !url) return;
+// Helper to load game/app content into iframe with full HTML context & web APIs
+function loadContentIntoIframe(iframe, rawUrl) {
+  if (!iframe || !rawUrl) return;
 
-  const isExternalHttp = url.startsWith('http://') || (url.startsWith('https://') && !url.includes('jsdelivr.net') && !url.includes('github.io') && !url.includes('githubusercontent.com') && !url.includes('githack.com'));
-  if (isExternalHttp) {
-    iframe.removeAttribute('srcdoc');
-    iframe.src = url;
+  // Clear srcdoc completely so browser doesn't use stale srcdoc
+  iframe.removeAttribute('srcdoc');
+
+  // If already absolute external URL
+  if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+    iframe.src = rawUrl;
     return;
   }
 
-  let resolvedUrl = url;
-  try {
-    resolvedUrl = new URL(url, document.baseURI || window.location.href).href;
-  } catch (e) {
-    resolvedUrl = url;
+  // Clean relative path (remove leading slashes / dots)
+  const cleanPath = rawUrl.replace(/^\.?\/+/, '');
+
+  // If running on localhost or 127.0.0.1, use local dev server URL
+  if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    iframe.src = `${window.location.origin}${basePath}${encodeURI(cleanPath)}`;
+    return;
   }
 
-  try {
-    const separator = resolvedUrl.includes('?') ? '&' : '?';
-    const fetchUrl = resolvedUrl.includes('_t=') ? resolvedUrl : `${resolvedUrl}${separator}_t=${Date.now()}`;
-    const res = await fetch(fetchUrl);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    let html = await res.text();
-
-    const cleanUrl = resolvedUrl.split('?')[0];
-    const fileBaseUrl = cleanUrl.substring(0, cleanUrl.lastIndexOf('/') + 1);
-
-    if (!/<base\s+[^>]*href=/i.test(html)) {
-      if (/<head[^>]*>/i.test(html)) {
-        html = html.replace(/<head[^>]*>/i, `$&<base href="${fileBaseUrl}">`);
-      } else {
-        html = `<base href="${fileBaseUrl}">` + html;
-      }
-    }
-
-    // Do NOT set src='about:blank' here because that initiates a competing navigation
-    iframe.removeAttribute('src');
-    iframe.srcdoc = html;
-  } catch (err) {
-    console.warn('Could not fetch HTML for srcdoc, falling back to direct src:', err);
-    iframe.removeAttribute('srcdoc');
-    let fallbackSrc = resolvedUrl;
-    if (fallbackSrc.includes('cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/')) {
-      fallbackSrc = fallbackSrc.replace('https://cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/', 'https://athyx-network.github.io/Athyx-Network/');
-    }
-    iframe.src = fallbackSrc;
-  }
+  // Always route to GitHub Pages which serves Content-Type: text/html; charset=utf-8!
+  // This completely prevents jsDelivr text/plain rendering and avoids srcdoc null-origin restrictions
+  const targetUrl = `https://athyx-network.github.io/Athyx-Network/${encodeURI(cleanPath)}`;
+  iframe.src = targetUrl;
 }
 
 // Player Modal Controls
@@ -689,7 +668,7 @@ function closePlayer() {
   if (!playerModal) return;
   if (playerIframe) {
     playerIframe.removeAttribute('srcdoc');
-    playerIframe.removeAttribute('src');
+    playerIframe.src = 'about:blank';
   }
   playerModal.classList.remove('active');
   activePlayerItem = null;
@@ -735,7 +714,11 @@ if (proxyIframeEl) {
   }
 }
 
-// Load Games & Apps from JSON files
+// Render games and apps immediately from embedded data
+filterGames();
+filterApps();
+
+// Load Games & Apps from JSON files in background
 loadGames();
 loadApps();
 
