@@ -92,7 +92,6 @@ function createTab(makeActive = true) {
     const frame = scramjet.createFrame();
     if (frame && frame.frame) {
         frame.frame.setAttribute("allow", "autoplay; fullscreen; gamepad; clipboard-read; clipboard-write");
-        frame.frame.setAttribute("allowfullscreen", "");
     }
     const tab = {
         id: nextTabId++,
@@ -355,6 +354,8 @@ function toggleDevTools() {
         };
         frameWindow.document.body.appendChild(script);
     }
+}
+
 window.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'navigate' && event.data.url) {
         const activeTab = getActiveTab() || (tabs.length > 0 ? tabs[0] : null);
