@@ -25,7 +25,7 @@
     <section id="home-section" class="tab-panel active">
       <div class="home-version-badge" id="versionBadge" title="Release Version">
         <span class="version-dot"></span>
-        <span class="version-text">v1</span>
+        <span class="version-text">v2</span>
       </div>
       <div class="home-container">
         <div class="home-header">
@@ -113,7 +113,7 @@
     <!-- PROXY PAGE -->
     <section id="proxy-section" class="tab-panel">
       <div class="proxy-page-wrapper">
-        <iframe src="https://athyx-network.github.io/Athyx-Network/proxy/index.html" id="proxyIframe" class="proxy-iframe" title="Web Proxy" allow="clipboard-read; clipboard-write; fullscreen; encrypted-media; autoplay; gamepad"></iframe>
+        <iframe src="proxy/index.html" id="proxyIframe" class="proxy-iframe" title="Web Proxy" allow="clipboard-read; clipboard-write; fullscreen; encrypted-media; autoplay; gamepad"></iframe>
       </div>
     </section>
 
@@ -306,7 +306,17 @@
     </div>
   </div>
 
-  <script src="https://athyx-network.github.io/Athyx-Network/script.js?v=10"></script>
+  <script><![CDATA[if (window.location.protocol === 'file:') {
+      var pi = document.getElementById('proxyIframe');
+      if (pi) pi.src = 'https://athyx-network.github.io/Athyx-Network/proxy/index.html';
+      var s = document.createElement('script');
+      s.src = 'https://athyx-network.github.io/Athyx-Network/script.js?v=12';
+      document.body.appendChild(s);
+    } else {
+      var s = document.createElement('script');
+      s.src = 'script.js?v=12';
+      document.body.appendChild(s);
+    }]]></script>
 </body>
 </html>
 </foreignObject>
