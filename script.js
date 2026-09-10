@@ -672,10 +672,16 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// Initialize proxy iframe if on jsDelivr base
+// Initialize proxy iframe with live URL
 const proxyIframeEl = document.getElementById('proxyIframe');
 if (proxyIframeEl) {
-  loadContentIntoIframe(proxyIframeEl, 'proxy/index.html');
+  proxyIframeEl.removeAttribute('srcdoc');
+  if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('jsdelivr')) {
+    const currentFolder = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    proxyIframeEl.src = `${window.location.origin}${currentFolder}proxy/index.html`;
+  } else {
+    proxyIframeEl.src = 'https://athyx-network.github.io/Athyx-Network/proxy/index.html';
+  }
 }
 
 // Load Games & Apps from JSON files
