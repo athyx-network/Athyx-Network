@@ -1,10 +1,5 @@
 // Calculate base path immediately
-const basePath = (function() {
-    if (typeof location !== 'undefined' && location.pathname) {
-        return location.pathname.replace(/[^/]*$/, '');
-    }
-    return '/proxy/';
-})();
+var basePath = window.basePath || (typeof location !== 'undefined' && location.pathname ? location.pathname.replace(/[^/]*$/, '') : '/proxy/');
 window.basePath = basePath;
 
 if (typeof BareMux === 'undefined') {
