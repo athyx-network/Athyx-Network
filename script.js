@@ -401,8 +401,49 @@ window.addEventListener('keydown', (e) => {
 // GAMES & APPS SYSTEM
 // ==========================================
 
-let gamesData = [];
-let appsData = [];
+const DEFAULT_GAMES_LIST = [
+  { "name": "Angry Birds", "path": "games/Angry Birds.html", "icon": "angry_birds.png" },
+  { "name": "Bad Piggies", "path": "games/Bad Piggies.html", "icon": "bad_piggies.png" },
+  { "name": "Baldi's Basics", "path": "games/Baldis Basics.html", "icon": "baldis_basics.png" },
+  { "name": "Basketball Stars", "path": "games/Basketball Stars.html", "icon": "basketball_stars.png" },
+  { "name": "Block Blast", "path": "games/Block Blast.html", "icon": "block_blast.png" },
+  { "name": "Bowmasters", "path": "games/Bow Masters.html", "icon": "bow_masters.png" },
+  { "name": "Brawl Stars", "path": "games/Brawl Stars.html", "icon": "brawl_stars.png" },
+  { "name": "Cluster Rush", "path": "games/Cluster Rush.html", "icon": "cluster_rush.png" },
+  { "name": "Cookie Clicker", "path": "games/Cookie Clicker.html", "icon": "cookie_clicker.png" },
+  { "name": "Crossy Road", "path": "games/Crossy Road.html", "icon": "crossy_road.png" },
+  { "name": "DOOM", "path": "games/Doom.html", "icon": "doom.png" },
+  { "name": "Five Nights at Epstein's", "path": "games/Five Nights At Epsteins.html", "icon": "five_nights_at_epsteins.png" },
+  { "name": "Five Nights at Freddy's", "path": "games/Five Nights At Freddys.html", "icon": "fnaf1.png" },
+  { "name": "Five Nights at Freddy's 2", "path": "games/Five Nights At Freddys 2.html", "icon": "fnaf2.png" },
+  { "name": "Geometry Dash", "path": "games/Geometry Dash.html", "icon": "geometry_dash.svg" },
+  { "name": "Chrome Dino", "path": "games/Google Dino.html", "icon": "google_dino.png" },
+  { "name": "Granny", "path": "games/Granny.html", "icon": "granny.png" },
+  { "name": "Helix Jump", "path": "games/Helix Jump.html", "icon": "helix_jump.png" },
+  { "name": "Hypper Sandbox", "path": "games/Hypper Sandbox.html", "icon": "hypper_sandbox.png" },
+  { "name": "Minecraft", "path": "games/Minecraft.html", "icon": "minecraft.png" },
+  { "name": "Moto X3M", "path": "games/Moto X3m.html", "icon": "moto_x3m.png" },
+  { "name": "Obby 99% Will Lose", "path": "games/Obby 99% will lose.html", "icon": "obby.png" },
+  { "name": "OvO", "path": "games/OvO.html", "icon": "ovo.png" },
+  { "name": "Plants vs. Zombies", "path": "games/Plants VS Zombies.html", "icon": "pvz.png" },
+  { "name": "Raldi's Crackhouse", "path": "games/Raldis Crackhouse.html", "icon": "raldis_crackhouse.png" },
+  { "name": "Retro Bowl", "path": "games/Retro Bowl.html", "icon": "retro_bowl.png" },
+  { "name": "Snow Rider 3D", "path": "games/Snow Rider.html", "icon": "snow_rider.png" },
+  { "name": "Subway Surfers: St. Petersburg", "path": "games/Subway Surfers: St .Petersburg.html", "icon": "subway_surfers.png" },
+  { "name": "Wordle", "path": "games/Wordle.html", "icon": "wordle.png" }
+];
+
+const DEFAULT_APPS_LIST = [
+  { "name": "DOS Wasm X", "path": "apps/Dos Wasm X.html", "icon": "dos_wasm_x.png" },
+  { "name": "EmulatorJS", "path": "apps/Emulator JS.html", "icon": "emulatorjs.png" },
+  { "name": "Meowio NES Emulator", "path": "apps/Meowio NES Emulator.html", "icon": "nes_emulator.png" },
+  { "name": "PICO-8 Education Edition", "path": "apps/Pico 8 Edu.html", "icon": "pico8.png" },
+  { "name": "TurboWarp (Scratch Plus)", "path": "apps/Scratch Plus (Turbowarp).html", "icon": "turbowarp.png" },
+  { "name": "Silk", "path": "apps/Silk.html", "icon": "silk.png" }
+];
+
+let gamesData = DEFAULT_GAMES_LIST.map(item => normalizeItem(item, 'game')).filter(Boolean);
+let appsData = DEFAULT_APPS_LIST.map(item => normalizeItem(item, 'app')).filter(Boolean);
 
 // Elements for Games & Apps
 const gamesGrid = document.getElementById('gamesGrid');
@@ -451,7 +492,7 @@ async function loadGames() {
       const text = await res.text();
       if (text.trim().length > 0) {
         const json = JSON.parse(text);
-        if (Array.isArray(json)) {
+        if (Array.isArray(json) && json.length > 0) {
           gamesData = json.map(item => normalizeItem(item, 'game')).filter(Boolean);
         }
       }
@@ -469,7 +510,7 @@ async function loadApps() {
       const text = await res.text();
       if (text.trim().length > 0) {
         const json = JSON.parse(text);
-        if (Array.isArray(json)) {
+        if (Array.isArray(json) && json.length > 0) {
           appsData = json.map(item => normalizeItem(item, 'app')).filter(Boolean);
         }
       }
@@ -572,19 +613,24 @@ if (appsSearchInput) {
 async function loadContentIntoIframe(iframe, url) {
   if (!iframe || !url) return;
 
-  const isExternalHttp = url.startsWith('http://') || (url.startsWith('https://') && !url.includes('jsdelivr.net') && !url.includes('github.io') && !url.includes('githubusercontent.com'));
+  const isExternalHttp = url.startsWith('http://') || (url.startsWith('https://') && !url.includes('jsdelivr.net') && !url.includes('github.io') && !url.includes('githubusercontent.com') && !url.includes('githack.com'));
   if (isExternalHttp) {
     iframe.removeAttribute('srcdoc');
     iframe.src = url;
     return;
   }
 
-  const separator = url.includes('?') ? '&' : '?';
-  const urlWithCacheBuster = url.includes('_t=') ? url : `${url}${separator}_t=${Date.now()}`;
-  const resolvedUrl = new URL(urlWithCacheBuster, document.baseURI || window.location.href).href;
+  let resolvedUrl = url;
+  try {
+    resolvedUrl = new URL(url, document.baseURI || window.location.href).href;
+  } catch (e) {
+    resolvedUrl = url;
+  }
 
   try {
-    const res = await fetch(resolvedUrl);
+    const separator = resolvedUrl.includes('?') ? '&' : '?';
+    const fetchUrl = resolvedUrl.includes('_t=') ? resolvedUrl : `${resolvedUrl}${separator}_t=${Date.now()}`;
+    const res = await fetch(fetchUrl);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     let html = await res.text();
 
@@ -599,12 +645,17 @@ async function loadContentIntoIframe(iframe, url) {
       }
     }
 
-    iframe.src = 'about:blank';
+    // Do NOT set src='about:blank' here because that initiates a competing navigation
+    iframe.removeAttribute('src');
     iframe.srcdoc = html;
   } catch (err) {
     console.warn('Could not fetch HTML for srcdoc, falling back to direct src:', err);
     iframe.removeAttribute('srcdoc');
-    iframe.src = resolvedUrl;
+    let fallbackSrc = resolvedUrl;
+    if (fallbackSrc.includes('cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/')) {
+      fallbackSrc = fallbackSrc.replace('https://cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/', 'https://athyx-network.github.io/Athyx-Network/');
+    }
+    iframe.src = fallbackSrc;
   }
 }
 
@@ -638,7 +689,7 @@ function closePlayer() {
   if (!playerModal) return;
   if (playerIframe) {
     playerIframe.removeAttribute('srcdoc');
-    playerIframe.src = 'about:blank';
+    playerIframe.removeAttribute('src');
   }
   playerModal.classList.remove('active');
   activePlayerItem = null;
