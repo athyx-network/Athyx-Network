@@ -2,6 +2,14 @@
 var basePath = window.basePath || (typeof location !== 'undefined' && location.pathname ? location.pathname.replace(/[^/]*$/, '') : '/proxy/');
 window.basePath = basePath;
 
+// Immediately purge any banned legacy counter3/leelive URLs from localStorage
+try {
+    const saved = localStorage.getItem('proxServer');
+    if (saved && (saved.includes('counter3') || saved.includes('leelive') || !saved.includes('://'))) {
+        localStorage.removeItem('proxServer');
+    }
+} catch (e) {}
+
 if (typeof BareMux === 'undefined') {
     BareMux = {
         BareMuxConnection: class {
@@ -33,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     sync: basePath + 'JS/scramjet.sync.js',
                 },
             });
-            scramjet.init();
+            await scramjet.init();
         }
     } catch (e) {
         console.warn('Scramjet controller initialization error:', e);
@@ -42,13 +50,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Dynamic path calculation for subfolder hosting compatibility
     if ('serviceWorker' in navigator) {
         try {
-            await navigator.serviceWorker.register(basePath + 'sw.js?v=11', { scope: basePath });
+            await navigator.serviceWorker.register(basePath + 'sw.js?v=12', { scope: basePath });
             navigator.serviceWorker.ready.then((registration) => {
                 const sw = registration.active || registration.installing || registration.waiting || navigator.serviceWorker.controller;
                 if (sw) {
                     sw.postMessage({
                         type: "config",
-                        wispurl: localStorage.getItem("proxServer") || _CONFIG.wispurl,
+                        wispurl: localStorage.getItem("proxServer") || (typeof _CONFIG !== 'undefined' ? _CONFIG.wispurl : "wss://lunarrr.eminescusm.ro/w/"),
                     });
                 }
             });
@@ -83,7 +91,7 @@ let sortableInstance = null;
 function createTab(makeActive = true) {
     const frame = scramjet.createFrame();
     if (frame && frame.frame) {
-        frame.frame.setAttribute("allow", "autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated");
+        frame.frame.setAttribute("allow", "autoplay; fullscreen; gamepad; clipboard-read; clipboard-write");
         frame.frame.setAttribute("allowfullscreen", "");
     }
     const tab = {
@@ -351,6 +359,12 @@ window.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'navigate' && event.data.url) {
         const activeTab = getActiveTab() || (tabs.length > 0 ? tabs[0] : null);
         if (activeTab && activeTab.frame) {
+            const addressBar = document.getElementById("address-bar");
+            if (addressBar) addressBar.value = event.data.url;
+            activeTab.url = event.data.url;
+            activeTab.loading = true;
+            activeTab.progress = 20;
+            updateLoadingBar(activeTab);
             activeTab.frame.go(event.data.url);
         }
     }

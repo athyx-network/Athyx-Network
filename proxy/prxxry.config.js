@@ -17,6 +17,14 @@ function normalizeWispUrl(url) {
 
 const DEFAULT_WISP_URL = "wss://lunarrr.eminescusm.ro/w/";
 
+// Immediately purge any banned legacy counter3/leelive URLs from localStorage
+try {
+  const saved = localStorage.getItem("proxServer");
+  if (saved && (saved.includes("leelive") || saved.includes("counter3") || !saved.includes("://"))) {
+    localStorage.removeItem("proxServer");
+  }
+} catch (e) {}
+
 let _CONFIG = {
   wispurl: normalizeWispUrl(localStorage.getItem("proxServer")) || DEFAULT_WISP_URL,
   bareurl: undefined
