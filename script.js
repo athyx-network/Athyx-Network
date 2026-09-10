@@ -568,6 +568,46 @@ if (appsSearchInput) {
   appsSearchInput.addEventListener('input', filterApps);
 }
 
+// Helper to load HTML into iframes via srcdoc (bypasses jsDelivr text/plain content-type)
+async function loadContentIntoIframe(iframe, url) {
+  if (!iframe || !url) return;
+
+  const isExternalHttp = url.startsWith('http://') || (url.startsWith('https://') && !url.includes('jsdelivr.net') && !url.includes('github.io') && !url.includes('githubusercontent.com'));
+  if (isExternalHttp) {
+    iframe.removeAttribute('srcdoc');
+    iframe.src = url;
+    return;
+  }
+
+  const separator = url.includes('?') ? '&' : '?';
+  const urlWithCacheBuster = url.includes('_t=') ? url : `${url}${separator}_t=${Date.now()}`;
+  const resolvedUrl = new URL(urlWithCacheBuster, document.baseURI || window.location.href).href;
+
+  try {
+    const res = await fetch(resolvedUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    let html = await res.text();
+
+    const cleanUrl = resolvedUrl.split('?')[0];
+    const fileBaseUrl = cleanUrl.substring(0, cleanUrl.lastIndexOf('/') + 1);
+
+    if (!/<base\s+[^>]*href=/i.test(html)) {
+      if (/<head[^>]*>/i.test(html)) {
+        html = html.replace(/<head[^>]*>/i, `$&<base href="${fileBaseUrl}">`);
+      } else {
+        html = `<base href="${fileBaseUrl}">` + html;
+      }
+    }
+
+    iframe.src = 'about:blank';
+    iframe.srcdoc = html;
+  } catch (err) {
+    console.warn('Could not fetch HTML for srcdoc, falling back to direct src:', err);
+    iframe.removeAttribute('srcdoc');
+    iframe.src = resolvedUrl;
+  }
+}
+
 // Player Modal Controls
 function openPlayer(item, type) {
   if (!playerModal) return;
@@ -578,10 +618,6 @@ function openPlayer(item, type) {
     playerTypeIcon.className = type === 'game' ? 'fa-solid fa-gamepad' : 'fa-solid fa-shapes';
   }
   if (playerIframe) {
-    // Add cache-busting parameter for local files to prevent browser caching stale scripts
-    const separator = item.url.includes('?') ? '&' : '?';
-    const finalUrl = item.url.startsWith('http') ? item.url : `${item.url}${separator}_t=${Date.now()}`;
-    
     playerIframe.onload = () => {
       try {
         if (playerIframe.contentWindow) {
@@ -592,7 +628,7 @@ function openPlayer(item, type) {
       } catch (e) {}
     };
 
-    playerIframe.src = finalUrl;
+    loadContentIntoIframe(playerIframe, item.url);
   }
   
   playerModal.classList.add('active');
@@ -600,7 +636,10 @@ function openPlayer(item, type) {
 
 function closePlayer() {
   if (!playerModal) return;
-  if (playerIframe) playerIframe.src = '';
+  if (playerIframe) {
+    playerIframe.removeAttribute('srcdoc');
+    playerIframe.src = 'about:blank';
+  }
   playerModal.classList.remove('active');
   activePlayerItem = null;
   if (document.fullscreenElement) {
@@ -632,6 +671,12 @@ window.addEventListener('keydown', (e) => {
     closePlayer();
   }
 });
+
+// Initialize proxy iframe if on jsDelivr base
+const proxyIframeEl = document.getElementById('proxyIframe');
+if (proxyIframeEl) {
+  loadContentIntoIframe(proxyIframeEl, 'proxy/index.html');
+}
 
 // Load Games & Apps from JSON files
 loadGames();
