@@ -731,4 +731,6 @@ function updateLoadingBar(tab) {
     }
 }
 
-module.exports = { addNewShortcutButton };
+if (typeof module !== 'undefined' && module && module.exports) {
+    module.exports = { addNewShortcutButton };
+}
