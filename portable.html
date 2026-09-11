@@ -22,7 +22,7 @@
     <section id="home-section" class="tab-panel active">
       <div class="home-version-badge" id="versionBadge" title="Release Version">
         <span class="version-dot"></span>
-        <span class="version-text">v2</span>
+        <span class="version-text">v3</span>
       </div>
       <div class="home-container">
         <div class="home-header">
@@ -31,8 +31,8 @@
 
         <!-- Search Bar with Mode Selector on Right -->
         <div class="home-search-bar">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="text" id="homeSearchInput" placeholder="Search games..." />
+          <i class="fa-solid fa-magnifying-glass search-icon" id="homeSearchIcon" style="cursor: pointer;"></i>
+          <input type="text" id="homeSearchInput" placeholder="Search games..." autocomplete="off" spellcheck="false" />
           <div class="search-divider"></div>
           <div class="search-mode-select" id="searchModeSelect">
             <button type="button" class="mode-toggle-btn" id="modeToggleBtn">
@@ -65,14 +65,18 @@
         <div class="page-header-row">
           <div class="page-title-group">
             <h2 class="section-page-title"><i class="fa-solid fa-gamepad"></i> Games</h2>
+            <span class="search-count-badge" id="gamesSearchCount"></span>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSd75ahNiXbp8Pu9TDx6U-mZiHjQnJw2p7uB_zvVJMqJKsCJfA/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer" class="suggest-btn" title="Suggest a Game" style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.42rem 0.95rem; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 9999px; color: #8e8e93; font-size: 0.82rem; font-weight: 500; text-decoration: none; transition: all 0.2s ease;">
               <i class="fa-solid fa-plus" style="font-size: 0.75rem;"></i>
               <span>Suggest Game</span>
             </a>
           </div>
-          <div class="page-search-wrapper">
-            <i class="fa-solid fa-magnifying-glass page-search-icon"></i>
-            <input type="text" id="gamesSearchInput" class="page-search-input" placeholder="Search games..." />
+          <div class="custom-search-box page-search-wrapper">
+            <i class="fa-solid fa-magnifying-glass page-search-icon" id="gamesSearchIcon"></i>
+            <input type="text" id="gamesSearchInput" class="page-search-input custom-search-input" placeholder="Search games..." autocomplete="off" spellcheck="false" />
+            <button type="button" class="search-clear-btn" id="gamesSearchClear" title="Clear search" style="display: none;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </div>
 
@@ -91,10 +95,14 @@
         <div class="page-header-row">
           <div class="page-title-group">
             <h2 class="section-page-title"><i class="fa-solid fa-shapes"></i> Apps</h2>
+            <span class="search-count-badge" id="appsSearchCount"></span>
           </div>
-          <div class="page-search-wrapper">
-            <i class="fa-solid fa-magnifying-glass page-search-icon"></i>
-            <input type="text" id="appsSearchInput" class="page-search-input" placeholder="Search apps..." />
+          <div class="custom-search-box page-search-wrapper">
+            <i class="fa-solid fa-magnifying-glass page-search-icon" id="appsSearchIcon"></i>
+            <input type="text" id="appsSearchInput" class="page-search-input custom-search-input" placeholder="Search apps..." autocomplete="off" spellcheck="false" />
+            <button type="button" class="search-clear-btn" id="appsSearchClear" title="Clear search" style="display: none;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </div>
 

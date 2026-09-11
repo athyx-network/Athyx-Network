@@ -102,21 +102,24 @@ if (modeToggleBtn && searchModeSelect) {
 }
 
 function handleHomeSearch() {
-  if (!homeSearchInput) return;
-  const val = homeSearchInput.value.trim();
+  const input = document.getElementById('homeSearchInput');
+  if (!input) return;
+  const val = input.value.trim();
   // Switch to selected tab (games, apps, or proxy)
   switchTab(currentSearchMode);
   
   if (currentSearchMode === 'games') {
-    if (gamesSearchInput) {
-      gamesSearchInput.value = val;
-      filterGames();
+    const gamesInput = document.getElementById('gamesSearchInput');
+    if (gamesInput) {
+      gamesInput.value = val;
     }
+    filterGames();
   } else if (currentSearchMode === 'apps') {
-    if (appsSearchInput) {
-      appsSearchInput.value = val;
-      filterApps();
+    const appsInput = document.getElementById('appsSearchInput');
+    if (appsInput) {
+      appsInput.value = val;
     }
+    filterApps();
   } else if (currentSearchMode === 'proxy') {
     const proxyIframe = document.getElementById('proxyIframe');
     if (proxyIframe && val) {
@@ -134,6 +137,11 @@ if (homeSearchInput) {
   homeSearchInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') handleHomeSearch();
   });
+}
+
+const homeSearchIcon = document.getElementById('homeSearchIcon');
+if (homeSearchIcon) {
+  homeSearchIcon.addEventListener('click', handleHomeSearch);
 }
 
 // Base URL for jsDelivr CDN
@@ -566,63 +574,194 @@ function createCard(item, type) {
   return card;
 }
 
+function matchesSearch(item, query) {
+  if (!query) return true;
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+
+  const title = (item.title || item.name || '').toLowerCase();
+  const rawId = (item.id || '').toLowerCase();
+  const url = (item.url || '').toLowerCase();
+
+  // 1. Direct Substring Match
+  if (title.includes(q) || rawId.includes(q) || url.includes(q)) {
+    return true;
+  }
+
+  // 2. Punctuation-stripped alphanumeric Match (e.g., "fnaf 2", "baldis basics", "pvz")
+  const cleanQ = q.replace(/[^a-z0-9]/g, '');
+  const cleanTitle = title.replace(/[^a-z0-9]/g, '');
+  if (cleanQ && cleanTitle.includes(cleanQ)) {
+    return true;
+  }
+
+  // 3. Acronym Match (e.g. "fnaf" for "Five Nights at Freddy's", "pvz" for "Plants vs. Zombies", "gd" for "Geometry Dash")
+  const words = title.split(/[\s\-:_]+/).filter(Boolean);
+  const initials = words.map(w => w[0]).join('');
+  if (cleanQ && initials.startsWith(cleanQ)) {
+    return true;
+  }
+
+  // 4. Word Prefix Match (e.g. "pig" matches "Bad Piggies")
+  if (words.some(w => w.startsWith(q))) {
+    return true;
+  }
+
+  return false;
+}
+
 function filterGames() {
-  if (!gamesGrid) return;
-  const query = (gamesSearchInput ? gamesSearchInput.value : '').trim().toLowerCase();
+  const grid = document.getElementById('gamesGrid');
+  if (!grid) return;
+  const input = document.getElementById('gamesSearchInput');
+  const clearBtn = document.getElementById('gamesSearchClear');
+  const noResults = document.getElementById('gamesNoResults');
+  const countBadge = document.getElementById('gamesSearchCount');
   
-  const filtered = gamesData.filter(item => {
-    return !query || (item.title && item.title.toLowerCase().includes(query));
-  });
+  const query = (input ? input.value : '').trim();
+  if (clearBtn) {
+    clearBtn.style.display = query.length > 0 ? 'inline-flex' : 'none';
+  }
 
-  gamesGrid.innerHTML = '';
+  const filtered = gamesData.filter(item => matchesSearch(item, query));
+
+  grid.innerHTML = '';
   filtered.forEach(item => {
-    gamesGrid.appendChild(createCard(item, 'game'));
+    grid.appendChild(createCard(item, 'game'));
   });
 
-  if (gamesNoResults) {
+  if (countBadge) {
+    countBadge.textContent = query
+      ? `${filtered.length} found`
+      : `${filtered.length} ${filtered.length === 1 ? 'game' : 'games'}`;
+  }
+
+  if (noResults) {
     if (filtered.length === 0) {
-      gamesNoResults.style.display = 'flex';
-      gamesNoResults.innerHTML = gamesData.length === 0
+      noResults.style.display = 'flex';
+      noResults.innerHTML = gamesData.length === 0
         ? '<i class="fa-solid fa-gamepad"></i><p>No games added yet</p>'
         : '<i class="fa-solid fa-ghost"></i><p>No games found matching your search</p>';
     } else {
-      gamesNoResults.style.display = 'none';
+      noResults.style.display = 'none';
     }
   }
 }
 
 function filterApps() {
-  if (!appsGrid) return;
-  const query = (appsSearchInput ? appsSearchInput.value : '').trim().toLowerCase();
+  const grid = document.getElementById('appsGrid');
+  if (!grid) return;
+  const input = document.getElementById('appsSearchInput');
+  const clearBtn = document.getElementById('appsSearchClear');
+  const noResults = document.getElementById('appsNoResults');
+  const countBadge = document.getElementById('appsSearchCount');
 
-  const filtered = appsData.filter(item => {
-    return !query || (item.title && item.title.toLowerCase().includes(query));
-  });
+  const query = (input ? input.value : '').trim();
+  if (clearBtn) {
+    clearBtn.style.display = query.length > 0 ? 'inline-flex' : 'none';
+  }
 
-  appsGrid.innerHTML = '';
+  const filtered = appsData.filter(item => matchesSearch(item, query));
+
+  grid.innerHTML = '';
   filtered.forEach(item => {
-    appsGrid.appendChild(createCard(item, 'app'));
+    grid.appendChild(createCard(item, 'app'));
   });
 
-  if (appsNoResults) {
+  if (countBadge) {
+    countBadge.textContent = query
+      ? `${filtered.length} found`
+      : `${filtered.length} ${filtered.length === 1 ? 'app' : 'apps'}`;
+  }
+
+  if (noResults) {
     if (filtered.length === 0) {
-      appsNoResults.style.display = 'flex';
-      appsNoResults.innerHTML = appsData.length === 0
+      noResults.style.display = 'flex';
+      noResults.innerHTML = appsData.length === 0
         ? '<i class="fa-solid fa-shapes"></i><p>No apps added yet</p>'
         : '<i class="fa-solid fa-ghost"></i><p>No apps found matching your search</p>';
     } else {
-      appsNoResults.style.display = 'none';
+      noResults.style.display = 'none';
     }
   }
 }
 
-// Search input listeners
-if (gamesSearchInput) {
-  gamesSearchInput.addEventListener('input', filterGames);
-}
-if (appsSearchInput) {
-  appsSearchInput.addEventListener('input', filterApps);
-}
+// Universal delegated input & click listeners for instant real-time search
+document.addEventListener('input', (e) => {
+  if (!e.target) return;
+  if (e.target.id === 'gamesSearchInput') {
+    filterGames();
+  } else if (e.target.id === 'appsSearchInput') {
+    filterApps();
+  }
+});
+
+document.addEventListener('click', (e) => {
+  const clearBtn = e.target.closest('#gamesSearchClear, #appsSearchClear');
+  if (clearBtn) {
+    if (clearBtn.id === 'gamesSearchClear') {
+      const input = document.getElementById('gamesSearchInput');
+      if (input) { input.value = ''; input.focus(); }
+      filterGames();
+    } else if (clearBtn.id === 'appsSearchClear') {
+      const input = document.getElementById('appsSearchInput');
+      if (input) { input.value = ''; input.focus(); }
+      filterApps();
+    }
+    return;
+  }
+
+  const searchIcon = e.target.closest('#gamesSearchIcon, #appsSearchIcon');
+  if (searchIcon) {
+    if (searchIcon.id === 'gamesSearchIcon') {
+      const input = document.getElementById('gamesSearchInput');
+      if (input) input.focus();
+    } else if (searchIcon.id === 'appsSearchIcon') {
+      const input = document.getElementById('appsSearchInput');
+      if (input) input.focus();
+    }
+  }
+});
+
+// Quick keyboard shortcut (press '/' or Ctrl+K / Cmd+K to search, Esc to clear)
+window.addEventListener('keydown', (e) => {
+  if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+    if (e.key === 'Escape') {
+      if (document.activeElement.id === 'gamesSearchInput') {
+        document.activeElement.value = '';
+        filterGames();
+        document.activeElement.blur();
+      } else if (document.activeElement.id === 'appsSearchInput') {
+        document.activeElement.value = '';
+        filterApps();
+        document.activeElement.blur();
+      } else if (document.activeElement.id === 'homeSearchInput') {
+        document.activeElement.value = '';
+        document.activeElement.blur();
+      }
+    }
+    return;
+  }
+
+  if (e.key === '/' || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) {
+    const activePanel = document.querySelector('.tab-panel.active');
+    if (activePanel) {
+      if (activePanel.id === 'games-section') {
+        e.preventDefault();
+        const input = document.getElementById('gamesSearchInput');
+        if (input) input.focus();
+      } else if (activePanel.id === 'apps-section') {
+        e.preventDefault();
+        const input = document.getElementById('appsSearchInput');
+        if (input) input.focus();
+      } else if (activePanel.id === 'home-section') {
+        e.preventDefault();
+        const input = document.getElementById('homeSearchInput');
+        if (input) input.focus();
+      }
+    }
+  }
+});
 
 // Helper to load game/app content into iframe with full HTML context & web APIs
 function loadContentIntoIframe(iframe, rawUrl) {

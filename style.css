@@ -806,7 +806,8 @@ input:checked+.slider:before {
   transform: translateY(0);
 }
 
-.page-search-wrapper {
+.page-search-wrapper,
+.custom-search-box {
   position: relative;
   display: flex;
   align-items: center;
@@ -820,25 +821,74 @@ input:checked+.slider:before {
   left: 0.85rem;
   font-size: 0.85rem;
   color: var(--text-muted);
-  pointer-events: none;
+  cursor: text;
+  z-index: 2;
+  transition: color 0.2s ease;
 }
 
-.page-search-input {
+.page-search-input,
+.custom-search-input {
   width: 100%;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 9999px;
-  padding: 0.5rem 1rem 0.5rem 2.25rem;
+  padding: 0.52rem 2.2rem 0.52rem 2.25rem;
   color: var(--text-color);
   font-family: inherit;
   font-size: 0.85rem;
   outline: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
 }
 
-.page-search-input:focus {
-  border-color: rgba(255, 255, 255, 0.3);
+.page-search-input:focus,
+.custom-search-input:focus {
+  border-color: rgba(255, 255, 255, 0.35);
   background: #18181b;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.page-search-input:focus + .page-search-icon,
+.custom-search-box:focus-within .page-search-icon {
+  color: #ffffff;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 0.65rem;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: #8e8e93;
+  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+  z-index: 3;
+}
+
+.search-clear-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.search-count-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  color: #8e8e93;
+  font-weight: 500;
+  user-select: none;
 }
 
 /* Content Grid */
