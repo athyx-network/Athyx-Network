@@ -770,7 +770,7 @@ function resolveItemUrl(rawUrl) {
     return rawUrl;
   }
   const cleanPath = rawUrl.replace(/^\.?\/+/, '');
-  if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) {
+  if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http') && !window.location.hostname.includes('github.io')) {
     const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
     return `${window.location.origin}${basePath}${encodeURI(cleanPath)}`;
   }
@@ -804,7 +804,7 @@ function openGameInAboutBlank(item, resolvedUrl) {
       }
     }
 
-    // Embed game directly via iframe.src (NOT srcdoc) with full permissions
+    // Embed game directly via iframe.src (NOT srcdoc, NOT blob) with full permissions
     const iframe = doc.createElement('iframe');
     iframe.src = resolvedUrl;
     iframe.style.position = 'fixed';
@@ -834,7 +834,7 @@ function openGameInAboutBlank(item, resolvedUrl) {
   }
 }
 
-// Helper to load game/app content into modal iframe as about:blank (never srcdoc)
+// Helper to load game/app content directly into modal iframe via standard src
 function loadContentIntoIframe(iframe, rawUrl, type) {
   if (!iframe || !rawUrl) return;
 
@@ -843,47 +843,8 @@ function loadContentIntoIframe(iframe, rawUrl, type) {
 
   const resolvedUrl = resolveItemUrl(rawUrl);
 
-  // If already absolute external URL
-  if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
-    iframe.src = resolvedUrl;
-    return;
-  }
-
-  // Fetch the game/app content and write it directly into about:blank inside the player modal
-  fetch(resolvedUrl)
-    .then(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.text();
-    })
-    .then(html => {
-      iframe.src = 'about:blank';
-
-      // Compute base URL for relative assets/scripts
-      const baseHref = resolvedUrl.substring(0, resolvedUrl.lastIndexOf('/') + 1);
-      let content = html;
-      if (!content.includes('<base ') && !content.includes('<BASE ')) {
-        if (content.includes('<head>') || content.includes('<HEAD>')) {
-          content = content.replace(/<head>/i, `<head>\n  <base href="${baseHref}">`);
-        } else if (content.includes('<html>') || content.includes('<HTML>')) {
-          content = content.replace(/<html>/i, `<html>\n<head>\n  <base href="${baseHref}">\n</head>`);
-        } else {
-          content = `<base href="${baseHref}">\n` + content;
-        }
-      }
-
-      const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
-      if (doc) {
-        doc.open();
-        doc.write(content);
-        doc.close();
-      } else {
-        iframe.src = resolvedUrl;
-      }
-    })
-    .catch(err => {
-      console.warn('Direct about:blank write fallback to src:', err);
-      iframe.src = resolvedUrl;
-    });
+  // Directly load the game or app via src (never creates blob: URLs and never uses srcdoc)
+  iframe.src = resolvedUrl;
 }
 
 // Player Modal Controls
@@ -970,7 +931,7 @@ if (proxyIframeEl) {
     const currentFolder = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
     proxyIframeEl.src = `${window.location.origin}${currentFolder}proxy/index.html`;
   } else {
-    proxyIframeEl.src = 'https://athyx-network.github.io/Athyx-Network/proxy/index.html';
+    proxyIframeEl.src = `${JSDELIVR_BASE}proxy/index.html`;
   }
 }
 

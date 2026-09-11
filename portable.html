@@ -22,7 +22,7 @@
     <section id="home-section" class="tab-panel active">
       <div class="home-version-badge" id="versionBadge" title="Release Version">
         <span class="version-dot"></span>
-        <span class="version-text">v7</span>
+        <span class="version-text">v8</span>
       </div>
       <div class="home-container">
         <div class="home-header">
@@ -317,13 +317,13 @@
   <script>
     if (window.location.protocol === 'file:') {
       var pi = document.getElementById('proxyIframe');
-      if (pi) pi.src = 'https://athyx-network.github.io/Athyx-Network/proxy/index.html';
+      if (pi) pi.src = 'https://cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/proxy/index.html';
       var s = document.createElement('script');
-      s.src = 'https://athyx-network.github.io/Athyx-Network/script.js?v=12';
+      s.src = 'https://cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/script.js?v=14';
       document.body.appendChild(s);
     } else {
       var s = document.createElement('script');
-      s.src = 'script.js?v=12';
+      s.src = 'script.js?v=14';
       document.body.appendChild(s);
     }
   </script>
