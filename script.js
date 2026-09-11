@@ -763,12 +763,91 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Helper to resolve absolute or CDN URL for any game/app
+function resolveItemUrl(rawUrl) {
+  if (!rawUrl) return '';
+  if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+    return rawUrl;
+  }
+  const cleanPath = rawUrl.replace(/^\.?\/+/, '');
+  if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) {
+    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    return `${window.location.origin}${basePath}${encodeURI(cleanPath)}`;
+  }
+  return `${JSDELIVR_BASE}${encodeURI(cleanPath)}`;
+}
+
+// Open game in about:blank cloaked window (never srcdoc)
+function openGameInAboutBlank(item, resolvedUrl) {
+  try {
+    const win = window.open('about:blank', '_blank');
+    if (!win || win.closed || typeof win.closed === 'undefined') {
+      return false;
+    }
+
+    const doc = win.document;
+    doc.title = item.title || document.title;
+
+    // Set favicon
+    if (item.image) {
+      const link = doc.createElement('link');
+      link.rel = 'icon';
+      link.href = item.image;
+      doc.head.appendChild(link);
+    } else {
+      const currentFav = document.getElementById('pageFavicon');
+      if (currentFav && currentFav.href) {
+        const link = doc.createElement('link');
+        link.rel = 'icon';
+        link.href = currentFav.href;
+        doc.head.appendChild(link);
+      }
+    }
+
+    // Embed game directly via iframe.src (NOT srcdoc) with full permissions
+    const iframe = doc.createElement('iframe');
+    iframe.src = resolvedUrl;
+    iframe.style.position = 'fixed';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
+    iframe.style.bottom = '0';
+    iframe.style.right = '0';
+    iframe.style.width = '100vw';
+    iframe.style.height = '100vh';
+    iframe.style.border = 'none';
+    iframe.style.margin = '0';
+    iframe.style.padding = '0';
+    iframe.style.overflow = 'hidden';
+    iframe.style.zIndex = '999999';
+    iframe.allow = 'autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; encrypted-media';
+
+    doc.body.style.margin = '0';
+    doc.body.style.padding = '0';
+    doc.body.style.overflow = 'hidden';
+    doc.body.style.backgroundColor = '#000000';
+    doc.body.appendChild(iframe);
+
+    return true;
+  } catch (e) {
+    console.warn('Could not open about:blank window for game:', e);
+    return false;
+  }
+}
+
 // Helper to load game/app content into iframe with full HTML context & web APIs
-function loadContentIntoIframe(iframe, rawUrl) {
+function loadContentIntoIframe(iframe, rawUrl, type) {
   if (!iframe || !rawUrl) return;
 
   // Clear srcdoc completely so browser doesn't use stale srcdoc
   iframe.removeAttribute('srcdoc');
+
+  const resolvedUrl = resolveItemUrl(rawUrl);
+
+  // For games: NEVER use srcdoc, always use iframe.src
+  if (type === 'game' || rawUrl.startsWith('games/')) {
+    iframe.src = resolvedUrl;
+    return;
+  }
 
   // If already absolute external URL
   if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
@@ -776,57 +855,51 @@ function loadContentIntoIframe(iframe, rawUrl) {
     return;
   }
 
-  // Clean relative path (remove leading slashes / dots)
   const cleanPath = rawUrl.replace(/^\.?\/+/, '');
 
-  // If running on any HTTP/HTTPS server or CDN (githubraw.com, localhost, GitHub Pages, custom domain, etc.)
-  if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) {
-    const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-    const localUrl = `${window.location.origin}${basePath}${encodeURI(cleanPath)}`;
-
-    // For HTML apps, directly fetch and execute the app code inside the iframe via srcdoc so it runs locally on the current CDN/host
-    if (cleanPath.startsWith('apps/') || cleanPath.endsWith('.html')) {
-      fetch(localUrl)
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.text();
-        })
-        .then(html => {
-          iframe.srcdoc = html;
-        })
-        .catch(err => {
-          // Fallback to jsDelivr CDN fetch for direct srcdoc execution
-          const cdnUrl = `${JSDELIVR_BASE}${encodeURI(cleanPath)}`;
-          fetch(cdnUrl)
-            .then(res => res.ok ? res.text() : Promise.reject())
-            .then(html => {
-              iframe.srcdoc = html;
-            })
-            .catch(() => {
-              iframe.src = localUrl;
-            });
-        });
-      return;
-    }
-
-    iframe.src = localUrl;
+  // For HTML apps only: fetch and run via srcdoc if on web server, otherwise src
+  if (cleanPath.startsWith('apps/')) {
+    fetch(resolvedUrl)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+      })
+      .then(html => {
+        iframe.srcdoc = html;
+      })
+      .catch(() => {
+        iframe.src = resolvedUrl;
+      });
     return;
   }
 
-  // Fallback for file:// protocol when opened locally without a web server
-  iframe.src = `${JSDELIVR_BASE}${encodeURI(cleanPath)}`;
+  iframe.src = resolvedUrl;
 }
 
 // Player Modal Controls
 function openPlayer(item, type) {
-  if (!playerModal) return;
+  if (!item) return;
   activePlayerItem = item;
+  
+  const resolvedUrl = resolveItemUrl(item.url);
+
+  // For games: open directly in about:blank cloaked tab!
+  if (type === 'game' || (item.url && item.url.startsWith('games/'))) {
+    const opened = openGameInAboutBlank(item, resolvedUrl);
+    if (opened) {
+      return;
+    }
+  }
+
+  // Fallback to modal player (or for apps)
+  if (!playerModal) return;
   
   if (playerTitle) playerTitle.textContent = item.title;
   if (playerTypeIcon) {
     playerTypeIcon.className = type === 'game' ? 'fa-solid fa-gamepad' : 'fa-solid fa-shapes';
   }
   if (playerIframe) {
+    playerIframe.removeAttribute('srcdoc');
     playerIframe.onload = () => {
       try {
         if (playerIframe.contentWindow) {
@@ -837,7 +910,7 @@ function openPlayer(item, type) {
       } catch (e) {}
     };
 
-    loadContentIntoIframe(playerIframe, item.url);
+    loadContentIntoIframe(playerIframe, item.url, type);
   }
   
   playerModal.classList.add('active');
@@ -859,6 +932,17 @@ function closePlayer() {
 
 if (playerCloseBtn) {
   playerCloseBtn.addEventListener('click', closePlayer);
+}
+
+const playerAboutBlankBtn = document.getElementById('playerAboutBlankBtn');
+if (playerAboutBlankBtn) {
+  playerAboutBlankBtn.addEventListener('click', () => {
+    if (activePlayerItem) {
+      const url = resolveItemUrl(activePlayerItem.url);
+      openGameInAboutBlank(activePlayerItem, url);
+      closePlayer();
+    }
+  });
 }
 
 if (playerFullscreenBtn) {
