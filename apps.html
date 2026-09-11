@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apps Hub &bull; Athyx Network</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #121215;
+      --surface-hover: #18181d;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.18);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      --accent: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Top Sticky Header */
+    #topBar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(12, 12, 15, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-title i {
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    .count-pill {
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 3px 10px;
+      border-radius: 9999px;
+    }
+
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-wrapper i.search-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 13px;
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    #searchBox {
+      width: 100%;
+      background: #16161a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 32px 8px 34px;
+      font-size: 13.5px;
+      color: #fff;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #searchBox:focus {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: #1a1a20;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 13px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .clear-btn:hover {
+      color: #fff;
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 28px 120px;
+    }
+
+    .hero-header {
+      margin-bottom: 28px;
+    }
+
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .hero-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Apps Grid */
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .app-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .app-card:hover {
+      transform: translateY(-4px);
+      background: var(--surface-hover);
+      border-color: var(--border-hover);
+      box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    .app-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .app-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      object-fit: cover;
+      background: #18181c;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 2px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.25s ease;
+    }
+
+    .app-card:hover .app-icon {
+      transform: scale(1.06);
+    }
+
+    .app-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .app-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .app-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .app-desc {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+
+    .app-action {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .app-card:hover .app-action {
+      color: #fff;
+    }
+
+    .app-action i {
+      font-size: 11px;
+      transition: transform 0.2s;
+    }
+
+    .app-card:hover .app-action i {
+      transform: translateX(3px);
+    }
+
+    /* State message */
+    .state-message {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 70px 20px;
+      color: var(--text-dim);
+      font-size: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .state-message i {
+      font-size: 32px;
+    }
+
+    /* Fullscreen App Stage */
+    #appStage {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+    }
+
+    #appStage.show {
+      display: flex;
+    }
+
+    .stage-header {
+      height: 48px;
+      background: #111114;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 2;
+    }
+
+    .stage-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stage-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stage-btn {
+      background: #1e1e24;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .stage-btn:hover {
+      background: #27272e;
+      color: #fff;
+    }
+
+    .stage-btn-close {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .stage-btn-close:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    #appStageIframe {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 48px);
+      border: none;
+      background: #000;
+    }
+
+    /* Loading modal */
+    #loadingModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 100000;
+      color: #fff;
+    }
+
+    #loadingModal.show {
+      display: flex;
+    }
+
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      #topBar {
+        padding: 12px 16px;
+      }
+      .main-content {
+        padding: 20px 16px 120px;
+      }
+      .apps-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top Sticky Bar -->
+  <header id="topBar">
+    <div class="brand-section">
+      <div class="brand-title">
+        <i class="fa-solid fa-shapes"></i>
+        <span>Apps Hub</span>
+      </div>
+      <span class="count-pill" id="appCountPill">6 Apps</span>
+    </div>
+
+    <div class="search-wrapper">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" id="searchBox" placeholder="Search apps..." autocomplete="off" spellcheck="false">
+      <button class="clear-btn" id="clearBtn" title="Clear search"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="hero-header">
+      <h1 class="hero-title">Applications & Tools</h1>
+    </div>
+
+    <div class="apps-grid" id="appsGrid"></div>
+  </main>
+
+  <!-- Fullscreen App Player -->
+  <div id="appStage">
+    <div class="stage-header">
+      <div class="stage-title">
+        <i class="fa-solid fa-shapes" style="color:var(--accent);"></i>
+        <span id="activeAppTitle">Application</span>
+      </div>
+      <div class="stage-controls">
+        <button class="stage-btn" onclick="reloadActiveApp()" title="Reload application"><i class="fa-solid fa-rotate-right"></i> Reload</button>
+        <button class="stage-btn" onclick="toggleStageFullscreen()" title="Toggle fullscreen"><i class="fa-solid fa-expand"></i> Fullscreen</button>
+        <button class="stage-btn stage-btn-close" onclick="closeActiveApp()" title="Exit (Esc)"><i class="fa-solid fa-xmark"></i> Close</button>
+      </div>
+    </div>
+    <iframe id="appStageIframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
+  </div>
+
+  <!-- Loading Modal Indicator -->
+  <div id="loadingModal">
+    <div class="loading-spinner"></div>
+    <div id="loadingModalText">Initializing application...</div>
+  </div>
+
+  <script>
+    const apps = [
+      { name: "TurboWarp", file: "turbowarp.html", icon: "icons/turbowarp.png", tag: "Creative" },
+      { name: "Silk Interactive", file: "silk.html", icon: "icons/silk.png", tag: "Art & Math" },
+      { name: "Pico-8 Education", file: "pico8edu.html", icon: "icons/pico8edu.jpg", tag: "Console" },
+      { name: "Github Client", file: "githubclient.html", icon: "icons/githubclient.png", tag: "Developer" },
+      { name: "EmulatorJS", file: "emulatorjs.html", icon: "icons/emulatorjs.png", tag: "Emulator" },
+      { name: "Dos Wasm X", file: "doswasmx.html", icon: "icons/doswasmx.png", tag: "Emulator" }
+    ];
+
+    let activeAppObj = null;
+
+    const grid = document.getElementById("appsGrid");
+    const countPill = document.getElementById("appCountPill");
+    const searchBox = document.getElementById("searchBox");
+    const clearBtn = document.getElementById("clearBtn");
+    const appStage = document.getElementById("appStage");
+    const appStageIframe = document.getElementById("appStageIframe");
+    const activeAppTitle = document.getElementById("activeAppTitle");
+    const loadingModal = document.getElementById("loadingModal");
+    const loadingModalText = document.getElementById("loadingModalText");
+
+    function renderApps() {
+      const query = searchBox.value.trim().toLowerCase();
+      const filtered = apps.filter(app => 
+        app.name.toLowerCase().includes(query) || 
+        app.tag.toLowerCase().includes(query)
+      );
+
+      grid.innerHTML = "";
+      countPill.textContent = `${filtered.length} Apps`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="state-message">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>No applications found matching "${query}".</span>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(app => {
+        const card = document.createElement("div");
+        card.className = "app-card";
+
+        card.innerHTML = `
+          <div class="app-top">
+            <img class="app-icon" src="${app.icon}" alt="${app.name}" loading="lazy">
+            <span class="app-tag">${app.tag}</span>
+          </div>
+          <div class="app-details">
+            <div class="app-name">${app.name}</div>
+          </div>
+          <div class="app-action">
+            <span>Launch App</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        `;
+
+        card.onclick = () => launchApp(app);
+        grid.appendChild(card);
+      });
+    }
+
+    async function launchApp(app) {
+      activeAppObj = app;
+      loadingModalText.textContent = `Launching ${app.name}...`;
+      loadingModal.classList.add("show");
+
+      try {
+        const response = await fetch(`apps/${app.file}`);
+        if (!response.ok) throw new Error("Status " + response.status);
+        const html = await response.text();
+
+        activeAppTitle.textContent = app.name;
+        appStageIframe.srcdoc = html;
+        appStage.classList.add("show");
+      } catch (err) {
+        console.error("Failed to load app:", err);
+        alert(`Failed to load ${app.name}.`);
+      } finally {
+        loadingModal.classList.remove("show");
+      }
+    }
+
+    function reloadActiveApp() {
+      if (activeAppObj) launchApp(activeAppObj);
+    }
+
+    function closeActiveApp() {
+      appStage.classList.remove("show");
+      appStageIframe.srcdoc = "";
+      activeAppObj = null;
+    }
+
+    function toggleStageFullscreen() {
+      if (!document.fullscreenElement) {
+        appStage.requestFullscreen().catch(err => console.error(err));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    searchBox.addEventListener("input", () => {
+      clearBtn.style.display = searchBox.value ? "block" : "none";
+      renderApps();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      searchBox.value = "";
+      clearBtn.style.display = "none";
+      searchBox.focus();
+      renderApps();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && appStage.classList.contains("show")) {
+        closeActiveApp();
+      }
+    });
+
+    renderApps();
+  </script>
+
+</body>
+</html>

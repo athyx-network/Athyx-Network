@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Settings &bull; Athyx Network</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #121215;
+      --surface-hover: #18181c;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.18);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      --accent: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 20px 120px;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 28px;
+    }
+
+    .title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    /* Settings Sections */
+    .section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: border-color 0.2s;
+    }
+
+    .section-card:hover {
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .section-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .section-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Presets Grid */
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .preset-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .preset-btn img {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+    }
+
+    .preset-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      color: #fff;
+    }
+
+    /* Form controls */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .input-field {
+      width: 100%;
+      background: #16161a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: #1a1a20;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+    }
+
+    .key-recorder-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .key-btn {
+      background: #1e1e24;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .key-btn.recording {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .key-btn:hover:not(.recording) {
+      background: #27272e;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn-primary {
+      background: #ffffff;
+      color: #09090b;
+      border: 1px solid #ffffff;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #e4e4e7;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .setting-row.no-border {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .setting-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .setting-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .setting-desc {
+      font-size: 12.5px;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+
+    .toggle-switch {
+      width: 44px;
+      height: 24px;
+      background: #27272a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    .toggle-switch.active {
+      background: #ffffff;
+      border-color: #ffffff;
+    }
+
+    .toggle-knob {
+      width: 18px;
+      height: 18px;
+      background: #71717a;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease;
+    }
+
+    .toggle-switch.active .toggle-knob {
+      transform: translateX(20px);
+      background: #09090b;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Toast */
+    .status-toast {
+      position: fixed;
+      bottom: 84px;
+      right: 24px;
+      background: #18181c;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 16px 36px -8px rgba(0,0,0,0.8);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      z-index: 100000;
+    }
+
+    .status-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="title"><i class="fa-solid fa-sliders" style="color:var(--accent);"></i> Settings & Preferences</h1>
+    </div>
+
+    <!-- ABOUT BLANK -->
+    <div class="section-card">
+      <div class="section-top">
+        <div class="section-icon-box" style="color: #60a5fa;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </div>
+        <h2 class="section-title">About:Blank</h2>
+      </div>
+
+      <div class="setting-row no-border">
+        <div class="setting-info">
+          <span class="setting-title">Auto-open on launch</span>
+        </div>
+        <div class="toggle-switch" id="autoAbToggle" onclick="toggleAutoAboutBlank()" role="switch" aria-checked="false">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB CLOAKING -->
+    <div class="section-card">
+      <div class="section-top">
+        <div class="section-icon-box">
+          <i class="fa-solid fa-mask"></i>
+        </div>
+        <h2 class="section-title">Tab Cloaking</h2>
+      </div>
+
+      <div class="presets-grid">
+        <button class="preset-btn" onclick="applyPreset('Google', 'https://www.google.com/favicon.ico')">
+          <img src="https://www.google.com/favicon.ico" alt="Google"> Google
+        </button>
+        <button class="preset-btn" onclick="applyPreset('Google Drive', 'https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png')">
+          <img src="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" alt="Drive"> Drive
+        </button>
+        <button class="preset-btn" onclick="applyPreset('Google Classroom', 'https://ssl.gstatic.com/classroom/favicon.png')">
+          <img src="https://ssl.gstatic.com/classroom/favicon.png" alt="Classroom"> Classroom
+        </button>
+        <button class="preset-btn" onclick="applyPreset('Google Docs', 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico')">
+          <img src="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" alt="Docs"> Docs
+        </button>
+        <button class="preset-btn" onclick="applyPreset('Canvas', 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico')">
+          <img src="https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico" alt="Canvas"> Canvas
+        </button>
+        <button class="preset-btn" onclick="applyPreset('Calculator', 'https://www.calculator.net/favicon.ico')">
+          <img src="https://www.calculator.net/favicon.ico" alt="Calculator"> Calculator
+        </button>
+        <button class="preset-btn" onclick="applyPreset('ClassLink', 'https://myapps.classlink.com/favicon.ico')">
+          <img src="https://myapps.classlink.com/favicon.ico" alt="ClassLink"> ClassLink
+        </button>
+        <button class="preset-btn" onclick="applyPreset('Desmos | Graphing Calculator', 'https://www.desmos.com/favicon.ico')">
+          <img src="https://www.desmos.com/favicon.ico" alt="Desmos"> Desmos
+        </button>
+        <button class="preset-btn" onclick="applyPreset('Khan Academy', 'https://www.khanacademy.org/favicon.ico')">
+          <img src="https://www.khanacademy.org/favicon.ico" alt="Khan"> Khan Academy
+        </button>
+        <button class="preset-btn" onclick="applyPreset('Wikipedia', 'https://en.wikipedia.org/static/favicon/wikipedia.ico')">
+          <img src="https://en.wikipedia.org/static/favicon/wikipedia.ico" alt="Wikipedia"> Wikipedia
+        </button>
+      </div>
+    </div>
+
+    <!-- PANIC BUTTON -->
+    <div class="section-card">
+      <div class="section-top">
+        <div class="section-icon-box" style="color: #ef4444;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h2 class="section-title">Emergency Panic Key</h2>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Trigger Key</label>
+        <div class="key-recorder-box">
+          <input type="text" id="panicKeyInput" class="input-field" placeholder="e.g. ` or ]" readonly style="max-width: 200px;">
+          <button class="key-btn" id="recordKeyBtn" onclick="toggleKeyRecording()"><i class="fa-solid fa-keyboard"></i> <span id="recordKeyText">Record Key</span></button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="panicUrlInput">Redirect Safe URL</label>
+        <input type="text" id="panicUrlInput" class="input-field" placeholder="https://www.google.com">
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="savePanicSettings()"><i class="fa-solid fa-check"></i> Save Panic Settings</button>
+        <button class="btn-secondary" onclick="resetPanicSettings()">Clear Panic Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Toast -->
+  <div id="toast" class="status-toast">
+    <i class="fa-solid fa-circle-check" style="color:#22c55e;"></i>
+    <span id="toastMsg">Changes saved</span>
+  </div>
+
+  <script>
+    const panicKeyInput = document.getElementById("panicKeyInput");
+    const panicUrlInput = document.getElementById("panicUrlInput");
+    const recordKeyBtn = document.getElementById("recordKeyBtn");
+    const recordKeyText = document.getElementById("recordKeyText");
+    const toast = document.getElementById("toast");
+    const toastMsg = document.getElementById("toastMsg");
+
+    let isRecording = false;
+
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+
+    function updateParentTab(title, iconUrl) {
+      try {
+        if (window.parent && window.parent.document) {
+          if (title) window.parent.document.title = title;
+          if (iconUrl) {
+            let link = window.parent.document.querySelector("link[rel*='icon']");
+            if (!link) {
+              link = window.parent.document.createElement('link');
+              link.rel = 'icon';
+              window.parent.document.head.appendChild(link);
+            }
+            link.href = iconUrl;
+          }
+        }
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function applyPreset(title, icon) {
+      localStorage.setItem("athyx_tab_title", title);
+      localStorage.setItem("athyx_tab_icon", icon);
+      updateParentTab(title, icon);
+      showToast(`Tab disguised as "${title}"`);
+    }
+
+
+    function toggleKeyRecording() {
+      if (isRecording) {
+        isRecording = false;
+        recordKeyBtn.classList.remove("recording");
+        recordKeyText.textContent = "Record Key";
+      } else {
+        isRecording = true;
+        recordKeyBtn.classList.add("recording");
+        recordKeyText.textContent = "Press any key...";
+      }
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (isRecording) {
+        e.preventDefault();
+        panicKeyInput.value = e.key;
+        isRecording = false;
+        recordKeyBtn.classList.remove("recording");
+        recordKeyText.textContent = "Record Key";
+        showToast(`Key "${e.key}" recorded! Click Save to apply.`);
+      }
+    });
+
+    function getAppUrl() {
+      try {
+        if (window.top && window.top.location && window.top.location.href && !window.top.location.href.startsWith("about:")) {
+          return window.top.location.href;
+        }
+      } catch(e) {}
+      return window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'index.html';
+    }
+
+    function openAboutBlank() {
+      const targetUrl = getAppUrl();
+      const win = window.open('about:blank', '_blank');
+      if (!win) {
+        alert('Popup was blocked by your browser! Please enable popups for this site to use about:blank cloaking.');
+        return;
+      }
+      
+      const title = localStorage.getItem('athyx_tab_title') || 'Athyx Network';
+      const icon = localStorage.getItem('athyx_tab_icon') || 'https://cdn.jsdelivr.net/gh/HyperFloppik/Ethyrnal-s-Arcade-v2.3@main/web-app-manifest-512x512.ico';
+
+      const doc = win.document;
+      doc.open();
+      doc.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <link rel="icon" href="${icon}">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100vw; height: 100vh; overflow: hidden; background: #09090b; }
+    iframe { width: 100%; height: 100%; border: none; display: block; }
+  </style>
+</head>
+<body>
+  <iframe src="${targetUrl}" allowfullscreen="true"></iframe>
+</body>
+</html>`);
+      doc.close();
+
+      try {
+        if (window.top) {
+          window.top.close();
+          window.top.location.replace("about:blank");
+        } else {
+          window.close();
+          window.location.replace("about:blank");
+        }
+      } catch(e) {
+        window.close();
+      }
+    }
+
+    function toggleAutoAboutBlank() {
+      const toggle = document.getElementById('autoAbToggle');
+      const current = localStorage.getItem('athyx_auto_about_blank') === 'true';
+      const next = !current;
+      localStorage.setItem('athyx_auto_about_blank', next.toString());
+      toggle.classList.toggle('active', next);
+      toggle.setAttribute('aria-checked', next.toString());
+      if (next) {
+        showToast('Auto about:blank enabled on launch');
+      } else {
+        showToast('Auto about:blank disabled');
+      }
+    }
+
+    function savePanicSettings() {
+      const key = panicKeyInput.value.trim();
+      const url = panicUrlInput.value.trim() || "https://www.google.com";
+      localStorage.setItem("athyx_panic_key", key);
+      localStorage.setItem("athyx_panic_url", url);
+      showToast("Panic key settings saved!");
+    }
+
+    function resetPanicSettings() {
+      localStorage.removeItem("athyx_panic_key");
+      localStorage.removeItem("athyx_panic_url");
+      panicKeyInput.value = "";
+      panicUrlInput.value = "https://www.google.com";
+      showToast("Panic key reset.");
+    }
+
+    // Initialize values from storage
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedPanicKey = localStorage.getItem("athyx_panic_key") || "";
+      const savedPanicUrl = localStorage.getItem("athyx_panic_url") || "https://www.google.com";
+      panicKeyInput.value = savedPanicKey;
+      panicUrlInput.value = savedPanicUrl;
+
+      const autoAb = localStorage.getItem("athyx_auto_about_blank") === "true";
+      const toggle = document.getElementById("autoAbToggle");
+      if (toggle) {
+        toggle.classList.toggle("active", autoAb);
+        toggle.setAttribute("aria-checked", autoAb.toString());
+      }
+    });
+  </script>
+
+</body>
+</html>

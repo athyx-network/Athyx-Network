@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Athyx Network</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #121215;
+      --surface-hover: #18181c;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.16);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      --accent: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px 100px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Subtle ambient lighting */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 400px;
+      background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.07) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Hero Heading */
+    .title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2.4rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+      background: linear-gradient(180deg, #ffffff 30%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Search Omnibar */
+    .search-container {
+      width: 100%;
+      max-width: 620px;
+      margin: 0 auto 20px auto;
+      position: relative;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(18, 18, 22, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 6px 10px 6px 18px;
+      box-shadow: 
+        0 12px 30px -10px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.02);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .search-box:focus-within {
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 
+        0 16px 36px -10px rgba(0, 0, 0, 0.8),
+        0 0 0 2px rgba(255, 255, 255, 0.08);
+      background: #151519;
+    }
+
+    .search-box i.search-icon {
+      color: var(--text-dim);
+      font-size: 16px;
+      margin-right: 12px;
+      transition: color 0.2s;
+    }
+
+    .search-box:focus-within i.search-icon {
+      color: #fff;
+    }
+
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: inherit;
+      font-size: 15px;
+      padding: 10px 0;
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .search-btn {
+      background: #27272a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #f4f4f5;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .search-btn:hover {
+      background: #3f3f46;
+      color: #fff;
+    }
+
+    .kbd-badge {
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #d4d4d8;
+    }
+
+    /* Search Quick Chips */
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .chip i {
+      font-size: 12px;
+    }
+
+    .chip:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Fullscreen Web Search Overlay */
+    #searchOverlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: none;
+      z-index: 9999;
+    }
+
+    #searchOverlay.show {
+      display: block;
+    }
+
+    #overlayFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000;
+    }
+
+    @media (max-width: 600px) {
+      .title {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <!-- Hero Title -->
+    <h1 class="title">Welcome to Athyx Network</h1>
+
+    <!-- Search Omnibar -->
+    <div class="search-container">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon" id="searchIcon"></i>
+        <input type="text" id="searchInput" placeholder="Search with Google or enter a web URL..." autocomplete="off" spellcheck="false">
+        <button class="search-btn" id="searchBtn" title="Press Enter to Search">
+          <span>Search</span>
+          <span class="kbd-badge">↵</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Search Chips -->
+    <div class="quick-chips">
+      <button class="chip" onclick="quickSearch('https://www.google.com')">
+        <i class="fa-brands fa-google"></i> Google
+      </button>
+      <button class="chip" onclick="quickSearch('https://duckduckgo.com')">
+        <i class="fa-solid fa-shield"></i> DuckDuckGo
+      </button>
+      <button class="chip" onclick="quickSearch('https://www.youtube.com')">
+        <i class="fa-brands fa-youtube"></i> YouTube
+      </button>
+      <button class="chip" onclick="quickSearch('https://en.wikipedia.org')">
+        <i class="fa-brands fa-wikipedia-w"></i> Wikipedia
+      </button>
+      <button class="chip" onclick="quickSearch('https://www.reddit.com')">
+        <i class="fa-brands fa-reddit-alien"></i> Reddit
+      </button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Web Viewer Overlay -->
+  <div id="searchOverlay">
+    <iframe id="overlayFrame" title="Web Search Viewer"></iframe>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.getElementById("searchBtn");
+    const searchIcon = document.getElementById("searchIcon");
+    const searchOverlay = document.getElementById("searchOverlay");
+    const overlayFrame = document.getElementById("overlayFrame");
+
+    function performSearch(customQuery) {
+      let query = customQuery || searchInput.value.trim();
+      if (!query) return;
+
+      // Handle raw URL vs search string
+      if (!/^https?:\/\//i.test(query)) {
+        if (/^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/i.test(query)) {
+          query = "https://" + query;
+        } else {
+          query = "https://www.google.com/search?q=" + encodeURIComponent(query);
+        }
+      }
+
+      const proxyUrl = "/scramjet/index.html#" + encodeURIComponent(query);
+      overlayFrame.src = proxyUrl;
+      searchOverlay.classList.add("show");
+    }
+
+    function quickSearch(url) {
+      performSearch(url);
+    }
+
+    function closeOverlay() {
+      searchOverlay.classList.remove("show");
+      overlayFrame.src = "about:blank";
+    }
+
+    // Keyboard shortcut handlers
+    searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        performSearch();
+        e.preventDefault();
+      }
+    });
+
+    searchBtn.addEventListener("click", () => performSearch());
+    searchIcon.addEventListener("click", () => performSearch());
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && searchOverlay.classList.contains("show")) {
+        closeOverlay();
+      }
+    });
+  </script>
+
+</body>
+</html>

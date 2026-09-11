@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Athyx Arcade</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #121215;
+      --surface-hover: #18181d;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.18);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      --accent: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Top Sticky Navigation Bar */
+    #topBar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(12, 12, 15, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-title i {
+      color: var(--accent);
+      font-size: 18px;
+    }
+
+    .count-pill {
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 3px 10px;
+      border-radius: 9999px;
+    }
+
+    .controls-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 440px;
+      justify-content: flex-end;
+    }
+
+    /* Search Box */
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-wrapper i.search-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 13px;
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    #searchBox {
+      width: 100%;
+      background: #16161a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 32px 8px 34px;
+      font-size: 13.5px;
+      color: #fff;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #searchBox:focus {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: #1a1a20;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 13px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .clear-search-btn:hover {
+      color: #fff;
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 28px 120px;
+    }
+
+    /* Filter Chips Bar */
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 18px;
+      margin-bottom: 6px;
+      scrollbar-width: none;
+    }
+
+    .filters-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-chip:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border-color: var(--border-hover);
+    }
+
+    .filter-chip.active {
+      background: #ffffff;
+      color: #09090b;
+      border-color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Games Grid */
+    #gamesGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 18px;
+    }
+
+    .game-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      user-select: none;
+    }
+
+    .game-card:hover {
+      transform: translateY(-4px);
+      background: var(--surface-hover);
+      border-color: var(--border-hover);
+      box-shadow: 0 16px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+
+    .thumb-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #18181c;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .game-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .game-card:hover .game-thumb {
+      transform: scale(1.08);
+    }
+
+    .thumb-fallback {
+      font-size: 36px;
+      color: var(--text-dim);
+    }
+
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .play-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      color: #09090b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transform: scale(0.85);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      padding-left: 3px;
+    }
+
+    .game-card:hover .play-overlay {
+      opacity: 1;
+    }
+
+    .game-card:hover .play-icon {
+      transform: scale(1);
+    }
+
+    .fav-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #a1a1aa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.2s;
+      z-index: 2;
+    }
+
+    .game-card:hover .fav-btn,
+    .fav-btn.active {
+      opacity: 1;
+    }
+
+    .fav-btn.active {
+      color: #eab308;
+    }
+
+    .fav-btn:hover {
+      transform: scale(1.15);
+      color: #eab308;
+    }
+
+    .game-info {
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .game-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #f4f4f5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .game-card:hover .game-title {
+      color: #fff;
+    }
+
+    /* State message */
+    .state-message {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text-dim);
+      font-size: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .state-message i {
+      font-size: 36px;
+      color: var(--text-muted);
+    }
+
+    /* Game Stage (Fullscreen Viewer) */
+    #gameStage {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+    }
+
+    #gameStage.show {
+      display: flex;
+    }
+
+    .stage-header {
+      height: 48px;
+      background: #111114;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 2;
+    }
+
+    .stage-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stage-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stage-btn {
+      background: #1e1e24;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .stage-btn:hover {
+      background: #27272e;
+      color: #fff;
+    }
+
+    .stage-btn-close {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .stage-btn-close:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    #gameStageIframe {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 48px);
+      border: none;
+      background: #000;
+    }
+
+    /* Loading modal */
+    #loadingModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 100000;
+      color: #fff;
+    }
+
+    #loadingModal.show {
+      display: flex;
+    }
+
+    .loading-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      #topBar {
+        padding: 12px 16px;
+      }
+      .main-content {
+        padding: 16px 16px 120px;
+      }
+      #gamesGrid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header id="topBar">
+    <div class="brand-section">
+      <div class="brand-title">
+        <i class="fa-solid fa-gamepad"></i>
+        <span>Arcade</span>
+      </div>
+      <span class="count-pill" id="gameCountPill">Loading...</span>
+    </div>
+
+    <div class="controls-section">
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchBox" placeholder="Search games..." autocomplete="off" spellcheck="false">
+        <button class="clear-search-btn" id="clearSearchBtn" title="Clear search"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <!-- Category Filter Chips -->
+    <div class="filters-bar">
+      <button class="filter-chip active" data-filter="all" onclick="setCategory('all')">
+        <i class="fa-solid fa-border-all"></i> All Games
+      </button>
+      <button class="filter-chip" data-filter="favorites" onclick="setCategory('favorites')">
+        <i class="fa-solid fa-star" style="color:#eab308;"></i> Favorites
+      </button>
+      <button class="filter-chip" data-filter="action" onclick="setCategory('action')">
+        <i class="fa-solid fa-fire"></i> Action
+      </button>
+      <button class="filter-chip" data-filter="classic" onclick="setCategory('classic')">
+        <i class="fa-solid fa-dice"></i> Classics & Retro
+      </button>
+      <button class="filter-chip" data-filter="casual" onclick="setCategory('casual')">
+        <i class="fa-solid fa-cube"></i> Casual & Puzzle
+      </button>
+    </div>
+
+    <!-- Games Grid -->
+    <div id="gamesGrid">
+      <div class="state-message">
+        <div class="loading-spinner"></div>
+        <span>Fetching game library...</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Fullscreen Game Stage Player -->
+  <div id="gameStage">
+    <div class="stage-header">
+      <div class="stage-title">
+        <i class="fa-solid fa-gamepad" style="color:var(--accent);"></i>
+        <span id="activeGameTitle">Game Name</span>
+      </div>
+      <div class="stage-controls">
+        <button class="stage-btn" onclick="reloadActiveGame()" title="Reload game"><i class="fa-solid fa-rotate-right"></i> Reload</button>
+        <button class="stage-btn" onclick="toggleStageFullscreen()" title="Toggle fullscreen"><i class="fa-solid fa-expand"></i> Fullscreen</button>
+        <button class="stage-btn stage-btn-close" onclick="closeActiveGame()" title="Exit (Esc)"><i class="fa-solid fa-xmark"></i> Close</button>
+      </div>
+    </div>
+    <iframe id="gameStageIframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
+  </div>
+
+  <!-- Loading Modal Indicator -->
+  <div id="loadingModal">
+    <div class="loading-spinner"></div>
+    <div id="loadingModalText">Preparing game assets...</div>
+  </div>
+
+  <script>
+    const REPO_BASE = "https://cdn.jsdelivr.net/gh/athyx-network/game-library@main/";
+    const GAMES_JSON_URL = REPO_BASE + "games.json";
+
+    let allGames = [];
+    let currentFilter = "all";
+    let activeGameObj = null;
+    let favorites = JSON.parse(localStorage.getItem("athyx_favorites") || "[]");
+
+    const gridEl = document.getElementById("gamesGrid");
+    const countPill = document.getElementById("gameCountPill");
+    const searchBox = document.getElementById("searchBox");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+    const gameStage = document.getElementById("gameStage");
+    const gameStageIframe = document.getElementById("gameStageIframe");
+    const activeGameTitle = document.getElementById("activeGameTitle");
+    const loadingModal = document.getElementById("loadingModal");
+    const loadingModalText = document.getElementById("loadingModalText");
+
+    // Fallback list of games in athyx-network/game-library
+    const fallbackGames = [
+      { "name": "Angry Birds", "path": "Angry Birds.html", "icon": "icons/angry_birds.png", "category": "casual" },
+      { "name": "Bad Piggies", "path": "Bad Piggies.html", "icon": "icons/bad_piggies.png", "category": "casual" },
+      { "name": "Baldi's Basics", "path": "Baldis Basics.html", "icon": "icons/baldis_basics.png", "category": "action" },
+      { "name": "Basketball Stars", "path": "Basketball Stars.html", "icon": "icons/basketball_stars.png", "category": "action" },
+      { "name": "Block Blast", "path": "Block Blast.html", "icon": "icons/block_blast.png", "category": "casual" },
+      { "name": "Bowmasters", "path": "Bow Masters.html", "icon": "icons/bow_masters.png", "category": "action" },
+      { "name": "Brawl Stars", "path": "Brawl Stars.html", "icon": "icons/brawl_stars.png", "category": "action" },
+      { "name": "Cluster Rush", "path": "Cluster Rush.html", "icon": "icons/cluster_rush.png", "category": "action" },
+      { "name": "Cookie Clicker", "path": "Cookie Clicker.html", "icon": "icons/cookie_clicker.png", "category": "casual" },
+      { "name": "Crossy Road", "path": "Crossy Road.html", "icon": "icons/crossy_road.png", "category": "casual" },
+      { "name": "DOOM", "path": "Doom.html", "icon": "icons/doom.png", "category": "classic" },
+      { "name": "Five Nights at Epstein's", "path": "Five Nights At Epsteins.html", "icon": "icons/five_nights_at_epsteins.png", "category": "action" },
+      { "name": "Five Nights at Freddy's", "path": "Five Nights At Freddys.html", "icon": "icons/fnaf1.png", "category": "action" },
+      { "name": "Five Nights at Freddy's 2", "path": "Five Nights At Freddys 2.html", "icon": "icons/fnaf2.png", "category": "action" },
+      { "name": "Geometry Dash", "path": "Geometry Dash.html", "icon": "icons/geometry_dash.svg", "category": "action" },
+      { "name": "Chrome Dino", "path": "Google Dino.html", "icon": "icons/google_dino.png", "category": "classic" },
+      { "name": "Granny", "path": "Granny.html", "icon": "icons/granny.png", "category": "action" },
+      { "name": "Helix Jump", "path": "Helix Jump.html", "icon": "icons/helix_jump.png", "category": "casual" },
+      { "name": "Hypper Sandbox", "path": "Hypper Sandbox.html", "icon": "icons/hypper_sandbox.png", "category": "casual" },
+      { "name": "Minecraft", "path": "Minecraft.html", "icon": "icons/minecraft.png", "category": "classic" },
+      { "name": "Moto X3M", "path": "Moto X3m.html", "icon": "icons/moto_x3m.png", "category": "action" },
+      { "name": "Obby 99% Will Lose", "path": "Obby 99% will lose.html", "icon": "icons/obby.png", "category": "casual" },
+      { "name": "OvO", "path": "OvO.html", "icon": "icons/ovo.png", "category": "action" },
+      { "name": "Plants vs. Zombies", "path": "Plants VS Zombies.html", "icon": "icons/pvz.png", "category": "classic" },
+      { "name": "Raldi's Crackhouse", "path": "Raldis Crackhouse.html", "icon": "icons/raldis_crackhouse.png", "category": "action" },
+      { "name": "Retro Bowl", "path": "Retro Bowl.html", "icon": "icons/retro_bowl.png", "category": "classic" },
+      { "name": "Snow Rider 3D", "path": "Snow Rider.html", "icon": "icons/snow_rider.png", "category": "action" },
+      { "name": "Subway Surfers: St. Petersburg", "path": "Subway Surfers: St .Petersburg.html", "icon": "icons/subway_surfers.png", "category": "action" },
+      { "name": "Wordle", "path": "Wordle.html", "icon": "icons/wordle.png", "category": "casual" }
+    ];
+
+    async function fetchGameLibrary() {
+      try {
+        const res = await fetch(GAMES_JSON_URL);
+        if (!res.ok) throw new Error("Could not load games.json");
+        allGames = await res.json();
+      } catch (err) {
+        console.warn("Using fallback game database:", err);
+        allGames = fallbackGames;
+      }
+      countPill.textContent = `${allGames.length} Games`;
+      renderGames();
+    }
+
+    function toggleFavorite(gameName, e) {
+      if (e) e.stopPropagation();
+      const index = favorites.indexOf(gameName);
+      if (index > -1) {
+        favorites.splice(index, 1);
+      } else {
+        favorites.push(gameName);
+      }
+      localStorage.setItem("athyx_favorites", JSON.stringify(favorites));
+      renderGames();
+    }
+
+    function setCategory(cat) {
+      currentFilter = cat;
+      document.querySelectorAll(".filter-chip").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-filter") === cat);
+      });
+      renderGames();
+    }
+
+    function getFilteredGames() {
+      const query = searchBox.value.trim().toLowerCase();
+      let list = allGames.filter(g => g.name.toLowerCase().includes(query));
+
+      if (currentFilter === "favorites") {
+        list = list.filter(g => favorites.includes(g.name));
+      } else if (currentFilter !== "all") {
+        list = list.filter(g => {
+          const cat = (g.category || "").toLowerCase();
+          const name = g.name.toLowerCase();
+          if (currentFilter === "action") {
+            return cat === "action" || name.includes("rush") || name.includes("fnaf") || name.includes("five nights") || name.includes("moto") || name.includes("dash") || name.includes("brawl") || name.includes("stars") || name.includes("rider");
+          }
+          if (currentFilter === "classic") {
+            return cat === "classic" || name.includes("doom") || name.includes("minecraft") || name.includes("retro") || name.includes("dino") || name.includes("plants") || name.includes("wordle");
+          }
+          if (currentFilter === "casual") {
+            return cat === "casual" || name.includes("cookie") || name.includes("blast") || name.includes("jump") || name.includes("birds") || name.includes("piggies") || name.includes("crossy") || name.includes("baldi") || name.includes("obby");
+          }
+          return true;
+        });
+      }
+
+      // Sort favorites first
+      list.sort((a, b) => {
+        const aFav = favorites.includes(a.name) ? 1 : 0;
+        const bFav = favorites.includes(b.name) ? 1 : 0;
+        return bFav - aFav;
+      });
+
+      return list;
+    }
+
+    function renderGames() {
+      const list = getFilteredGames();
+      gridEl.innerHTML = "";
+
+      if (list.length === 0) {
+        gridEl.innerHTML = `
+          <div class="state-message">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>No games found matching your selection.</span>
+          </div>
+        `;
+        return;
+      }
+
+      list.forEach(game => {
+        const isFav = favorites.includes(game.name);
+        const iconUrl = game.icon ? (game.icon.startsWith("http") ? game.icon : REPO_BASE + encodeURI(game.icon)) : "";
+
+        const card = document.createElement("div");
+        card.className = "game-card";
+
+        card.innerHTML = `
+          <div class="thumb-wrapper">
+            ${iconUrl ? `<img class="game-thumb" src="${iconUrl}" alt="${game.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : ""}
+            <i class="fa-solid fa-gamepad thumb-fallback" style="${iconUrl ? 'display:none;' : ''}"></i>
+            <div class="play-overlay">
+              <div class="play-icon"><i class="fa-solid fa-play"></i></div>
+            </div>
+            <button class="fav-btn ${isFav ? 'active' : ''}" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
+              <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
+            </button>
+          </div>
+          <div class="game-info">
+            <span class="game-title" title="${game.name}">${game.name}</span>
+          </div>
+        `;
+
+        card.querySelector(".fav-btn").onclick = (e) => toggleFavorite(game.name, e);
+        card.onclick = () => launchGame(game);
+
+        gridEl.appendChild(card);
+      });
+    }
+
+    async function launchGame(game) {
+      activeGameObj = game;
+      loadingModalText.textContent = `Loading ${game.name}...`;
+      loadingModal.classList.add("show");
+
+      const gameUrl = REPO_BASE + encodeURI(game.path);
+
+      try {
+        const res = await fetch(gameUrl);
+        if (!res.ok) throw new Error("Status " + res.status);
+        const html = await res.text();
+
+        activeGameTitle.textContent = game.name;
+        gameStageIframe.srcdoc = html;
+        gameStage.classList.add("show");
+      } catch (err) {
+        console.error("Failed to launch game:", err);
+        alert(`Could not launch "${game.name}". Please check your internet connection.`);
+      } finally {
+        loadingModal.classList.remove("show");
+      }
+    }
+
+    function reloadActiveGame() {
+      if (activeGameObj) launchGame(activeGameObj);
+    }
+
+    function closeActiveGame() {
+      gameStage.classList.remove("show");
+      gameStageIframe.srcdoc = "";
+      activeGameObj = null;
+    }
+
+    function toggleStageFullscreen() {
+      if (!document.fullscreenElement) {
+        gameStage.requestFullscreen().catch(err => console.error(err));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Search events
+    searchBox.addEventListener("input", () => {
+      clearSearchBtn.style.display = searchBox.value ? "block" : "none";
+      renderGames();
+    });
+
+    clearSearchBtn.addEventListener("click", () => {
+      searchBox.value = "";
+      clearSearchBtn.style.display = "none";
+      searchBox.focus();
+      renderGames();
+    });
+
+    // Escape listener
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && gameStage.classList.contains("show")) {
+        closeActiveGame();
+      }
+    });
+
+    // Initial fetch
+    fetchGameLibrary();
+  </script>
+
+</body>
+</html>
