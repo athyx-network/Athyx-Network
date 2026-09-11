@@ -834,65 +834,62 @@ function openGameInAboutBlank(item, resolvedUrl) {
   }
 }
 
-// Helper to load game/app content into iframe with full HTML context & web APIs
+// Helper to load game/app content into modal iframe as about:blank (never srcdoc)
 function loadContentIntoIframe(iframe, rawUrl, type) {
   if (!iframe || !rawUrl) return;
 
-  // Clear srcdoc completely so browser doesn't use stale srcdoc
+  // Clear srcdoc completely so browser never sets location to about:srcdoc
   iframe.removeAttribute('srcdoc');
 
   const resolvedUrl = resolveItemUrl(rawUrl);
 
-  // For games: NEVER use srcdoc, always use iframe.src
-  if (type === 'game' || rawUrl.startsWith('games/')) {
+  // If already absolute external URL
+  if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
     iframe.src = resolvedUrl;
     return;
   }
 
-  // If already absolute external URL
-  if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
-    iframe.src = rawUrl;
-    return;
-  }
+  // Fetch the game/app content and write it directly into about:blank inside the player modal
+  fetch(resolvedUrl)
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.text();
+    })
+    .then(html => {
+      iframe.src = 'about:blank';
 
-  const cleanPath = rawUrl.replace(/^\.?\/+/, '');
+      // Compute base URL for relative assets/scripts
+      const baseHref = resolvedUrl.substring(0, resolvedUrl.lastIndexOf('/') + 1);
+      let content = html;
+      if (!content.includes('<base ') && !content.includes('<BASE ')) {
+        if (content.includes('<head>') || content.includes('<HEAD>')) {
+          content = content.replace(/<head>/i, `<head>\n  <base href="${baseHref}">`);
+        } else if (content.includes('<html>') || content.includes('<HTML>')) {
+          content = content.replace(/<html>/i, `<html>\n<head>\n  <base href="${baseHref}">\n</head>`);
+        } else {
+          content = `<base href="${baseHref}">\n` + content;
+        }
+      }
 
-  // For HTML apps only: fetch and run via srcdoc if on web server, otherwise src
-  if (cleanPath.startsWith('apps/')) {
-    fetch(resolvedUrl)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.text();
-      })
-      .then(html => {
-        iframe.srcdoc = html;
-      })
-      .catch(() => {
+      const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+      if (doc) {
+        doc.open();
+        doc.write(content);
+        doc.close();
+      } else {
         iframe.src = resolvedUrl;
-      });
-    return;
-  }
-
-  iframe.src = resolvedUrl;
+      }
+    })
+    .catch(err => {
+      console.warn('Direct about:blank write fallback to src:', err);
+      iframe.src = resolvedUrl;
+    });
 }
 
 // Player Modal Controls
 function openPlayer(item, type) {
-  if (!item) return;
+  if (!item || !playerModal) return;
   activePlayerItem = item;
-  
-  const resolvedUrl = resolveItemUrl(item.url);
-
-  // For games: open directly in about:blank cloaked tab!
-  if (type === 'game' || (item.url && item.url.startsWith('games/'))) {
-    const opened = openGameInAboutBlank(item, resolvedUrl);
-    if (opened) {
-      return;
-    }
-  }
-
-  // Fallback to modal player (or for apps)
-  if (!playerModal) return;
   
   if (playerTitle) playerTitle.textContent = item.title;
   if (playerTypeIcon) {
