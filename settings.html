@@ -844,22 +844,12 @@
           </div>
           <div>
             <h2 class="section-title">Themes & Appearance</h2>
-            <p class="section-desc">Choose a curated theme or color palette for Athyx Network</p>
           </div>
         </div>
         <div class="active-theme-badge" id="activeThemeBadge">
           <span class="badge-dot"></span>
           <span id="activeThemeName">Crimson</span>
         </div>
-      </div>
-
-      <div class="theme-category-pills">
-        <button class="theme-cat-btn active" data-cat="all" onclick="filterThemes('all')">All Themes</button>
-        <button class="theme-cat-btn" data-cat="Classic" onclick="filterThemes('Classic')">Classic</button>
-        <button class="theme-cat-btn" data-cat="Minimal" onclick="filterThemes('Minimal')">Minimal</button>
-        <button class="theme-cat-btn" data-cat="Vibrant" onclick="filterThemes('Vibrant')">Vibrant</button>
-        <button class="theme-cat-btn" data-cat="Neon" onclick="filterThemes('Neon')">Neon</button>
-        <button class="theme-cat-btn" data-cat="Cozy" onclick="filterThemes('Cozy')">Cozy & Pastels</button>
       </div>
 
       <div class="theme-grid" id="themeGrid"></div>
@@ -875,21 +865,6 @@
           <div>
             <h2 class="section-title">Proxy & Wisp Servers</h2>
           </div>
-        </div>
-      </div>
-
-      <div class="proxy-status-box">
-        <div class="proxy-status-info">
-          <span class="proxy-status-label">Active Wisp Server</span>
-          <span class="proxy-status-value">
-            <span id="activeWispName">Lunarr Wisp</span>
-          </span>
-          <span id="activeWispUrl" style="font-family: monospace; font-size: 11.5px; color: var(--text-dim);">wss://lunarrr.eminescusm.ro/w/</span>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn-secondary" onclick="pingAllWispServers()" title="Test server response times">
-            <i class="fa-solid fa-gauge-high"></i> Ping Test All
-          </button>
         </div>
       </div>
 
@@ -916,10 +891,6 @@
           <div class="toggle-knob"></div>
         </div>
       </div>
-
-      <div class="btn-row" style="margin-top: 14px;">
-        <button class="btn-secondary" onclick="resetWispToDefault()"><i class="fa-solid fa-rotate-left"></i> Reset to Default Server</button>
-      </div>
     </div>
 
     
@@ -930,14 +901,12 @@
         </div>
         <div>
           <h2 class="section-title">Navigation & Selection Bar</h2>
-          <p class="section-desc">Customize the floating navigation selection bar appearance</p>
         </div>
       </div>
 
       <div class="setting-row no-border">
         <div class="setting-info">
           <span class="setting-title">Compact Mode (Icons Only)</span>
-          <span class="setting-desc">Remove text labels from the selection bar for a sleek, compact icon-only dock</span>
         </div>
         <div class="toggle-switch" id="compactDockToggle" onclick="toggleCompactDock()" role="switch" aria-checked="false">
           <div class="toggle-knob"></div>
@@ -960,7 +929,6 @@
       <div class="setting-row no-border">
         <div class="setting-info">
           <span class="setting-title">Auto-open on launch</span>
-          <span class="setting-desc">Automatically launch cloaked window whenever Athyx opens</span>
         </div>
         <div class="toggle-switch" id="autoAbToggle" onclick="toggleAutoAboutBlank()" role="switch" aria-checked="false">
           <div class="toggle-knob"></div>
@@ -969,28 +937,6 @@
 
       <div class="btn-row" style="margin-top: 14px;">
         <button class="btn-primary" onclick="openAboutBlank()"><i class="fa-solid fa-arrow-up-right-from-square"></i> Launch About:Blank Now</button>
-      </div>
-    </div>
-
-    
-    <div class="section-card">
-      <div class="section-top">
-        <div class="section-icon-box" style="color: #a855f7;">
-          <i class="fa-solid fa-file-code"></i>
-        </div>
-        <div>
-          <h2 class="section-title">SVG Vector Cloak (.svg)</h2>
-          <p class="section-desc">Run Athyx inside an SVG &lt;foreignObject&gt; image container with IXL learning disguise</p>
-        </div>
-      </div>
-
-      <div class="setting-desc" style="margin-bottom: 14px; font-size: 13px; line-height: 1.5;">
-        SVG cloaking wraps the entire network inside an SVG XML vector image with shims and educational metadata. Most web filters classify it as a harmless image asset.
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-primary" onclick="openSvgCloak()"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open SVG Cloak</button>
-        <button class="btn-secondary" onclick="downloadSvgCloak()"><i class="fa-solid fa-download"></i> Download athyx.svg</button>
       </div>
     </div>
 
@@ -1052,7 +998,6 @@
         </div>
         <div>
           <h2 class="section-title">Emergency Panic Key</h2>
-          <p class="section-desc">Instantly redirect to a safe page when pressing your emergency key</p>
         </div>
       </div>
 
