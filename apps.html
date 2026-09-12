@@ -506,13 +506,15 @@
       return url + sep + "_nc=" + Date.now();
     }
 
+    const APP_ICONS_BASE = "https://cdn.jsdelivr.net/gh/athyx-network/game-library@main/app_icons/";
+
     const apps = [
-      { name: "TurboWarp", file: "turbowarp.html", icon: "icons/turbowarp.png", tag: "Creative" },
-      { name: "Silk Interactive", file: "silk.html", icon: "icons/silk.png", tag: "Art & Math" },
-      { name: "Pico-8 Education", file: "pico8edu.html", icon: "icons/pico8edu.jpg", tag: "Console" },
-      { name: "Github Client", file: "githubclient.html", icon: "icons/githubclient.png", tag: "Developer" },
-      { name: "EmulatorJS", file: "emulatorjs.html", icon: "icons/emulatorjs.png", tag: "Emulator" },
-      { name: "Dos Wasm X", file: "doswasmx.html", icon: "icons/doswasmx.png", tag: "Emulator" }
+      { name: "TurboWarp", file: "turbowarp.html", icon: "turbowarp.png", tag: "Creative" },
+      { name: "Silk Interactive", file: "silk.html", icon: "silk.png", tag: "Art & Math" },
+      { name: "Pico-8 Education", file: "pico8edu.html", icon: "pico8edu.jpg", tag: "Console" },
+      { name: "Github Client", file: "githubclient.html", icon: "githubclient.png", tag: "Developer" },
+      { name: "EmulatorJS", file: "emulatorjs.html", icon: "emulatorjs.png", tag: "Emulator" },
+      { name: "Dos Wasm X", file: "doswasmx.html", icon: "doswasmx.png", tag: "Emulator" }
     ];
 
     let activeAppObj = null;
@@ -549,10 +551,12 @@
       filtered.forEach(app => {
         const card = document.createElement("div");
         card.className = "app-card";
+        const rawIcon = app.icon ? (app.icon.startsWith("http") ? app.icon : APP_ICONS_BASE + app.icon.replace(/^app_icons\//, '').replace(/^icons\//, '')) : "";
+        const iconUrl = rawIcon ? (rawIcon + (rawIcon.includes("?") ? "&" : "?") + "t=" + Date.now()) : "";
 
         card.innerHTML = `
           <div class="app-top">
-            <img class="app-icon" src="${withNoCache(app.icon)}" alt="${app.name}" loading="lazy">
+            <img class="app-icon" src="${iconUrl}" alt="${app.name}" loading="lazy">
             <span class="app-tag">${app.tag}</span>
           </div>
           <div class="app-details">
