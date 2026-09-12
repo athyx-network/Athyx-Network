@@ -273,6 +273,10 @@ async function getSharedConnection() {
     return sharedConnection;
 }
 
+if (localStorage.getItem('wispAutoswitch') === null) {
+    localStorage.setItem('wispAutoswitch', 'true');
+}
+
 async function initializeBrowser() {
     const root = document.getElementById("app");
     root.innerHTML = `
@@ -286,7 +290,9 @@ async function initializeBrowser() {
                     <input class="bar" id="address-bar" autocomplete="off" placeholder="Search or enter URL">
                     <button id="home-btn-nav" title="Home"><i class="fa-solid fa-house"></i></button>
                 </div>
-                <button id="devtools-btn" title="DevTools"><i class="fa-solid fa-code"></i></button>
+                <button id="devtools-btn" title="Inspect / DevTools"><i class="fa-solid fa-code"></i></button>
+                <button id="fullscreen-btn" title="Toggle Fullscreen"><i class="fa-solid fa-expand"></i></button>
+                <button id="cloak-btn" title="Open in Cloaked Tab"><i class="fa-solid fa-mask"></i></button>
                 <button id="wisp-settings-btn" title="Proxy Settings"><i class="fa-solid fa-gear"></i></button>
             </div>
             <div class="loading-bar-container"><div class="loading-bar" id="loading-bar"></div></div>
@@ -323,6 +329,16 @@ async function initializeBrowser() {
     elements.reloadBtn.onclick = () => getActiveTab()?.frame.reload();
     document.getElementById('home-btn-nav').onclick = () => window.location.href = '../index.html';
     document.getElementById('devtools-btn').onclick = toggleDevTools;
+    document.getElementById('fullscreen-btn').onclick = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+            document.exitFullscreen().catch(() => {});
+        }
+    };
+    document.getElementById('cloak-btn').onclick = () => {
+        if (typeof cloakPage === 'function') cloakPage();
+    };
     document.getElementById('wisp-settings-btn').onclick = openSettings;
 
     
@@ -768,16 +784,38 @@ function setWisp(url) {
 }
 
 function toggleDevTools() {
-    const win = getActiveTab()?.frame.frame.contentWindow;
-    if (!win) return;
-    if (win.eruda) {
-        win.eruda.show();
-        return;
+    const frame = getActiveTab()?.frame?.frame;
+    if (!frame) return;
+    try {
+        const win = frame.contentWindow;
+        if (!win) return;
+        if (win.eruda) {
+            if (win.eruda._isInit) {
+                const entry = win.document.querySelector('.eruda-entry-btn');
+                if (entry && entry.style.display === 'none') {
+                    win.eruda.show();
+                } else {
+                    win.eruda.hide();
+                }
+            } else {
+                win.eruda.init();
+                win.eruda.show();
+            }
+            return;
+        }
+        const script = win.document.createElement('script');
+        script.src = "https://cdn.jsdelivr.net/npm/eruda";
+        script.onload = () => {
+            if (win.eruda) {
+                win.eruda.init();
+                win.eruda.show();
+                notify('info', 'DevTools', 'Eruda DevTools injected.');
+            }
+        };
+        win.document.head.appendChild(script);
+    } catch (e) {
+        notify('warning', 'DevTools', 'Could not access frame content directly.');
     }
-    const script = win.document.createElement('script');
-    script.src = "https://cdn.jsdelivr.net/npm/eruda";
-    script.onload = () => { win.eruda.init(); win.eruda.show(); };
-    win.document.body.appendChild(script);
 }
 
 async function checkHashParameters() {
