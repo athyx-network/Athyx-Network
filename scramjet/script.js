@@ -264,12 +264,16 @@ async function getSharedConnection() {
     const basePath = getBasePath();
     const wispUrl = localStorage.getItem("proxServer") ?? DEFAULT_WISP;
     
-    sharedConnection = new BareMux.BareMuxConnection(basePath + "bareworker.js");
-    await sharedConnection.setTransport(
-        "https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport@2.1.28/dist/index.mjs",
-        [{ wisp: wispUrl }]
-    );
-    sharedConnectionReady = true;
+    try {
+        sharedConnection = new BareMux.BareMuxConnection(basePath + "bareworker.js");
+        await sharedConnection.setTransport(
+            "https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport@2.1.28/dist/index.mjs",
+            [{ wisp: wispUrl }]
+        );
+        sharedConnectionReady = true;
+    } catch (e) {
+        console.warn("Shared connection initialization warning:", e);
+    }
     return sharedConnection;
 }
 

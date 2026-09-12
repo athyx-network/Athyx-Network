@@ -107,9 +107,7 @@ let serverHealth = new Map();
 let currentServerStartTime = null;
 const MAX_CONSECUTIVE_FAILURES = 2;
 const PING_TIMEOUT = 2500;
-
-let resolveConfigReady;
-const configReadyPromise = new Promise(resolve => resolveConfigReady = resolve);
+const FETCH_TIMEOUT_MS = 15000;
 
 async function pingServer(url) {
     return new Promise((resolve) => {
@@ -158,6 +156,7 @@ function switchToServer(url, latency = null) {
     
     console.log(`SW: Switching from ${wispConfig.wispurl} to ${url}`);
     wispConfig.wispurl = url;
+    wispConfig.activeClientUrl = null;
     currentServerStartTime = Date.now();
     
     self.clients.matchAll().then(clients => {
@@ -201,9 +200,11 @@ async function proactiveServerCheck() {
 self.addEventListener("message", ({ data }) => {
     if (!data) return;
     if (data.type === "config") {
-        if (data.wispurl) {
+        if (data.wispurl && data.wispurl !== wispConfig.wispurl) {
             wispConfig.wispurl = data.wispurl;
-            console.log("SW: Configured wispurl:", data.wispurl);
+            wispConfig.activeClientUrl = null;
+            if (scramjet && scramjet.client) scramjet.client = null;
+            console.log("SW: Updated wispurl:", data.wispurl);
             currentServerStartTime = Date.now();
         }
         if (data.servers && data.servers.length > 0) {
@@ -217,11 +218,6 @@ self.addEventListener("message", ({ data }) => {
             if (wispConfig.autoswitch && wispConfig.servers?.length > 0) {
                 setTimeout(proactiveServerCheck, 400);
             }
-        }
-        
-        if (wispConfig.wispurl && resolveConfigReady) {
-            resolveConfigReady();
-            resolveConfigReady = null;
         }
     } else if (data.type === "ping") {
         pingServer(wispConfig.wispurl).then(result => {
@@ -240,9 +236,13 @@ self.addEventListener("fetch", (event) => {
             return new Response(new ArrayBuffer(0), { status: 204 });
         }
 
-        await scramjet.loadConfig();
-        if (scramjet.route(event)) {
-            return scramjet.fetch(event);
+        try {
+            await scramjet.loadConfig();
+            if (scramjet.route(event)) {
+                return await scramjet.fetch(event);
+            }
+        } catch (err) {
+            console.warn("SW fetch routing error:", err);
         }
         return fetch(event.request);
     })());
@@ -283,26 +283,61 @@ function sanitizeHeadersForHttp2(headers) {
     return sanitized;
 }
 
+let clientInitPromise = null;
 async function ensureClient(wispUrl) {
-    const connection = new BareMux.BareMuxConnection(basePath + "bareworker.js");
-    await connection.setTransport(
-        "https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport@2.1.28/dist/index.mjs",
-        [{ wisp: wispUrl }]
-    );
-    scramjet.client = new BareMux.BareClient();
-    return scramjet.client;
+    if (scramjet.client && wispConfig.activeClientUrl === wispUrl) {
+        return scramjet.client;
+    }
+    if (clientInitPromise) {
+        return await clientInitPromise;
+    }
+
+    clientInitPromise = (async () => {
+        try {
+            const connection = new BareMux.BareMuxConnection(basePath + "bareworker.js");
+            await connection.setTransport(
+                "https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport@2.1.28/dist/index.mjs",
+                [{ wisp: wispUrl }]
+            );
+            scramjet.client = new BareMux.BareClient();
+            wispConfig.activeClientUrl = wispUrl;
+            return scramjet.client;
+        } finally {
+            clientInitPromise = null;
+        }
+    })();
+
+    return await clientInitPromise;
+}
+
+async function fetchWithTimeout(client, url, options, timeoutMs = FETCH_TIMEOUT_MS) {
+    let timer;
+    const timeoutPromise = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`Request to ${url} timed out after ${timeoutMs}ms`)), timeoutMs);
+    });
+
+    try {
+        const res = await Promise.race([
+            client.fetch(url, options),
+            timeoutPromise
+        ]);
+        clearTimeout(timer);
+        return res;
+    } catch (err) {
+        clearTimeout(timer);
+        throw err;
+    }
 }
 
 scramjet.addEventListener("request", async (e) => {
     e.response = (async () => {
-        await configReadyPromise;
-        
-        if (!wispConfig.wispurl) {
-            return new Response("Wisp URL not configured", { status: 500 });
-        }
+        const targetWisp = wispConfig.wispurl || "wss://lunarrr.eminescusm.ro/w/";
 
-        if (!scramjet.client) {
-            await ensureClient(wispConfig.wispurl);
+        try {
+            await ensureClient(targetWisp);
+        } catch (connErr) {
+            console.error("SW: Failed to initialize BareClient:", connErr);
+            return new Response("Wisp Connection Error: " + connErr.message, { status: 503 });
         }
 
         const reqHeaders = sanitizeHeadersForHttp2(e.requestHeaders);
@@ -319,12 +354,12 @@ scramjet.addEventListener("request", async (e) => {
             fetchOptions.duplex = "half";
         }
 
-        const MAX_RETRIES = 2;
+        const MAX_RETRIES = 1;
         let lastErr;
 
         for (let i = 0; i <= MAX_RETRIES; i++) {
             try {
-                const response = await scramjet.client.fetch(e.url, fetchOptions);
+                const response = await fetchWithTimeout(scramjet.client, e.url, fetchOptions, FETCH_TIMEOUT_MS);
                 updateServerHealth(wispConfig.wispurl, true);
                 return response;
             } catch (err) {
@@ -337,49 +372,29 @@ scramjet.addEventListener("request", async (e) => {
                     errMsg.includes("http2") ||
                     errMsg.includes("protocol") ||
                     errMsg.includes("closed") ||
+                    errMsg.includes("timeout") ||
                     errMsg.includes("broken pipe");
 
                 if (!isRetryable || i === MAX_RETRIES) break;
 
                 console.warn(`Scramjet retry ${i + 1}/${MAX_RETRIES} for ${e.url} due to: ${err.message}`);
 
-                // Try quick failover to next active server in pool on retry
+                // If failover enabled, switch to another server
                 if (wispConfig.autoswitch && wispConfig.servers && wispConfig.servers.length > 1) {
                     const nextServer = wispConfig.servers.find(s => s.url !== wispConfig.wispurl);
                     if (nextServer) {
                         try {
-                            console.log(`SW: Retrying with failover server ${nextServer.url}`);
                             switchToServer(nextServer.url);
                             await ensureClient(nextServer.url);
                         } catch {}
                     }
                 }
 
-                await new Promise(r => setTimeout(r, 300 * (i + 1)));
+                await new Promise(r => setTimeout(r, 250));
             }
         }
 
         updateServerHealth(wispConfig.wispurl, false);
-
-        // Background failover check
-        if (wispConfig.autoswitch && wispConfig.servers && wispConfig.servers.length > 1) {
-            const currentHealth = serverHealth.get(wispConfig.wispurl);
-            if (currentHealth && currentHealth.consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-                for (const server of wispConfig.servers) {
-                    if (server.url === wispConfig.wispurl) continue;
-                    const serverH = serverHealth.get(server.url);
-                    if (!serverH || serverH.consecutiveFailures < MAX_CONSECUTIVE_FAILURES) {
-                        const pingResult = await pingServer(server.url);
-                        if (pingResult.success) {
-                            console.log(`SW: Auto-switching to ${server.url} due to repeated failures`);
-                            switchToServer(server.url, pingResult.latency);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
         console.error("Scramjet Final Fetch Error:", lastErr);
         return new Response("Scramjet Fetch Error: " + (lastErr ? lastErr.message : "Network Error"), { status: 502 });
     })();
