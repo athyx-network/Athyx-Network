@@ -1,5 +1,1 @@
-Website maintained and created by Ethyrnal.
-Links: https://sites.google.com/view/spacepton
-
-For future:
-Implement user counter using replit api https://realtime-visitor-counter--daniilkhramov4.replit.app/
+Welcome to my Github page or my ubg repo. They both use the same name so github forces me to have the repo that has my name's readme be in my bio
