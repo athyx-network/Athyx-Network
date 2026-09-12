@@ -367,52 +367,93 @@ async function initializeBrowser() {
     checkHashParameters();
 }
 
+function getProxyEngine() {
+    return localStorage.getItem('proxyEngine') || 'uv';
+}
+
+function setProxyEngine(engine) {
+    localStorage.setItem('proxyEngine', engine);
+    updateEngineUI();
+    notify('success', 'Engine Changed', `Now using ${engine === 'uv' ? 'Ultraviolet (Recommended)' : 'Scramjet'}`);
+    const activeTab = getActiveTab();
+    if (activeTab && activeTab.url && !activeTab.url.includes('NT.html')) {
+        handleSubmit(activeTab.url);
+    }
+}
+window.setProxyEngine = setProxyEngine;
+
+function updateEngineUI() {
+    const engine = getProxyEngine();
+    const uvCard = document.getElementById('engine-card-uv');
+    const sjCard = document.getElementById('engine-card-scramjet');
+    if (uvCard) uvCard.classList.toggle('active', engine === 'uv');
+    if (sjCard) sjCard.classList.toggle('active', engine === 'scramjet');
+}
+
+function navigateTab(tab, targetUrl) {
+    const engine = getProxyEngine();
+    tab.url = targetUrl;
+    tab.loading = true;
+    tab.loadStartTime = Date.now();
+    showIframeLoading(true, targetUrl);
+    updateLoadingBar(tab, 25);
+
+    try {
+        const urlObj = new URL(targetUrl);
+        tab.title = urlObj.hostname;
+        tab.favicon = `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=32`;
+    } catch {
+        tab.title = "Browsing";
+        tab.favicon = null;
+    }
+    updateTabsUI();
+    updateAddressBar();
+
+    const iframe = tab.frame.frame || tab.frame;
+    const rootPath = getBasePath().replace(/\/scramjet\/$/, '/');
+
+    if (engine === 'uv') {
+        const prefix = window.__uv$config?.prefix || (rootPath + 'uv/service/');
+        const encode = window.__uv$config?.encodeUrl || (u => (typeof Ultraviolet !== 'undefined' ? Ultraviolet.codec.xor.encode(u) : encodeURIComponent(u)));
+        iframe.src = prefix + encode(targetUrl);
+    } else {
+        iframe.src = getBasePath() + 'scramjet/' + encodeURIComponent(targetUrl);
+    }
+}
+
 function createTab(makeActive = true) {
-    const frame = sharedScramjet.createFrame();
+    const tabId = nextTabId++;
+    const iframe = document.createElement("iframe");
+    iframe.id = "tab-frame-" + tabId;
+    iframe.src = "NT.html";
+    iframe.style.cssText = "width:100%; height:100%; border:none; background:transparent;";
+
     const tab = {
-        id: nextTabId++,
+        id: tabId,
         title: "New Tab",
         url: "NT.html",
-        frame,
+        frame: {
+            frame: iframe,
+            back: () => {
+                try { iframe.contentWindow?.history.back(); } catch(e) {}
+            },
+            forward: () => {
+                try { iframe.contentWindow?.history.forward(); } catch(e) {}
+            },
+            reload: () => {
+                try { iframe.contentWindow?.location.reload(); } catch(e) {}
+            },
+            go: (targetUrl) => {
+                navigateTab(tab, targetUrl);
+            }
+        },
         loading: false,
         favicon: null,
         skipTimeout: null,
         loadStartTime: null
     };
 
-    frame.frame.src = "NT.html";
-
-    frame.addEventListener("urlchange", (e) => {
-        tab.url = e.url;
-        tab.loading = true;
-        tab.loadStartTime = Date.now();
-
-        if (tab.id === activeTabId) {
-            showIframeLoading(true, tab.url);
-        }
-
-        try {
-            const urlObj = new URL(e.url);
-            tab.title = urlObj.hostname;
-            tab.favicon = `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=32`;
-        } catch {
-            tab.title = "Browsing";
-            tab.favicon = null;
-        }
-        
-        updateTabsUI();
-        updateAddressBar();
-        updateLoadingBar(tab, 10);
-
-        if (tab.skipTimeout) clearTimeout(tab.skipTimeout);
-        tab.skipTimeout = setTimeout(() => {
-            if (tab.loading && tab.id === activeTabId) {
-                document.getElementById('skip-btn')?.style.setProperty('display', 'inline-block');
-            }
-        }, 200);
-    });
-
-    frame.frame.addEventListener('load', () => {
+    iframe.addEventListener('load', () => {
         tab.loading = false;
         clearTimeout(tab.skipTimeout);
 
@@ -421,15 +462,35 @@ function createTab(makeActive = true) {
         }
 
         try {
-            const title = frame.frame.contentWindow.document.title;
-            if (title) tab.title = title;
-        } catch { }
+            const win = iframe.contentWindow;
+            const currentHref = win.location.href;
 
-        if (frame.frame.contentWindow.location.href.includes('NT.html')) {
-            tab.title = "New Tab";
-            tab.url = "";
-            tab.favicon = null;
-        }
+            if (currentHref.includes('NT.html')) {
+                tab.title = "New Tab";
+                tab.url = "";
+                tab.favicon = null;
+            } else if (currentHref.includes('/uv/service/') && window.__uv$config?.decodeUrl) {
+                const encoded = currentHref.split('/uv/service/')[1];
+                if (encoded) {
+                    const decoded = window.__uv$config.decodeUrl(encoded);
+                    tab.url = decoded;
+                    const u = new URL(decoded);
+                    tab.title = win.document.title || u.hostname;
+                    tab.favicon = `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=32`;
+                }
+            } else if (currentHref.includes('/scramjet/scramjet/')) {
+                const encoded = currentHref.split('/scramjet/scramjet/')[1];
+                if (encoded) {
+                    const decoded = decodeURIComponent(encoded);
+                    tab.url = decoded;
+                    const u = new URL(decoded);
+                    tab.title = win.document.title || u.hostname;
+                    tab.favicon = `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=32`;
+                }
+            } else {
+                if (win.document.title) tab.title = win.document.title;
+            }
+        } catch (e) { }
 
         updateTabsUI();
         updateAddressBar();
@@ -437,7 +498,7 @@ function createTab(makeActive = true) {
     });
 
     tabs.push(tab);
-    document.getElementById("iframe-container").appendChild(frame.frame);
+    document.getElementById("iframe-container").appendChild(iframe);
     if (makeActive) switchTab(tab.id);
     return tab;
 }
@@ -538,16 +599,15 @@ function handleSubmit(url) {
     let input = url ?? document.getElementById("address-bar").value.trim();
     if (!input) return;
 
-    if (!input.startsWith('http')) {
+    if (!input.startsWith('http://') && !input.startsWith('https://')) {
         input = input.includes('.') && !input.includes(' ') 
             ? `https://${input}`
             : `https://search.brave.com/search?q=${encodeURIComponent(input)}`;
     }
     
-    tab.loading = true;
-    showIframeLoading(true, input);
-    updateLoadingBar(tab, 10);
-    tab.frame.go(input);
+    if (tab) {
+        tab.frame.go(input);
+    }
 }
 
 function updateLoadingBar(tab, percent) {
@@ -581,6 +641,7 @@ function openSettings() {
     }
 
     modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
+    updateEngineUI();
     renderServerList();
 }
 
@@ -839,6 +900,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         await getSharedConnection();
 
         if ('serviceWorker' in navigator) {
+            const rootPath = getBasePath().replace(/\/scramjet\/$/, '/');
+            try {
+                navigator.serviceWorker.register(rootPath + 'uv/sw.js', { scope: rootPath + 'uv/' }).catch(e => console.warn("UV SW registration:", e));
+            } catch (e) {}
+
             const reg = await navigator.serviceWorker.register(getBasePath() + 'sw.js', { scope: getBasePath() });
             
             
