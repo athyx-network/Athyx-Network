@@ -118,9 +118,28 @@ const getStoredWisps = () => {
 const getActiveTab = () => tabs.find(t => t.id === activeTabId);
 
 const notify = (type, title, message) => {
-    if (typeof Notify !== 'undefined') {
+    if (typeof Notify !== 'undefined' && Notify[type]) {
         Notify[type](title, message);
+        return;
     }
+    let container = document.querySelector('.notification-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'notification-container';
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = 'notification';
+    const icon = type === 'error' ? 'fa-circle-xmark' : type === 'warning' ? 'fa-triangle-exclamation' : type === 'info' ? 'fa-circle-info' : 'fa-circle-check';
+    const color = type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : type === 'info' ? '#3b82f6' : '#10b981';
+    toast.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size:16px;"></i><div><div style="font-weight:600;font-size:13px;">${title}</div><div style="color:var(--text-muted);font-size:12px;">${message}</div></div>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3200);
 };
 
 async function getSharedScramjet() {
@@ -452,8 +471,22 @@ function openSettings() {
     modal.classList.remove('hidden');
 
     document.getElementById('close-wisp-modal').onclick = () => modal.classList.add('hidden');
+    
     const saveBtn = document.getElementById('save-custom-wisp');
     if (saveBtn) saveBtn.onclick = saveCustomWisp;
+
+    const urlInput = document.getElementById('custom-wisp-input');
+    if (urlInput) {
+        urlInput.onkeydown = (e) => {
+            if (e.key === 'Enter') saveCustomWisp();
+        };
+    }
+    const nameInput = document.getElementById('custom-wisp-name');
+    if (nameInput) {
+        nameInput.onkeydown = (e) => {
+            if (e.key === 'Enter') saveCustomWisp();
+        };
+    }
 
     modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
     renderServerList();
@@ -474,14 +507,15 @@ function renderServerList() {
         item.className = `wisp-option ${isActive ? 'active' : ''}`;
 
         const deleteBtn = isCustom
-            ? `<button class="delete-wisp-btn" onclick="event.stopPropagation(); deleteCustomWisp('${server.url}')"><i class="fa-solid fa-trash"></i></button>`
+            ? `<button class="delete-wisp-btn" title="Remove Server" onclick="event.stopPropagation(); deleteCustomWisp('${server.url}')"><i class="fa-solid fa-trash"></i></button>`
             : '';
 
         item.innerHTML = `
             <div class="wisp-option-header">
                 <div class="wisp-option-name">
                     ${server.name}
-                    ${isActive ? '<i class="fa-solid fa-check" style="margin-left:8px; font-size: 0.7em; color: var(--accent);"></i>' : ''}
+                    ${isCustom ? '<span style="font-size:10px; padding:2px 6px; border-radius:4px; background:var(--accent-dim); color:var(--accent); margin-left:6px; font-weight:600;">CUSTOM</span>' : ''}
+                    ${isActive ? '<i class="fa-solid fa-check" style="margin-left:8px; font-size: 0.75em; color: var(--accent);"></i>' : ''}
                 </div>
                 <div class="server-status">
                     ${deleteBtn}
@@ -522,36 +556,60 @@ function renderServerList() {
 }
 
 function saveCustomWisp() {
-    const input = document.getElementById('custom-wisp-input');
-    const url = input.value.trim();
+    const nameInput = document.getElementById('custom-wisp-name');
+    const urlInput = document.getElementById('custom-wisp-input');
 
-    if (!url) return;
-    if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
-        notify('error', 'Invalid URL', 'URL must start with wss:// or ws://');
+    let name = nameInput ? nameInput.value.trim() : '';
+    let url = urlInput ? urlInput.value.trim() : '';
+
+    if (!url) {
+        notify('error', 'Missing URL', 'Please enter a Wisp WebSocket URL.');
+        return;
+    }
+
+    if (url.startsWith('http://')) {
+        url = 'ws://' + url.slice(7);
+    } else if (url.startsWith('https://')) {
+        url = 'wss://' + url.slice(8);
+    } else if (!url.startsWith('ws://') && !url.startsWith('wss://')) {
+        url = 'wss://' + url;
+    }
+
+    try {
+        const parsed = new URL(url);
+        if (!name) {
+            name = `Custom (${parsed.hostname})`;
+        }
+    } catch (e) {
+        notify('error', 'Invalid URL', 'Please enter a valid WebSocket URL (e.g. wss://example.com/wisp/)');
         return;
     }
 
     const customWisps = getStoredWisps();
-    if (customWisps.some(w => w.url === url) || WISP_SERVERS.some(w => w.url === url)) {
+    if (customWisps.some(w => w.url.toLowerCase() === url.toLowerCase()) || WISP_SERVERS.some(w => w.url.toLowerCase() === url.toLowerCase())) {
         notify('warning', 'Already Exists', 'This server is already in the list.');
         return;
     }
 
-    const newServer = { name: `Custom ${customWisps.length + 1}`, url };
+    const newServer = { name, url };
     customWisps.push(newServer);
     localStorage.setItem('customWisps', JSON.stringify(customWisps));
-    
-    
+
+    if (nameInput) nameInput.value = '';
+    if (urlInput) urlInput.value = '';
+
+    notify('success', 'Server Added', `Added ${name}`);
+    renderServerList();
     setWisp(url);
-    
-    input.value = '';
 }
 
 window.deleteCustomWisp = function (urlToDelete) {
-    if (!confirm("Remove this server?")) return;
+    if (!confirm("Remove this custom server?")) return;
 
     let customWisps = getStoredWisps().filter(w => w.url !== urlToDelete);
     localStorage.setItem('customWisps', JSON.stringify(customWisps));
+
+    notify('info', 'Server Removed', 'Custom server was removed.');
 
     if (localStorage.getItem('proxServer') === urlToDelete) {
         setWisp(DEFAULT_WISP);
