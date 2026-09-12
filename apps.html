@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Apps Hub &bull; Athyx Network</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="themes.css">
   <script src="themes.js"></script>
@@ -34,7 +40,8 @@
       padding: 0;
     }
 
-    html, body {
+    html,
+    body {
       min-height: 100%;
       background: var(--bg);
       color: var(--text);
@@ -347,97 +354,102 @@
       font-weight: 600;
       color: #fff;
       display: flex;
-    /* Floating Quit Button */
-    .stage-quit-btn {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      z-index: 100000;
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: rgba(18, 18, 22, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #f43f5e;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      outline: none;
-      opacity: 0.85;
-    }
 
-    .stage-quit-btn:hover {
-      opacity: 1;
-      background: #ef4444;
-      border-color: #ef4444;
-      color: #ffffff;
-      transform: scale(1.08);
-      box-shadow: 0 10px 28px -2px rgba(239, 68, 68, 0.5);
-    }
-
-    .stage-quit-btn:active {
-      transform: scale(0.95);
-    }
-
-    #appStageIframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #000;
-      overflow: hidden;
-    }
-
-    /* Loading modal */
-    #loadingModal {
-      position: fixed;
-      inset: 0;
-      background: rgba(9, 9, 11, 0.85);
-      backdrop-filter: blur(8px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 100000;
-      color: #fff;
-    }
-
-    #loadingModal.show {
-      display: flex;
-    }
-
-    .loading-spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid rgba(255, 255, 255, 0.1);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    @media (max-width: 600px) {
-      #topBar {
-        padding: 12px 16px;
+      /* Floating Quit Button */
+      .stage-quit-btn {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 100000;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: rgba(18, 18, 22, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #f43f5e;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        outline: none;
+        opacity: 0.85;
       }
-      .main-content {
-        padding: 20px 16px 120px;
+
+      .stage-quit-btn:hover {
+        opacity: 1;
+        background: #ef4444;
+        border-color: #ef4444;
+        color: #ffffff;
+        transform: scale(1.08);
+        box-shadow: 0 10px 28px -2px rgba(239, 68, 68, 0.5);
       }
-      .apps-grid {
-        grid-template-columns: 1fr;
+
+      .stage-quit-btn:active {
+        transform: scale(0.95);
       }
-    }
+
+      #appStageIframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: #000;
+        overflow: hidden;
+      }
+
+      /* Loading modal */
+      #loadingModal {
+        position: fixed;
+        inset: 0;
+        background: rgba(9, 9, 11, 0.85);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        z-index: 100000;
+        color: #fff;
+      }
+
+      #loadingModal.show {
+        display: flex;
+      }
+
+      .loading-spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 600px) {
+        #topBar {
+          padding: 12px 16px;
+        }
+
+        .main-content {
+          padding: 20px 16px 120px;
+        }
+
+        .apps-grid {
+          grid-template-columns: 1fr;
+        }
+      }
   </style>
 </head>
 
@@ -474,7 +486,9 @@
     <button class="stage-quit-btn" onclick="closeActiveApp()" title="Quit App (Esc)" aria-label="Quit App">
       <i class="fa-solid fa-xmark"></i>
     </button>
-    <iframe id="appStageIframe" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated" scrolling="no"></iframe>
+    <iframe id="appStageIframe"
+      allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated"
+      scrolling="no"></iframe>
   </div>
 
   <!-- Loading Modal Indicator -->
@@ -484,6 +498,14 @@
   </div>
 
   <script>
+    function withNoCache(url) {
+      if (!url || typeof url !== "string") return url;
+      if (url.startsWith("data:") || url.startsWith("blob:") || url.startsWith("javascript:")) return url;
+      if (url.includes("_nc=")) return url;
+      const sep = url.includes("?") ? "&" : "?";
+      return url + sep + "_nc=" + Date.now();
+    }
+
     const apps = [
       { name: "TurboWarp", file: "turbowarp.html", icon: "icons/turbowarp.png", tag: "Creative" },
       { name: "Silk Interactive", file: "silk.html", icon: "icons/silk.png", tag: "Art & Math" },
@@ -506,8 +528,8 @@
 
     function renderApps() {
       const query = searchBox.value.trim().toLowerCase();
-      const filtered = apps.filter(app => 
-        app.name.toLowerCase().includes(query) || 
+      const filtered = apps.filter(app =>
+        app.name.toLowerCase().includes(query) ||
         app.tag.toLowerCase().includes(query)
       );
 
@@ -527,11 +549,10 @@
       filtered.forEach(app => {
         const card = document.createElement("div");
         card.className = "app-card";
-        const iconUrl = app.icon ? (app.icon + (app.icon.includes("?") ? "&" : "?") + "t=" + Date.now()) : "";
 
         card.innerHTML = `
           <div class="app-top">
-            <img class="app-icon" src="${iconUrl}" alt="${app.name}" loading="lazy">
+            <img class="app-icon" src="${withNoCache(app.icon)}" alt="${app.name}" loading="lazy">
             <span class="app-tag">${app.tag}</span>
           </div>
           <div class="app-details">
@@ -554,24 +575,32 @@
       loadingModal.classList.add("show");
 
       try {
-        const response = await fetch(`apps/${app.file}`);
+        const response = await fetch(withNoCache(`apps/${app.file}`), {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+          }
+        });
         if (!response.ok) throw new Error("Status " + response.status);
         const html = await response.text();
 
         document.body.classList.add("app-active");
 
-        // Hide scrollbars inside app iframe srcdoc
+        // Hide scrollbars & inject no-cache meta inside app iframe srcdoc
+        const noCacheMeta = `<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">`;
         const hideScrollCss = `<style>html, body { overflow: hidden !important; margin: 0; padding: 0; width: 100%; height: 100%; } *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }</style>`;
         const cleanHtml = html.includes("<head>")
-          ? html.replace("<head>", "<head>" + hideScrollCss)
-          : hideScrollCss + html;
+          ? html.replace("<head>", "<head>" + noCacheMeta + hideScrollCss)
+          : "<head>" + noCacheMeta + hideScrollCss + "</head>" + html;
 
         appStageIframe.srcdoc = cleanHtml;
         appStage.classList.add("show");
 
         try {
           window.parent.postMessage({ action: "athyx_game_active", active: true }, "*");
-        } catch(e) {}
+        } catch (e) { }
       } catch (err) {
         console.error("Failed to load app:", err);
         alert(`Failed to load ${app.name}.`);
@@ -590,11 +619,11 @@
       activeAppObj = null;
       document.body.classList.remove("app-active");
       if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
+        document.exitFullscreen().catch(() => { });
       }
       try {
         window.parent.postMessage({ action: "athyx_game_active", active: false }, "*");
-      } catch(e) {}
+      } catch (e) { }
     }
 
     function toggleStageFullscreen() {
@@ -627,4 +656,5 @@
   </script>
 
 </body>
+
 </html>

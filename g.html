@@ -760,130 +760,36 @@
 })();
 <\/script>`;
 
-        // Auto-Scaler & Compatibility Injection
-        const autoScalerShim = `
+        // Clean default container styling (non-destructive)
+        const defaultStyleShim = `
 <style>
 html, body {
-  width: 100vw !important;
-  height: 100vh !important;
   margin: 0 !important;
   padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
   overflow: hidden !important;
   background: #000 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-* {
-  scrollbar-width: none !important;
 }
 *::-webkit-scrollbar {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
 }
-#gameContainer, #unity-container, #canvas-container, #c2canvasdiv, #player, .game-container {
-  width: 100vw !important;
-  height: 100vh !important;
-  max-width: 100vw !important;
-  max-height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  overflow: hidden !important;
-  position: absolute !important;
-  inset: 0 !important;
+* {
+  scrollbar-width: none !important;
 }
-canvas, #gameContainer canvas, #unity-canvas, canvas#canvas {
-  max-width: 100vw !important;
-  max-height: 100vh !important;
-  object-fit: contain !important;
-  margin: auto !important;
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  transform: none !important;
+iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  display: block !important;
 }
-</style>
-<script>
-(function() {
-  function autoScaleGame() {
-    try {
-      const canvases = document.querySelectorAll('canvas');
-      const containers = document.querySelectorAll('#gameContainer, #unity-container, #canvas-container, #c2canvasdiv, #player, .game-container');
-      
-      containers.forEach(function(el) {
-        el.style.setProperty('width', '100vw', 'important');
-        el.style.setProperty('height', '100vh', 'important');
-        el.style.setProperty('max-width', '100vw', 'important');
-        el.style.setProperty('max-height', '100vh', 'important');
-        el.style.setProperty('display', 'flex', 'important');
-        el.style.setProperty('align-items', 'center', 'important');
-        el.style.setProperty('justify-content', 'center', 'important');
-        el.style.setProperty('overflow', 'hidden', 'important');
-        el.style.setProperty('margin', '0', 'important');
-        el.style.setProperty('padding', '0', 'important');
-        el.style.setProperty('position', 'absolute', 'important');
-        el.style.setProperty('inset', '0', 'important');
-      });
-
-      canvases.forEach(function(canvas) {
-        const nativeW = canvas.width || parseFloat(canvas.getAttribute('width')) || 960;
-        const nativeH = canvas.height || parseFloat(canvas.getAttribute('height')) || 600;
-        const aspect = (nativeW && nativeH) ? (nativeW / nativeH) : (16 / 9);
-
-        const winW = window.innerWidth || document.documentElement.clientWidth;
-        const winH = window.innerHeight || document.documentElement.clientHeight;
-        const winAspect = winW / winH;
-
-        let scaleW, scaleH;
-        if (winAspect > aspect) {
-          scaleH = winH;
-          scaleW = Math.round(scaleH * aspect);
-        } else {
-          scaleW = winW;
-          scaleH = Math.round(scaleW / aspect);
-        }
-
-        canvas.style.setProperty('width', scaleW + 'px', 'important');
-        canvas.style.setProperty('height', scaleH + 'px', 'important');
-        canvas.style.setProperty('max-width', '100vw', 'important');
-        canvas.style.setProperty('max-height', '100vh', 'important');
-        canvas.style.setProperty('object-fit', 'contain', 'important');
-        canvas.style.setProperty('position', 'relative', 'important');
-        canvas.style.setProperty('top', 'auto', 'important');
-        canvas.style.setProperty('left', 'auto', 'important');
-        canvas.style.setProperty('transform', 'none', 'important');
-        canvas.style.setProperty('margin', 'auto', 'important');
-        canvas.style.setProperty('display', 'block', 'important');
-      });
-    } catch(e) {}
-  }
-
-  window.addEventListener('resize', autoScaleGame);
-  window.addEventListener('orientationchange', autoScaleGame);
-  window.addEventListener('DOMContentLoaded', autoScaleGame);
-  window.addEventListener('load', function() {
-    autoScaleGame();
-    [50, 150, 300, 600, 1000, 2000, 3500, 5000].forEach(function(delay) {
-      setTimeout(autoScaleGame, delay);
-    });
-  });
-
-  if (window.MutationObserver) {
-    var observer = new MutationObserver(function() {
-      autoScaleGame();
-    });
-    observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
-  }
-})();
-<\/script>`;
+</style>`;
 
         // Inject base tag if not present
         const baseTag = baseMatch ? '' : `<base href="${gameBaseFolder}">`;
-        const headInjection = baseTag + autoScalerShim + unityShim;
+        const headInjection = baseTag + defaultStyleShim + unityShim;
 
         let cleanHtml;
         if (/<head[^>]*>/i.test(html)) {
