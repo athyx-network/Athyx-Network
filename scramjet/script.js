@@ -901,12 +901,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         if ('serviceWorker' in navigator) {
             const rootPath = getBasePath().replace(/\/scramjet\/$/, '/');
+            let uvReg = null;
             try {
-                navigator.serviceWorker.register(rootPath + 'uv/sw.js', { scope: rootPath + 'uv/' }).catch(e => console.warn("UV SW registration:", e));
-            } catch (e) {}
+                uvReg = await navigator.serviceWorker.register(rootPath + 'uv/sw.js', { scope: rootPath + 'uv/' });
+            } catch (e) {
+                console.warn("UV SW registration:", e);
+            }
 
             const reg = await navigator.serviceWorker.register(getBasePath() + 'sw.js', { scope: getBasePath() });
-            
             
             await navigator.serviceWorker.ready;
             
@@ -921,16 +923,16 @@ document.addEventListener('DOMContentLoaded', async function () {
                 autoswitch: autoswitch
             };
 
-            
             const sendConfig = async () => {
                 const sw = reg.active || navigator.serviceWorker.controller;
                 if (sw) {
-                    console.log("Sending config to SW:", swConfig);
                     sw.postMessage(swConfig);
+                }
+                if (uvReg && uvReg.active) {
+                    uvReg.active.postMessage(swConfig);
                 }
             };
 
-            
             sendConfig();
             setTimeout(sendConfig, 500);
             setTimeout(sendConfig, 1500);

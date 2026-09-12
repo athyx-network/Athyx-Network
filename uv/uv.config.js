@@ -17,8 +17,18 @@
     self.__uv$config = {
         prefix: (basePath ? basePath : '') + '/uv/service/',
         bare: '/bare/',
-        encodeUrl: typeof Ultraviolet !== 'undefined' ? Ultraviolet.codec.xor.encode : (u => encodeURIComponent(u)),
-        decodeUrl: typeof Ultraviolet !== 'undefined' ? Ultraviolet.codec.xor.decode : (u => decodeURIComponent(u)),
+        encodeUrl: (u) => {
+            if (typeof Ultraviolet !== 'undefined' && Ultraviolet.codec && Ultraviolet.codec.xor) {
+                return Ultraviolet.codec.xor.encode(u);
+            }
+            return encodeURIComponent(u);
+        },
+        decodeUrl: (u) => {
+            if (typeof Ultraviolet !== 'undefined' && Ultraviolet.codec && Ultraviolet.codec.xor) {
+                return Ultraviolet.codec.xor.decode(u);
+            }
+            return decodeURIComponent(u);
+        },
         handler: (basePath ? basePath : '') + '/uv/uv.handler.js',
         bundle: (basePath ? basePath : '') + '/uv/uv.bundle.js',
         config: (basePath ? basePath : '') + '/uv/uv.config.js',
