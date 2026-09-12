@@ -53,7 +53,7 @@
       margin: 0 auto;
     }
 
-    /* Header */
+    
     .header {
       margin-bottom: 28px;
     }
@@ -69,7 +69,7 @@
       letter-spacing: -0.02em;
     }
 
-    /* Settings Sections */
+    
     .section-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -117,7 +117,7 @@
       margin-top: 2px;
     }
 
-    /* Theme System Components */
+    
     .active-theme-badge {
       display: inline-flex;
       align-items: center;
@@ -207,7 +207,7 @@
       box-shadow: 0 0 0 1px var(--accent), 0 8px 24px -4px var(--accent-glow);
     }
 
-    /* Miniature App Mockup inside Theme Card */
+    
     .theme-preview-box {
       width: 100%;
       height: 76px;
@@ -343,7 +343,7 @@
       border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
-    /* Presets Grid */
+    
     .presets-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -380,7 +380,7 @@
       color: #fff;
     }
 
-    /* Form controls */
+    
     .form-group {
       margin-bottom: 16px;
     }
@@ -566,7 +566,7 @@
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     }
 
-    /* Toast */
+    
     .status-toast {
       position: fixed;
       bottom: 84px;
@@ -599,12 +599,12 @@
 <body>
 
   <div class="container">
-    <!-- Header -->
+    
     <div class="header">
       <h1 class="title"><i class="fa-solid fa-sliders" style="color:var(--accent);"></i> Settings & Preferences</h1>
     </div>
 
-    <!-- THEMES & APPEARANCE -->
+    
     <div class="section-card" id="themeSection">
       <div class="section-top" style="justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -634,7 +634,7 @@
       <div class="theme-grid" id="themeGrid"></div>
     </div>
 
-    <!-- NAVIGATION & DOCK SETTINGS -->
+    
     <div class="section-card">
       <div class="section-top">
         <div class="section-icon-box" style="color: var(--accent);">
@@ -657,7 +657,7 @@
       </div>
     </div>
 
-    <!-- ABOUT BLANK -->
+    
     <div class="section-card">
       <div class="section-top">
         <div class="section-icon-box" style="color: #60a5fa;">
@@ -684,7 +684,7 @@
       </div>
     </div>
 
-    <!-- TAB CLOAKING -->
+    
     <div class="section-card">
       <div class="section-top">
         <div class="section-icon-box">
@@ -734,7 +734,7 @@
       </div>
     </div>
 
-    <!-- PANIC BUTTON -->
+    
     <div class="section-card">
       <div class="section-top">
         <div class="section-icon-box" style="color: #ef4444;">
@@ -766,7 +766,7 @@
     </div>
   </div>
 
-  <!-- Status Toast -->
+  
   <div id="toast" class="status-toast">
     <i class="fa-solid fa-circle-check" style="color:var(--accent);"></i>
     <span id="toastMsg">Changes saved</span>
@@ -791,7 +791,7 @@
       setTimeout(() => toast.classList.remove("show"), 2500);
     }
 
-    // THEME MANAGEMENT
+    
     function renderThemes(category = "all") {
       if (!window.AthyxThemeEngine) return;
       const themes = AthyxThemeEngine.getThemes();
@@ -855,7 +855,7 @@
         themeGrid.appendChild(card);
       });
 
-      // Update badge
+      
       const activeObj = AthyxThemeEngine.getThemeById(currentThemeId);
       if (activeObj && activeThemeNameEl) {
         activeThemeNameEl.textContent = activeObj.name;
@@ -867,7 +867,7 @@
       AthyxThemeEngine.applyTheme(themeId);
       const theme = AthyxThemeEngine.getThemeById(themeId);
 
-      // Update active classes on cards
+      
       document.querySelectorAll(".theme-card").forEach(c => {
         const id = c.getAttribute("data-theme-id");
         c.classList.toggle("active", id === themeId);
@@ -1057,7 +1057,7 @@
       showToast("Panic key reset.");
     }
 
-    // Initialize values from storage
+    
     window.addEventListener("DOMContentLoaded", () => {
       renderThemes("all");
 

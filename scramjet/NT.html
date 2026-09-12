@@ -51,7 +51,7 @@
       background-repeat: no-repeat;
     }
 
-    /* Ambient lighting */
+    
     body::before {
       content: '';
       position: fixed;
@@ -70,7 +70,7 @@
       z-index: 1;
     }
 
-    /* Title */
+    
     .title {
       font-family: 'Outfit', sans-serif;
       font-size: clamp(2.4rem, 5vw, 3.2rem);
@@ -82,7 +82,7 @@
       -webkit-text-fill-color: transparent;
     }
 
-    /* Search Box */
+    
     .search-box {
       display: flex;
       align-items: center;
@@ -150,7 +150,7 @@
       color: #fff;
     }
 
-    /* Shortcuts Grid */
+    
     .shortcuts {
       display: flex;
       flex-wrap: wrap;
@@ -208,7 +208,7 @@
       color: var(--text);
     }
 
-    /* Loader */
+    
     .loader {
       position: fixed;
       inset: 0;
@@ -299,7 +299,7 @@
       window.parent?.postMessage({ type: 'navigate', url }, '*');
     };
 
-    // Search Form
+    
     $('#searchForm').onsubmit = e => {
       e.preventDefault();
       let q = $('#searchInput').value.trim();
@@ -315,7 +315,7 @@
       nav(q);
     };
 
-    // Shortcuts Click Delegation
+    
     $('#shortcuts').onclick = e => {
       const shortcut = e.target.closest('.shortcut[data-url]');
       const addBtn = e.target.closest('#addShortcut');

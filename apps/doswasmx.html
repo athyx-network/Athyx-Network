@@ -17,18 +17,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.0/nipplejs.min.js"></script>
-    <!-- when developing offline -->
-    <!-- <script src="jquery-3.3.1.min.js"></script>
-    <link rel="stylesheet" href="font-awesome.min.css">
-    <script src="rivets.bundled.min.js"></script>
-    <link rel="stylesheet" href="bootstrap.min.css">
-    <script src="popper.min.js"></script>
-    <script src="bootstrap.min.js"></script>
-    <script src="toastr.min.js"></script>
-    <link rel="stylesheet" href="toastr.min.css">
-    <script src="FileSaver.min.js"></script> 
-    <script src="zip.min.js"></script>
-    <script src="nipplejs.min.js"></script> -->
+    
+    
 </head>
 <style>
     .githubDiv a {
@@ -79,7 +69,6 @@
     }
     
 
-
     input[type="file"] {
         display: none;
     }
@@ -115,7 +104,7 @@
 
         <div id="topPanel" style="display: none;">
 
-            <!-- BEFORE LOAD -->
+            
             <div rv-if="data.beforeEmulatorStarted">
 
                 <div class="mt-2 mb-2" rv-if="data.message">
@@ -163,7 +152,7 @@
         
                 <input id="file-upload" type="file" multiple />
         
-                <!-- ROM LIST -->
+                
                 <div class="form-group mt-2 mb-4" rv-if="data.loggedIn | ev '==true'"
                     style="width: 300px;margin-left: auto; margin-right:auto;">
                     <select class="form-control" id="romselect">
@@ -179,7 +168,7 @@
 
             </div>
 
-            <!-- DRAG AND DROP -->
+            
             <div style="margin-top:40px;" rv-if="data.beforeEmulatorStarted">
                 <div>
                     <div id="dropArea" rv-hide="data.moduleInitializing"
@@ -207,8 +196,7 @@
 
             </div>
 
-
-            <!-- AFTER LOAD -->
+            
             <div style="display: inline;" rv-hide="data.beforeEmulatorStarted" id="afterLoadDiv">
 
                 <div class="mt-2 mb-2" rv-if="data.message">
@@ -267,10 +255,7 @@
                         <a class="dropdown-item" onclick="myApp.speedUp()" style="cursor: pointer;">Speed Up Time</a>
                         <a class="dropdown-item" onclick="myApp.mouseDecreaseSpeed()" style="cursor: pointer;">Decrease Mouse Sensitivity</a>
                         <a class="dropdown-item" onclick="myApp.mouseIncreaseSpeed()" style="cursor: pointer;">Increase Mouse Sensitivity</a>
-                        <!-- <a class="dropdown-item" onclick="myApp.saveStateLocal()" rv-if="data.loggedIn | ev '==false'" style="cursor: pointer;">Save State (Experimental)</a>
-                        <a class="dropdown-item" onclick="myApp.loadStateLocal()" rv-if="data.loggedIn | ev '==false'" rv-hide="data.noLocalSave" style="cursor: pointer;">Load State (Experimental)</a>
-                        <a class="dropdown-item" onclick="myApp.saveCloud()" rv-if="data.loggedIn | ev '==true'" style="cursor: pointer;">Save Cloud State (Experimental)</a>
-                        <a class="dropdown-item" onclick="myApp.loadCloud()" rv-if="data.loggedIn | ev '==true'" rv-hide="data.noCloudSave" style="cursor: pointer;">Load Cloud State (Experimental)</a> -->
+                        
                         <a class="dropdown-item" onclick="myApp.cacheIsoAndBaseImage()" rv-if="data.loggedIn | ev '==true'" style="cursor: pointer;">Cache ISO and Base Image</a>
                         <a class="dropdown-item" onclick="myApp.importModal()" style="cursor: pointer;">Import Files</a>
                         <a class="dropdown-item" onclick="myApp.importModal('noCopy')" rv-if="data.loggedIn | ev '==true'" style="cursor: pointer;">Import Files Without Copy</a>
@@ -298,14 +283,13 @@
             </div>
         </div>
 
-
             <input id="file-import" type="file" multiple />
 
     </div>
 
     <div id="canvasDiv" class="mt-2 mb-4"
         style="height:480px;text-align: center;margin-left: auto;margin-right: auto;display: none;">
-        <!-- ID has to be canvas it's hardcoded in the EM generated .js -->
+        
         <canvas id="canvas" width="640" height="480" style="height: 100%;" ></canvas>
     </div>
 
@@ -323,7 +307,7 @@
         </a>
     </h6>
 
-    <!--  Settings Modal -->
+    
     <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -416,7 +400,7 @@
         </div>
     </div>
 
-    <!--  Export Modal -->
+    
     <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -438,7 +422,7 @@
         </div>
     </div>
 
-    <!--  IMPORT Modal -->
+    
     <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -493,7 +477,7 @@
     </div>
 
     
-    <!-- Mobile UX -->
+    
     <div id="mobileButtons" class="mobileButtons" style="display: none;text-align: center;
             padding-top: 20px;padding-bottom: 20px;">
         <div style="margin-bottom: 10px;">
@@ -518,10 +502,7 @@
                     <a class="dropdown-item" onclick="myApp.speedUp()" style="cursor: pointer;">Speed Up Time</a>
                     <a class="dropdown-item" onclick="myApp.mouseDecreaseSpeed()" style="cursor: pointer;">Decrease Mouse Sensitivity</a>
                     <a class="dropdown-item" onclick="myApp.mouseIncreaseSpeed()" style="cursor: pointer;">Increase Mouse Sensitivity</a>
-                    <!-- <a class="dropdown-item" onclick="myApp.saveStateLocal()" rv-if="data.loggedIn | ev '==false'" style="cursor: pointer;">Save State (Experimental)</a>
-                    <a class="dropdown-item" onclick="myApp.loadStateLocal()" rv-if="data.loggedIn | ev '==false'" rv-hide="data.noLocalSave" style="cursor: pointer;">Load State (Experimental)</a>
-                    <a class="dropdown-item" onclick="myApp.saveCloud()" rv-if="data.loggedIn | ev '==true'" style="cursor: pointer;">Save Cloud State (Experimental)</a>
-                    <a class="dropdown-item" onclick="myApp.loadCloud()" rv-if="data.loggedIn | ev '==true'" rv-hide="data.noCloudSave" style="cursor: pointer;">Load Cloud State (Experimental)</a> -->
+                    
                     <a class="dropdown-item" onclick="myApp.cacheIsoAndBaseImage()" rv-if="data.loggedIn | ev '==true'" style="cursor: pointer;">Cache ISO and Base Image</a>
                     <a class="dropdown-item" onclick="myApp.importModal()" style="cursor: pointer;">Import Files</a>
                     <a class="dropdown-item" onclick="myApp.importModal('noCopy')" rv-if="data.loggedIn | ev '==true'" style="cursor: pointer;">Import Files Without Copy</a>
@@ -629,8 +610,7 @@
         </div>
     </div>
 
-
-    <!--  Login Modal -->
+    
     <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">

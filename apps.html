@@ -48,7 +48,7 @@
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
 
-    /* Top Sticky Header */
+    
     #topBar {
       position: sticky;
       top: 0;
@@ -98,7 +98,7 @@
       border-radius: 9999px;
     }
 
-    /* Search Box */
+    
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -159,7 +159,7 @@
       color: var(--accent);
     }
 
-    /* Main Container */
+    
     .main-content {
       max-width: 1200px;
       margin: 0 auto;
@@ -184,7 +184,7 @@
       color: var(--text-muted);
     }
 
-    /* Apps Grid */
+    
     .apps-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -289,7 +289,7 @@
       transform: translateX(3px);
     }
 
-    /* State message */
+    
     .state-message {
       grid-column: 1 / -1;
       text-align: center;
@@ -306,7 +306,7 @@
       font-size: 32px;
     }
 
-    /*     /* App Stage (Fullscreen Viewer) */
+    
     #appStage {
       position: fixed;
       inset: 0;
@@ -355,7 +355,7 @@
       color: #fff;
       display: flex;
 
-      /* Floating Quit Button */
+      
       .stage-quit-btn {
         position: fixed;
         top: 16px;
@@ -403,7 +403,7 @@
         overflow: hidden;
       }
 
-      /* Loading modal */
+      
       #loadingModal {
         position: fixed;
         inset: 0;
@@ -455,7 +455,7 @@
 
 <body>
 
-  <!-- Top Sticky Bar -->
+  
   <header id="topBar">
     <div class="brand-section">
       <div class="brand-title">
@@ -472,7 +472,7 @@
     </div>
   </header>
 
-  <!-- Main Content Area -->
+  
   <main class="main-content">
     <div class="hero-header">
       <h1 class="hero-title">Applications & Tools</h1>
@@ -481,7 +481,7 @@
     <div class="apps-grid" id="appsGrid"></div>
   </main>
 
-  <!-- Fullscreen App Player -->
+  
   <div id="appStage">
     <button class="stage-quit-btn" onclick="closeActiveApp()" title="Quit App (Esc)" aria-label="Quit App">
       <i class="fa-solid fa-xmark"></i>
@@ -491,7 +491,7 @@
       scrolling="no"></iframe>
   </div>
 
-  <!-- Loading Modal Indicator -->
+  
   <div id="loadingModal">
     <div class="loading-spinner"></div>
     <div id="loadingModalText">Initializing application...</div>
@@ -588,7 +588,7 @@
 
         document.body.classList.add("app-active");
 
-        // Hide scrollbars & inject no-cache meta inside app iframe srcdoc
+        
         const noCacheMeta = `<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">`;
         const hideScrollCss = `<style>html, body { overflow: hidden !important; margin: 0; padding: 0; width: 100%; height: 100%; } *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }</style>`;
         const cleanHtml = html.includes("<head>")

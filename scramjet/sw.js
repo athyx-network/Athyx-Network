@@ -89,7 +89,6 @@ const scramjet = new ScramjetServiceWorker({
 self.addEventListener('install', (e) => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 
-// Wisp configuration - receives from script.js via postMessage
 let wispConfig = {
     wispurl: "wss://lunarrr.eminescusm.ro/w/",
     servers: [
@@ -100,7 +99,6 @@ let wispConfig = {
     autoswitch: false
 };
 
-// Server health tracking for autoswitching
 let serverHealth = new Map();
 let currentServerStartTime = null;
 const MAX_CONSECUTIVE_FAILURES = 2;
@@ -109,7 +107,6 @@ const PING_TIMEOUT = 3000;
 let resolveConfigReady;
 const configReadyPromise = new Promise(resolve => resolveConfigReady = resolve);
 
-// Ping a wisp server to check if it's responsive
 async function pingServer(url) {
     return new Promise((resolve) => {
         const start = Date.now();
@@ -139,7 +136,6 @@ async function pingServer(url) {
     });
 }
 
-// Update server health status
 function updateServerHealth(url, success) {
     const health = serverHealth.get(url) || { consecutiveFailures: 0, successes: 0, lastSuccess: 0 };
     
@@ -162,7 +158,7 @@ function switchToServer(url, latency = null) {
     wispConfig.wispurl = url;
     currentServerStartTime = Date.now();
     
-    // Notify all clients
+    
     self.clients.matchAll().then(clients => {
         clients.forEach(client => {
             client.postMessage({
@@ -174,27 +170,26 @@ function switchToServer(url, latency = null) {
         });
     });
 
-    // Reset connection to force reconnection with new server
+    
     if (scramjet && scramjet.client) {
         scramjet.client = null;
     }
 }
 
-// Proactively check server health and switch if needed
 async function proactiveServerCheck() {
     if (!wispConfig.autoswitch || !wispConfig.servers || wispConfig.servers.length <= 1) return;
 
     const currentUrl = wispConfig.wispurl;
     
-    // Ping all servers to get current health status
+    
     const results = await Promise.all(
         wispConfig.servers.map(s => pingServer(s.url))
     );
 
-    // Update health tracking
+    
     results.forEach(r => updateServerHealth(r.url, r.success));
 
-    // If current server is bad and we have a better option, switch
+    
     const currentHealth = serverHealth.get(currentUrl);
     if (currentHealth && currentHealth.consecutiveFailures > 0) {
         const bestWorking = results
@@ -227,7 +222,7 @@ self.addEventListener("message", ({ data }) => {
                 setTimeout(proactiveServerCheck, 500);
             }
         }
-        // Resolve config ready when we have at least wispurl
+        
         if (wispConfig.wispurl && resolveConfigReady) {
             resolveConfigReady();
             resolveConfigReady = null;
@@ -245,7 +240,7 @@ self.addEventListener("message", ({ data }) => {
 
 self.addEventListener("fetch", (event) => {
     event.respondWith((async () => {
-        // Check if request URL matches ad blocking patterns
+        
         if (isAdBlocked(event.request.url)) {
             console.log("SW: Blocked ad request:", event.request.url);
             return new Response(new ArrayBuffer(0), { status: 204 });
@@ -303,22 +298,22 @@ scramjet.addEventListener("request", async (e) => {
             }
         }
 
-        // Update server health on failure
+        
         updateServerHealth(wispConfig.wispurl, false);
 
-        // Check if we should switch to a different server
+        
         if (wispConfig.autoswitch && wispConfig.servers && wispConfig.servers.length > 1) {
             const currentHealth = serverHealth.get(wispConfig.wispurl);
             
-            // Only switch if server has been unstable for a while
+            
             if (currentHealth && currentHealth.consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-                // Find a working server that isn't the current one
+                
                 for (const server of wispConfig.servers) {
                     if (server.url === wispConfig.wispurl) continue;
                     const serverH = serverHealth.get(server.url);
-                    // Prefer servers with no failures or fewer failures
+                    
                     if (!serverH || serverH.consecutiveFailures < MAX_CONSECUTIVE_FAILURES) {
-                        // Ping to verify it's actually working
+                        
                         const pingResult = await pingServer(server.url);
                         if (pingResult.success) {
                             console.log(`SW: Auto-switching to ${server.url} due to failures on current server`);

@@ -1,7 +1,4 @@
-/**
- * Athyx Network Theme Engine
- * Provides dynamic theming across all parent shells, iframes, and sub-pages.
- */
+
 
 const ATHYX_THEMES = [
   {
@@ -342,7 +339,6 @@ const ATHYX_THEMES = [
   }
 ];
 
-// Active Theme State Manager
 const AthyxThemeEngine = {
   getThemes: () => ATHYX_THEMES,
   
@@ -366,7 +362,7 @@ const AthyxThemeEngine = {
       const root = document.documentElement;
       root.setAttribute("data-theme", theme.id);
 
-      // Set custom CSS variables on document root
+      
       Object.entries(theme.vars).forEach(([prop, value]) => {
         root.style.setProperty(prop, value);
       });
@@ -378,16 +374,16 @@ const AthyxThemeEngine = {
       } catch(e) {}
     }
 
-    // Trigger local callbacks / UI updates if registered
+    
     if (typeof window !== "undefined" && typeof window.onAthyxThemeChange === "function") {
       window.onAthyxThemeChange(theme);
     }
 
-    // Broadcast to parent, top, and child iframes
+    
     if (options.broadcast !== false && typeof window !== "undefined") {
       const msg = { action: "athyx_theme_change", themeId: theme.id };
       
-      // Notify parent & top
+      
       try {
         if (window.parent && window.parent !== window) {
           window.parent.postMessage(msg, "*");
@@ -397,7 +393,7 @@ const AthyxThemeEngine = {
         }
       } catch (e) {}
 
-      // Notify any child iframe (e.g. #contentFrame in index.html)
+      
       try {
         if (typeof document !== "undefined") {
           const frames = document.querySelectorAll("iframe");
@@ -418,7 +414,7 @@ const AthyxThemeEngine = {
     this.applyTheme(savedId, { broadcast: false, save: false });
 
     if (typeof window !== "undefined") {
-      // Listen for cross-window / iframe theme updates
+      
       window.addEventListener("message", (event) => {
         if (event.data && (event.data.action === "athyx_theme_change" || event.data.type === "athyx_theme_change")) {
           const newThemeId = event.data.themeId || event.data.theme;
@@ -430,7 +426,7 @@ const AthyxThemeEngine = {
         }
       });
 
-      // Listen for localStorage changes across browser tabs
+      
       window.addEventListener("storage", (event) => {
         if (event.key === "athyx_theme" && event.newValue) {
           this.applyTheme(event.newValue, { broadcast: false, save: false });
@@ -447,5 +443,4 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = { ATHYX_THEMES, AthyxThemeEngine };
 }
 
-// Immediately execute on script load to eliminate theme flicker
 AthyxThemeEngine.init();

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
+    
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DGZ6VYV4BG"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -47,7 +47,7 @@
     </div>
 
     <script>
-        // CLOAKING FUNCTION
+        
         function cloakPage() {
             if (window.self !== window.top) return;
             const newWin = window.open("about:blank", "_blank");
@@ -69,7 +69,7 @@ iframe{width:100%;height:100%;border:none;}
             window.close();
         }
 
-        // AUTOMATIC CLOAK ON LOAD
+        
         window.addEventListener("load", () => {
             if (localStorage.getItem("autoCloak") === "1" && window.self === window.top) {
                 cloakPage();

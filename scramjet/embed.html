@@ -34,7 +34,7 @@
         import * as BareMux from "https://cdn.jsdelivr.net/npm/@mercuryworkshop/bare-mux/dist/index.mjs";
         window.BareMux = BareMux;
         
-        // Load script.js after BareMux is available
+        
         const loadScripts = async () => {
             await new Promise(resolve => {
                 const script = document.createElement('script');
@@ -44,7 +44,7 @@
             });
         };
         
-        // Signal that scripts are loaded
+        
         window.scriptsLoaded = loadScripts();
     </script>
 </head>
@@ -81,7 +81,7 @@
         function showError(type,details=''){els.loading.style.display='none';els.error.style.display='flex';const err=ERRORS[type]||ERRORS.unknown;els.errorMessage.innerHTML=`<strong>${err.title}</strong><br><br>${err.message}<br><br><small style="color:var(--text-muted)">${err.hint}</small>${details?`<br><br><code style="font-size:11px;background:var(--surface);padding:4px 8px;border-radius:4px">${details}</code>`:''}`}
         function getErrorType(msg){msg=(msg||'').toLowerCase();if(msg.includes('fetch')||msg.includes('network'))return'connectionFailed';if(msg.includes('timeout'))return'timeout';if(msg.includes('blocked')||msg.includes('cors')||msg.includes('access'))return'blocked';if(msg.includes('websocket')||msg.includes('wisp'))return'proxyError';return'unknown'}
 
-        // Initialize scramjet directly in embed.html
+        
         let scramjetInstance = null;
         let connectionInstance = null;
 

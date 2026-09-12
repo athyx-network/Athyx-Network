@@ -61,7 +61,7 @@
       z-index: 1;
     }
 
-    /* Hero Heading */
+    
     .title {
       font-family: 'Outfit', sans-serif;
       font-size: clamp(2.4rem, 5vw, 3.4rem);
@@ -74,7 +74,7 @@
       -webkit-text-fill-color: transparent;
     }
 
-    /* Search Omnibar */
+    
     .search-container {
       width: 100%;
       max-width: 620px;
@@ -161,7 +161,7 @@
       color: #d4d4d8;
     }
 
-    /* Search Quick Chips */
+    
     .quick-chips {
       display: flex;
       flex-wrap: wrap;
@@ -195,7 +195,7 @@
       transform: translateY(-1px);
     }
 
-    /* Fullscreen Web Search Overlay */
+    
     #searchOverlay {
       position: fixed;
       inset: 0;
@@ -226,10 +226,10 @@
 <body>
 
   <div class="container">
-    <!-- Hero Title -->
+    
     <h1 class="title">Welcome to Athyx Network</h1>
 
-    <!-- Search Omnibar -->
+    
     <div class="search-container">
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass search-icon" id="searchIcon"></i>
@@ -241,7 +241,7 @@
       </div>
     </div>
 
-    <!-- Quick Search Chips -->
+    
     <div class="quick-chips">
       <button class="chip" onclick="quickSearch('https://www.google.com')">
         <i class="fa-brands fa-google"></i> Google
@@ -261,7 +261,7 @@
     </div>
   </div>
 
-  <!-- Fullscreen Web Viewer Overlay -->
+  
   <div id="searchOverlay">
     <iframe id="overlayFrame" title="Web Search Viewer"></iframe>
   </div>
@@ -277,7 +277,7 @@
       let query = customQuery || searchInput.value.trim();
       if (!query) return;
 
-      // Handle raw URL vs search string
+      
       if (!/^https?:\/\//i.test(query)) {
         if (/^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/i.test(query)) {
           query = "https://" + query;
@@ -300,7 +300,7 @@
       overlayFrame.src = "about:blank";
     }
 
-    // Keyboard shortcut handlers
+    
     searchInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
         performSearch();
