@@ -56,57 +56,25 @@
       padding: 14px 28px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       gap: 16px;
       z-index: 100;
-    }
-
-    .brand-section {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .brand-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-title i {
-      color: var(--accent);
-      font-size: 18px;
-    }
-
-    .count-pill {
-      font-size: 12px;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 3px 10px;
-      border-radius: 9999px;
     }
 
     .controls-section {
       display: flex;
       align-items: center;
       gap: 12px;
-      flex: 1;
-      max-width: 440px;
-      justify-content: flex-end;
+      width: 100%;
+      max-width: 500px;
+      justify-content: center;
     }
 
     
     .search-wrapper {
       position: relative;
       width: 100%;
-      max-width: 320px;
+      max-width: 500px;
       display: flex;
       align-items: center;
     }
@@ -465,14 +433,6 @@
 
   
   <header id="topBar">
-    <div class="brand-section">
-      <div class="brand-title">
-        <i class="fa-solid fa-gamepad"></i>
-        <span>Arcade</span>
-      </div>
-      <span class="count-pill" id="gameCountPill">Loading...</span>
-    </div>
-
     <div class="controls-section">
       <div class="search-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -586,7 +546,7 @@
         console.warn("Using fallback game database:", err);
         allGames = fallbackGames;
       }
-      countPill.textContent = `${allGames.length} Games`;
+      if (countPill) countPill.textContent = `${allGames.length} Games`;
       renderGames();
 
       const autoLaunch = sessionStorage.getItem("athyx_launch_game");
