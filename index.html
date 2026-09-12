@@ -377,18 +377,50 @@
     });
 
 
+    function updateTabTitleAndIcon(title, icon) {
+      if (title) document.title = title;
+      if (icon) {
+        let link = document.querySelector("link[rel*='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = icon;
+      }
+    }
+
     const savedTitle = localStorage.getItem("athyx_tab_title");
     const savedIcon = localStorage.getItem("athyx_tab_icon");
-    if (savedTitle) document.title = savedTitle;
-    if (savedIcon) {
-      let link = document.querySelector("link[rel*='icon']");
-      if (!link) {
-        link = document.createElement("link");
-        link.rel = "icon";
-        document.head.appendChild(link);
-      }
-      link.href = savedIcon;
+    const defaultSiteTitle = "Athyx Network";
+    const defaultSiteIcon = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + "favicon.png";
+
+    if (savedTitle || savedIcon) {
+      updateTabTitleAndIcon(savedTitle || defaultSiteTitle, savedIcon || defaultSiteIcon);
     }
+
+    // Auto Cloak on tab switch (blur / focus)
+    window.addEventListener("blur", () => {
+      const autoCloak = localStorage.getItem("athyx_auto_cloak") === "true";
+      if (autoCloak) {
+        const cloakTitle = localStorage.getItem("athyx_tab_title") || "Google Classroom";
+        const cloakIcon = localStorage.getItem("athyx_tab_icon") || "https://ssl.gstatic.com/classroom/favicon.png";
+        updateTabTitleAndIcon(cloakTitle, cloakIcon);
+      }
+    });
+
+    window.addEventListener("focus", () => {
+      const autoCloak = localStorage.getItem("athyx_auto_cloak") === "true";
+      if (autoCloak) {
+        const customTitle = localStorage.getItem("athyx_tab_title");
+        const customIcon = localStorage.getItem("athyx_tab_icon");
+        // If the user hasn't explicitly set a permanent custom disguise, restore to Athyx
+        const currentSelectedPreset = localStorage.getItem("athyx_preset_selected");
+        if (!currentSelectedPreset || currentSelectedPreset === "default") {
+          updateTabTitleAndIcon(defaultSiteTitle, defaultSiteIcon);
+        }
+      }
+    });
 
 
     window.addEventListener("keydown", (e) => {
