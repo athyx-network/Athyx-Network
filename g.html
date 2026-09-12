@@ -226,41 +226,6 @@
       transform: scale(1);
     }
 
-    .fav-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #a1a1aa;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      cursor: pointer;
-      opacity: 0;
-      transition: all 0.2s;
-      z-index: 2;
-    }
-
-    .game-card:hover .fav-btn,
-    .fav-btn.active {
-      opacity: 1;
-    }
-
-    .fav-btn.active {
-      color: #ffffff;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
-    }
-
-    .fav-btn:hover {
-      transform: scale(1.15);
-      color: #ffffff;
-    }
 
     .game-info {
       padding: 12px 14px;
@@ -474,7 +439,6 @@
     let allGames = [];
     let currentFilter = "all";
     let activeGameObj = null;
-    let favorites = JSON.parse(localStorage.getItem("athyx_favorites") || "[]");
 
     const gridEl = document.getElementById("gamesGrid");
     const countPill = document.getElementById("gameCountPill");
@@ -560,30 +524,9 @@
       }
     }
 
-    function toggleFavorite(gameName, e) {
-      if (e) e.stopPropagation();
-      const index = favorites.indexOf(gameName);
-      if (index > -1) {
-        favorites.splice(index, 1);
-      } else {
-        favorites.push(gameName);
-      }
-      localStorage.setItem("athyx_favorites", JSON.stringify(favorites));
-      renderGames();
-    }
-
     function getFilteredGames() {
       const query = searchBox.value.trim().toLowerCase();
-      let list = allGames.filter(g => g.name.toLowerCase().includes(query));
-
-      
-      list.sort((a, b) => {
-        const aFav = favorites.includes(a.name) ? 1 : 0;
-        const bFav = favorites.includes(b.name) ? 1 : 0;
-        return bFav - aFav;
-      });
-
-      return list;
+      return allGames.filter(g => g.name.toLowerCase().includes(query));
     }
 
     function renderGames() {
@@ -601,7 +544,6 @@
       }
 
       list.forEach(game => {
-        const isFav = favorites.includes(game.name);
         const rawIcon = game.icon ? (game.icon.startsWith("http") ? game.icon : REPO_BASE + encodeURI(game.icon)) : "";
         const iconUrl = rawIcon ? (rawIcon + (rawIcon.includes("?") ? "&" : "?") + "t=" + Date.now()) : "";
 
@@ -615,16 +557,12 @@
             <div class="play-overlay">
               <div class="play-icon"><i class="fa-solid fa-play"></i></div>
             </div>
-            <button class="fav-btn ${isFav ? 'active' : ''}" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">
-              <i class="fa-${isFav ? 'solid' : 'regular'} fa-star"></i>
-            </button>
           </div>
           <div class="game-info">
             <span class="game-title" title="${game.name}">${game.name}</span>
           </div>
         `;
 
-        card.querySelector(".fav-btn").onclick = (e) => toggleFavorite(game.name, e);
         card.onclick = () => launchGame(game);
 
         gridEl.appendChild(card);
