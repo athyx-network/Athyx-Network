@@ -1,30 +1,22 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DGZ6VYV4BG"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-DGZ6VYV4BG');
-  </script>
-
-  
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8298117975333372" crossorigin="anonymous"></script>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Athyx Network</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="themes.css">
   <script src="themes.js"></script>
 
-  <link rel="icon" type="image/x-icon" href="https://cdn.jsdelivr.net/gh/HyperFloppik/Ethyrnal-s-Arcade-v2.3@main/web-app-manifest-512x512.ico">
+  <link rel="icon" type="image/x-icon"
+    href="https://cdn.jsdelivr.net/gh/HyperFloppik/Ethyrnal-s-Arcade-v2.3@main/web-app-manifest-512x512.ico">
 
   <style>
     :root {
@@ -50,10 +42,11 @@
       padding: 0;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
-      background: 
+      background:
         linear-gradient(135deg, var(--accent-dim) 0%, rgba(0, 0, 0, 0) 55%),
         linear-gradient(180deg, var(--surface-active) 0%, var(--surface) 40%, var(--bg-base) 100%);
       background-color: var(--bg-base);
@@ -62,7 +55,7 @@
       color: var(--text-main);
     }
 
-    
+
     #contentFrame {
       position: absolute;
       top: 0;
@@ -75,7 +68,7 @@
       transition: opacity 0.15s ease, background 0.3s ease;
     }
 
-    
+
     .dock-wrapper {
       position: fixed;
       bottom: 24px;
@@ -90,7 +83,7 @@
       -webkit-backdrop-filter: blur(20px) saturate(160%);
       border: 1px solid var(--dock-border);
       border-radius: 18px;
-      box-shadow: 
+      box-shadow:
         0 20px 40px -15px rgba(0, 0, 0, 0.7),
         0 0 0 1px rgba(255, 255, 255, 0.03),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -105,7 +98,7 @@
       pointer-events: none;
     }
 
-    
+
     .dock-toggle-btn {
       position: fixed;
       bottom: 24px;
@@ -118,7 +111,7 @@
       backdrop-filter: blur(20px) saturate(160%);
       -webkit-backdrop-filter: blur(20px) saturate(160%);
       border: 1px solid var(--dock-border);
-      box-shadow: 
+      box-shadow:
         0 12px 30px -8px rgba(0, 0, 0, 0.6),
         0 0 0 1px rgba(255, 255, 255, 0.03),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -213,29 +206,33 @@
       margin: 0 4px;
     }
 
-    
+
     .dock-wrapper.compact-dock {
       padding: 5px;
       gap: 2px;
     }
+
     .dock-wrapper.compact-dock .dock-item {
       padding: 9px 13px;
       gap: 0;
     }
+
     .dock-wrapper.compact-dock .dock-item span {
       display: none !important;
     }
+
     .dock-wrapper.compact-dock .dock-item i {
       font-size: 16px;
     }
 
-    
+
     @media (max-width: 680px) {
       .dock-wrapper {
         bottom: 16px;
         padding: 5px;
         gap: 2px;
       }
+
       .dock-toggle-btn {
         bottom: 16px;
         right: 16px;
@@ -244,14 +241,17 @@
         font-size: 13px;
         border-radius: 11px;
       }
+
       .dock-item {
         padding: 9px 12px;
         font-size: 12.5px;
         gap: 6px;
       }
+
       .dock-item span {
         display: none;
       }
+
       .dock-item i {
         font-size: 16px;
       }
@@ -261,7 +261,7 @@
 
 <body>
 
-  
+
   <div class="dock-wrapper" id="dockNav" role="navigation" aria-label="Main Navigation">
     <button class="dock-item active" data-tab="home" onclick="navigate('home')" title="Home">
       <i class="fa-solid fa-house"></i>
@@ -286,12 +286,13 @@
     </button>
   </div>
 
-  
+
   <button class="dock-toggle-btn" id="dockToggleBtn" aria-label="Toggle Selection Bar" title="Toggle selection bar">
     <i class="fa-solid fa-chevron-down" id="dockToggleIcon"></i>
   </button>
 
-  <iframe id="contentFrame" title="Athyx Content" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated"></iframe>
+  <iframe id="contentFrame" title="Athyx Content"
+    allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated"></iframe>
 
   <script>
     const iframe = document.getElementById("contentFrame");
@@ -308,7 +309,7 @@
 
     dockToggleBtn.addEventListener("click", toggleDock);
 
-    
+
     if (localStorage.getItem("athyx_dock_hidden") === "true") {
       dockNav.classList.add("dock-hidden");
       dockToggleBtn.classList.add("dock-collapsed");
@@ -316,12 +317,12 @@
       dockToggleBtn.title = "Show selection bar";
     }
 
-    
+
     if (localStorage.getItem("athyx_compact_dock") === "true") {
       dockNav.classList.add("compact-dock");
     }
 
-    
+
     const routes = {
       home: () => "homepage.html?v=" + Date.now(),
       games: () => "g.html?v=" + Date.now(),
@@ -340,15 +341,15 @@
       const target = routes[tabKey];
       if (!target) return;
       const url = typeof target === "function" ? target() : target;
-      
+
       iframe.style.opacity = "0.7";
       iframe.src = url;
       setTimeout(() => { iframe.style.opacity = "1"; }, 100);
-      
+
       setActiveTab(tabKey);
     }
 
-    
+
     window.addEventListener("message", (event) => {
       if (event.data) {
         if (event.data.action === "navigate") {
@@ -367,15 +368,15 @@
       }
     });
 
-    
+
     iframe.addEventListener("load", () => {
       try {
         const themeId = localStorage.getItem("athyx_theme") || "crimson";
         iframe.contentWindow.postMessage({ action: "athyx_theme_change", themeId }, "*");
-      } catch(e) {}
+      } catch (e) { }
     });
 
-    
+
     const savedTitle = localStorage.getItem("athyx_tab_title");
     const savedIcon = localStorage.getItem("athyx_tab_icon");
     if (savedTitle) document.title = savedTitle;
@@ -389,7 +390,7 @@
       link.href = savedIcon;
     }
 
-    
+
     window.addEventListener("keydown", (e) => {
       const panicKey = localStorage.getItem("athyx_panic_key");
       const panicUrl = localStorage.getItem("athyx_panic_url") || "https://www.google.com";
@@ -398,7 +399,7 @@
       }
     });
 
-    
+
     (function checkAutoAboutBlank() {
       const autoAB = localStorage.getItem("athyx_auto_about_blank") === "true";
       const isTop = window.self === window.top;
@@ -432,19 +433,20 @@
             try {
               window.close();
               window.location.replace("about:blank");
-            } catch(e) {
+            } catch (e) {
               window.close();
             }
           }
-        } catch(e) {
+        } catch (e) {
           console.error("Auto about:blank failed:", e);
         }
       }
     })();
 
-    
+
     navigate("home");
   </script>
 
 </body>
+
 </html>

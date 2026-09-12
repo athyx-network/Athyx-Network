@@ -510,7 +510,38 @@ input.bar::placeholder {
 .server-status {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+}
+
+.ping-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ping-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #71717a;
+    transition: all 0.2s;
+}
+
+.ping-dot.online {
+    background: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+}
+
+.ping-dot.offline {
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.7);
 }
 
 .delete-wisp-btn {
@@ -518,13 +549,14 @@ input.bar::placeholder {
     border: none;
     color: var(--text-dim);
     cursor: pointer;
-    padding: 4px;
+    padding: 4px 6px;
     border-radius: 4px;
     transition: all 0.2s;
 }
 
 .delete-wisp-btn:hover {
     color: #ef4444;
+    background: rgba(239, 68, 68, 0.15);
 }
 
 .add-wisp-container {

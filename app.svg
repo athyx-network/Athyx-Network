@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-<foreignObject width="100%" height="100%" x="0" y="0">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="width:100vw; height:100vh; position:fixed; top:0; left:0; margin:0; padding:0; display:block;">
+<foreignObject width="100%" height="100%" style="width:100vw; height:100vh; overflow:visible;">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" style="width:100%; height:100%; margin:0; padding:0;">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -43,19 +43,124 @@
   ]]></script>
 
   <style><![CDATA[
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100vw; height: 100vh; overflow: hidden; background: #0c0406; }
-    foreignObject { width: 100vw; height: 100vh; overflow: visible; }
-    iframe { width: 100%; height: 100%; border: none; display: block; }
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #0c0406;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    foreignObject {
+      width: 100vw;
+      height: 100vh;
+      overflow: visible;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #athyx-frame {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #loader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0c0406;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+      z-index: 99;
+      transition: opacity 0.3s ease;
+    }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(244, 63, 94, 0.2);
+      border-top-color: #f43f5e;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   ]]></style>
 </head>
 <body>
-  <iframe id="athyx-frame" src="./index.html" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated"></iframe>
+  <div id="loader">
+    <div class="spinner"></div>
+    <div style="font-size: 14px; font-weight: 600; color: #fecdd3;">Loading Athyx Network...</div>
+  </div>
+
+  <iframe id="athyx-frame" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated"></iframe>
+
+  <script><![CDATA[
+    (async function() {
+      const GITHUB_REPO = "athyx-network/Athyx-Network@main";
+      const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}/`;
+      const frame = document.getElementById('athyx-frame');
+      const loader = document.getElementById('loader');
+
+      function hideLoader() {
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => loader.style.display = 'none', 300);
+        }
+      }
+
+      frame.addEventListener('load', hideLoader);
+
+      // Attempt 1: If hosted locally alongside index.html, load directly
+      if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('jsdelivr')) {
+        const isLocalHost = window.location.pathname.endsWith('/app.svg');
+        if (isLocalHost) {
+          const basePath = window.location.pathname.replace(/[^/]*$/, '');
+          frame.src = basePath + 'index.html';
+          return;
+        }
+      }
+
+      // Attempt 2: Standalone mode (loaded offline, from file://, or standalone) -> fetch via jsDelivr CDN
+      try {
+        const res = await fetch(CDN_BASE + 'index.html');
+        if (!res.ok) throw new Error('CDN fetch failed: ' + res.status);
+        let html = await res.text();
+
+        // Inject <base> tag so all relative assets (themes.css, themes.js, pages, icons) load from jsDelivr CDN
+        const baseTag = `<base href="${CDN_BASE}">`;
+        if (html.includes('<head>')) {
+          html = html.replace('<head>', '<head>' + baseTag);
+        } else {
+          html = baseTag + html;
+        }
+
+        frame.srcdoc = html;
+      } catch (err) {
+        console.warn('jsDelivr loader fallback to direct URL:', err);
+        frame.src = CDN_BASE + 'index.html';
+      }
+    })();
+  ]]></script>
 
   <div style="display: none;" aria-hidden="true">
     <section>
       <h2>What IXL Is</h2>
-      <p>IXL is a personalized learning platform focused on skills practice, targeted review, and steady progress tracking for students in K-12 math and language arts.</p>
+      <p>IXL is a learning platform focused on skills practice, targeted review, and steady progress tracking for students in K-12 math and language arts.</p>
     </section>
   </div>
 </body>

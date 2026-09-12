@@ -518,6 +518,10 @@ function renderServerList() {
                     ${isActive ? '<i class="fa-solid fa-check" style="margin-left:8px; font-size: 0.75em; color: var(--accent);"></i>' : ''}
                 </div>
                 <div class="server-status">
+                    <span class="ping-badge" id="modal-ping-${index}">
+                        <span class="ping-dot"></span>
+                        <span class="ping-text">...</span>
+                    </span>
                     ${deleteBtn}
                 </div>
             </div>
@@ -526,6 +530,22 @@ function renderServerList() {
 
         item.onclick = () => setWisp(server.url);
         list.appendChild(item);
+
+        // Ping test in background
+        pingWispServer(server.url, 2000).then(res => {
+            const badge = document.getElementById(`modal-ping-${index}`);
+            if (badge) {
+                const dot = badge.querySelector('.ping-dot');
+                const text = badge.querySelector('.ping-text');
+                if (res.success) {
+                    dot.className = 'ping-dot online';
+                    text.textContent = `${res.latency}ms`;
+                } else {
+                    dot.className = 'ping-dot offline';
+                    text.textContent = 'Offline';
+                }
+            }
+        });
     });
 
     

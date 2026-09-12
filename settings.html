@@ -593,6 +593,235 @@
       opacity: 1;
       transform: translateY(0);
     }
+    /* Proxy & Custom Wisp Settings */
+    .proxy-status-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .proxy-status-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .proxy-status-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+
+    .proxy-status-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .wisp-server-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .wisp-server-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      gap: 12px;
+    }
+
+    .wisp-server-card:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+
+    .wisp-server-card.active {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 4px 16px var(--accent-dim);
+    }
+
+    .wisp-card-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .wisp-radio {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .wisp-server-card.active .wisp-radio {
+      border-color: var(--accent);
+    }
+
+    .wisp-radio-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s;
+    }
+
+    .wisp-server-card.active .wisp-radio-dot {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .wisp-card-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .wisp-card-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .wisp-custom-tag {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .wisp-card-url {
+      font-family: monospace;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 420px;
+    }
+
+    .wisp-card-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .latency-pill {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .latency-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #71717a;
+      transition: all 0.2s;
+    }
+
+    .latency-dot.online {
+      background: #10b981;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+    }
+
+    .latency-dot.offline {
+      background: #ef4444;
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.7);
+    }
+
+    .delete-custom-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      border-radius: 8px;
+      padding: 6px 9px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .delete-custom-btn:hover {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+
+    .custom-wisp-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .custom-wisp-inputs {
+      display: grid;
+      grid-template-columns: 1fr 2fr auto;
+      gap: 10px;
+    }
+
+    @media (max-width: 680px) {
+      .custom-wisp-inputs {
+        grid-template-columns: 1fr;
+      }
+      .wisp-card-url {
+        max-width: 200px;
+      }
+    }
   </style>
 </head>
 
@@ -632,6 +861,64 @@
       </div>
 
       <div class="theme-grid" id="themeGrid"></div>
+    </div>
+
+    
+    <div class="section-card" id="proxyWispSection">
+      <div class="section-top" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="section-icon-box" style="color: var(--accent);">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <h2 class="section-title">Proxy & Wisp Servers</h2>
+            <p class="section-desc">Configure your active Wisp WebSocket server or add your own custom Wisp backend</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="proxy-status-box">
+        <div class="proxy-status-info">
+          <span class="proxy-status-label">Active Wisp Server</span>
+          <span class="proxy-status-value">
+            <span id="activeWispName">Lunarr Wisp</span>
+          </span>
+          <span id="activeWispUrl" style="font-family: monospace; font-size: 11.5px; color: var(--text-dim);">wss://lunarrr.eminescusm.ro/w/</span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-secondary" onclick="pingAllWispServers()" title="Test server response times">
+            <i class="fa-solid fa-gauge-high"></i> Ping Test All
+          </button>
+        </div>
+      </div>
+
+      <div class="form-label" style="margin-bottom: 10px;">Available Wisp Servers</div>
+      <div class="wisp-server-list" id="wispServerList"></div>
+
+      <div class="custom-wisp-box">
+        <div style="font-size: 13.5px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-plus-circle" style="color: var(--accent);"></i> Add Custom Wisp Server
+        </div>
+        <div class="custom-wisp-inputs">
+          <input type="text" id="customWispNameInput" class="input-field" placeholder="Server Name (e.g. My Wisp Node)">
+          <input type="text" id="customWispUrlInput" class="input-field" placeholder="wss://your-wisp-server.example.com/wisp/">
+          <button class="btn-primary" onclick="addCustomWispServer()"><i class="fa-solid fa-plus"></i> Add Server</button>
+        </div>
+      </div>
+
+      <div class="setting-row" style="margin-top: 18px;">
+        <div class="setting-info">
+          <span class="setting-title">Auto-switch on failure</span>
+          <span class="setting-desc">Automatically switch to the fastest working server if your current proxy is down or slow</span>
+        </div>
+        <div class="toggle-switch" id="wispAutoSwitchToggle" onclick="toggleWispAutoSwitch()" role="switch" aria-checked="false">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top: 14px;">
+        <button class="btn-secondary" onclick="resetWispToDefault()"><i class="fa-solid fa-rotate-left"></i> Reset to Default Server</button>
+      </div>
     </div>
 
     
@@ -681,6 +968,28 @@
 
       <div class="btn-row" style="margin-top: 14px;">
         <button class="btn-primary" onclick="openAboutBlank()"><i class="fa-solid fa-arrow-up-right-from-square"></i> Launch About:Blank Now</button>
+      </div>
+    </div>
+
+    
+    <div class="section-card">
+      <div class="section-top">
+        <div class="section-icon-box" style="color: #a855f7;">
+          <i class="fa-solid fa-file-code"></i>
+        </div>
+        <div>
+          <h2 class="section-title">SVG Vector Cloak (.svg)</h2>
+          <p class="section-desc">Run Athyx inside an SVG &lt;foreignObject&gt; image container with IXL learning disguise</p>
+        </div>
+      </div>
+
+      <div class="setting-desc" style="margin-bottom: 14px; font-size: 13px; line-height: 1.5;">
+        SVG cloaking wraps the entire network inside an SVG XML vector image with shims and educational metadata. Most web filters classify it as a harmless image asset.
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="openSvgCloak()"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open SVG Cloak</button>
+        <button class="btn-secondary" onclick="downloadSvgCloak()"><i class="fa-solid fa-download"></i> Download athyx.svg</button>
       </div>
     </div>
 
@@ -1010,6 +1319,205 @@
       }
     }
 
+    function generateSvgCloakContent() {
+      const title = localStorage.getItem('athyx_tab_title') || 'IXL | Math, Language Arts, Science, Social Studies, and Spanish';
+      const icon = localStorage.getItem('athyx_tab_icon') || 'https://www.google.com/favicon.ico';
+      const GITHUB_REPO = "athyx-network/Athyx-Network@main";
+      const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}/`;
+
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" style="width:100vw; height:100vh; position:fixed; top:0; left:0; margin:0; padding:0; display:block;">
+<foreignObject width="100%" height="100%" style="width:100vw; height:100vh; overflow:visible;">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" style="width:100%; height:100%; margin:0; padding:0;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${title}</title>
+  <meta name="description" content="IXL is the world's most popular subscription-based learning site for K-12. Used by over 18 million students, IXL provides personalized learning in more than 17,000 topics, covering math, language arts, science, social studies, and Spanish." />
+  <meta property="og:title" content="${title}" />
+  <meta property="og:description" content="IXL is the world's most popular subscription-based learning site for K-12. Interactive questions, awards, and certificates keep kids motivated as they master skills." />
+  <meta property="og:url" content="https://www.ixl.com" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="IXL Learning" />
+  <link rel="icon" type="image/png" href="${icon}" />
+
+  <` + `script><![CDATA[
+    (function(){
+      const XHTML_NS = "http://www.w3.org/1999/xhtml";
+      const root = document.querySelector("foreignObject").firstElementChild;
+      const head = root.querySelector("head");
+      const body = root.querySelector("body");
+      const originalCreateElement = document.createElement.bind(document);
+      const originalCreateElementNS = document.createElementNS.bind(document);
+
+      Object.defineProperty(document, "head", { get() { return head; }, configurable: true });
+      Object.defineProperty(document, "body", { get() { return body; }, configurable: true });
+      Object.defineProperty(document, "documentElement", { get() { return root; }, configurable: true });
+
+      document.createElement = function(tagName, options) {
+        if (typeof tagName === "string") {
+          return originalCreateElementNS(XHTML_NS, tagName, options);
+        }
+        return originalCreateElement(tagName, options);
+      };
+
+      document.createElementNS = function(namespaceURI, qualifiedName, options) {
+        if (namespaceURI == null || namespaceURI === XHTML_NS) {
+          return originalCreateElementNS(XHTML_NS, qualifiedName, options);
+        }
+        return originalCreateElementNS(namespaceURI, qualifiedName, options);
+      };
+    })();
+  ]]><` + `/script>
+
+  <style><![CDATA[
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #0c0406;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    foreignObject {
+      width: 100vw;
+      height: 100vh;
+      overflow: visible;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #athyx-frame {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #loader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0c0406;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+      z-index: 99;
+      transition: opacity 0.3s ease;
+    }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(244, 63, 94, 0.2);
+      border-top-color: #f43f5e;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  ]]></style>
+</head>
+<body>
+  <div id="loader">
+    <div class="spinner"></div>
+    <div style="font-size: 14px; font-weight: 600; color: #fecdd3;">Loading Athyx Network...</div>
+  </div>
+
+  <iframe id="athyx-frame" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated"></iframe>
+
+  <` + `script><![CDATA[
+    (async function() {
+      const CDN_BASE = "${CDN_BASE}";
+      const frame = document.getElementById('athyx-frame');
+      const loader = document.getElementById('loader');
+
+      function hideLoader() {
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => loader.style.display = 'none', 300);
+        }
+      }
+
+      frame.addEventListener('load', hideLoader);
+
+      if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('jsdelivr')) {
+        const isLocalHost = window.location.pathname.endsWith('/app.svg');
+        if (isLocalHost) {
+          const basePath = window.location.pathname.replace(/[^/]*$/, '');
+          frame.src = basePath + 'index.html';
+          return;
+        }
+      }
+
+      try {
+        const res = await fetch(CDN_BASE + 'index.html');
+        if (!res.ok) throw new Error('CDN fetch failed: ' + res.status);
+        let html = await res.text();
+
+        const baseTag = '<base href="' + CDN_BASE + '">';
+        if (html.includes('<head>')) {
+          html = html.replace('<head>', '<head>' + baseTag);
+        } else {
+          html = baseTag + html;
+        }
+
+        frame.srcdoc = html;
+      } catch (err) {
+        console.warn('jsDelivr fallback:', err);
+        frame.src = CDN_BASE + 'index.html';
+      }
+    })();
+  ]]><` + `/script>
+
+  <div style="display: none;" aria-hidden="true">
+    <section>
+      <h2>What IXL Is</h2>
+      <p>IXL is a learning platform focused on skills practice, targeted review, and steady progress tracking for students in K-12 math and language arts.</p>
+    </section>
+  </div>
+</body>
+</html>
+</foreignObject>
+</svg>`;
+    }
+
+    function openSvgCloak() {
+      const svgContent = generateSvgCloakContent();
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const blobUrl = URL.createObjectURL(blob);
+      const win = window.open(blobUrl, '_blank');
+      if (!win) {
+        alert('Popup was blocked by your browser! Please allow popups to open SVG Cloak.');
+        return;
+      }
+      showToast('Athyx opened in SVG Cloak');
+    }
+
+    function downloadSvgCloak() {
+      const svgContent = generateSvgCloakContent();
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'athyx.svg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded athyx.svg launcher');
+    }
+
     function toggleCompactDock() {
       const toggle = document.getElementById('compactDockToggle');
       const current = localStorage.getItem('athyx_compact_dock') === 'true';
@@ -1058,8 +1566,254 @@
     }
 
     
+    /* Wisp & Proxy Management */
+    const DEFAULT_WISP = "wss://lunarrr.eminescusm.ro/w/";
+    const DEFAULT_WISP_SERVERS = [
+      { name: "Lunarr Wisp", url: "wss://lunarrr.eminescusm.ro/w/" },
+      { name: "Space Wisp", url: "wss://gointospace.app/wisp/" },
+      { name: "Mercury Workshop Wisp", url: "wss://wisp.mercurywork.shop/" }
+    ];
+
+    function getStoredWisps() {
+      try {
+        let list = JSON.parse(localStorage.getItem("customWisps") || "[]");
+        return Array.isArray(list) ? list.filter(s => s && s.url) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function getAllWispServers() {
+      return [...DEFAULT_WISP_SERVERS, ...getStoredWisps()];
+    }
+
+    function getActiveWispUrl() {
+      const saved = localStorage.getItem("proxServer");
+      if (!saved || saved.includes("defschoolwork") || saved.includes("kutakutik") || saved.startsWith("https://lunarrr")) {
+        localStorage.setItem("proxServer", DEFAULT_WISP);
+        return DEFAULT_WISP;
+      }
+      return saved;
+    }
+
+    async function pingWisp(url, timeout = 2500) {
+      return new Promise((resolve) => {
+        const start = Date.now();
+        try {
+          const wsUrl = url.replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://');
+          const ws = new WebSocket(wsUrl);
+          const timer = setTimeout(() => {
+            try { ws.close(); } catch {}
+            resolve({ success: false, latency: null });
+          }, timeout);
+
+          ws.onopen = () => {
+            clearTimeout(timer);
+            const latency = Date.now() - start;
+            try { ws.close(); } catch {}
+            resolve({ success: true, latency });
+          };
+
+          ws.onerror = () => {
+            clearTimeout(timer);
+            try { ws.close(); } catch {}
+            resolve({ success: false, latency: null });
+          };
+        } catch {
+          resolve({ success: false, latency: null });
+        }
+      });
+    }
+
+    function renderWispSettings() {
+      const container = document.getElementById("wispServerList");
+      if (!container) return;
+
+      const currentUrl = getActiveWispUrl();
+      const allServers = getAllWispServers();
+      const activeServer = allServers.find(s => s.url === currentUrl) || { name: "Custom Server", url: currentUrl };
+
+      const activeNameEl = document.getElementById("activeWispName");
+      const activeUrlEl = document.getElementById("activeWispUrl");
+      if (activeNameEl) activeNameEl.textContent = activeServer.name;
+      if (activeUrlEl) activeUrlEl.textContent = activeServer.url;
+
+      const autoSwitch = localStorage.getItem("wispAutoswitch") === "true";
+      const autoSwitchToggle = document.getElementById("wispAutoSwitchToggle");
+      if (autoSwitchToggle) {
+        autoSwitchToggle.classList.toggle("active", autoSwitch);
+        autoSwitchToggle.setAttribute("aria-checked", autoSwitch.toString());
+      }
+
+      container.innerHTML = "";
+
+      allServers.forEach((server, index) => {
+        const isActive = server.url === currentUrl;
+        const isCustom = index >= DEFAULT_WISP_SERVERS.length;
+
+        const card = document.createElement("div");
+        card.className = `wisp-server-card ${isActive ? "active" : ""}`;
+        card.onclick = () => selectWispServer(server.url, server.name);
+
+        const deleteBtnHtml = isCustom
+          ? `<button class="delete-custom-btn" title="Remove custom server" onclick="event.stopPropagation(); deleteCustomWispServer('${server.url}')"><i class="fa-solid fa-trash"></i></button>`
+          : "";
+
+        card.innerHTML = `
+          <div class="wisp-card-left">
+            <div class="wisp-radio">
+              <div class="wisp-radio-dot"></div>
+            </div>
+            <div class="wisp-card-details">
+              <div class="wisp-card-name">
+                ${server.name}
+                ${isCustom ? '<span class="wisp-custom-tag">Custom</span>' : ''}
+              </div>
+              <div class="wisp-card-url" title="${server.url}">${server.url}</div>
+            </div>
+          </div>
+          <div class="wisp-card-right">
+            <div class="latency-pill" id="wisp-latency-${index}">
+              <span class="latency-dot"></span>
+              <span class="latency-text">Ping</span>
+            </div>
+            ${deleteBtnHtml}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function addCustomWispServer() {
+      const nameInput = document.getElementById("customWispNameInput");
+      const urlInput = document.getElementById("customWispUrlInput");
+
+      let name = nameInput ? nameInput.value.trim() : "";
+      let url = urlInput ? urlInput.value.trim() : "";
+
+      if (!url) {
+        showToast("Please enter a Wisp WebSocket URL.");
+        return;
+      }
+
+      if (url.startsWith("http://")) {
+        url = "ws://" + url.slice(7);
+      } else if (url.startsWith("https://")) {
+        url = "wss://" + url.slice(8);
+      } else if (!url.startsWith("ws://") && !url.startsWith("wss://")) {
+        url = "wss://" + url;
+      }
+
+      try {
+        const parsed = new URL(url);
+        if (!name) {
+          name = `Custom (${parsed.hostname})`;
+        }
+      } catch (e) {
+        showToast("Invalid URL. Please enter a valid WebSocket URL.");
+        return;
+      }
+
+      const all = getAllWispServers();
+      if (all.some(s => s.url.toLowerCase() === url.toLowerCase())) {
+        showToast("This Wisp server is already in your list!");
+        return;
+      }
+
+      const customWisps = getStoredWisps();
+      customWisps.push({ name, url });
+      localStorage.setItem("customWisps", JSON.stringify(customWisps));
+      localStorage.setItem("proxServer", url);
+
+      if (nameInput) nameInput.value = "";
+      if (urlInput) urlInput.value = "";
+
+      renderWispSettings();
+      pingAllWispServers();
+      showToast(`Custom Wisp "${name}" added and activated!`);
+    }
+
+    function deleteCustomWispServer(url) {
+      if (!confirm("Are you sure you want to remove this custom Wisp server?")) return;
+
+      let customWisps = getStoredWisps().filter(s => s.url !== url);
+      localStorage.setItem("customWisps", JSON.stringify(customWisps));
+
+      if (getActiveWispUrl() === url) {
+        localStorage.setItem("proxServer", DEFAULT_WISP);
+        showToast("Active server was removed. Reverted to default.");
+      } else {
+        showToast("Custom Wisp server removed.");
+      }
+
+      renderWispSettings();
+      pingAllWispServers();
+    }
+
+    function selectWispServer(url, name) {
+      localStorage.setItem("proxServer", url);
+      renderWispSettings();
+      showToast(`Proxy server changed to "${name}"`);
+    }
+
+    function toggleWispAutoSwitch() {
+      const current = localStorage.getItem("wispAutoswitch") === "true";
+      const next = !current;
+      localStorage.setItem("wispAutoswitch", next.toString());
+      const toggle = document.getElementById("wispAutoSwitchToggle");
+      if (toggle) {
+        toggle.classList.toggle("active", next);
+        toggle.setAttribute("aria-checked", next.toString());
+      }
+      showToast(next ? "Wisp Auto-switch enabled on failure" : "Wisp Auto-switch disabled");
+    }
+
+    function resetWispToDefault() {
+      localStorage.setItem("proxServer", DEFAULT_WISP);
+      renderWispSettings();
+      pingAllWispServers();
+      showToast("Proxy reset to default Lunarr Wisp server");
+    }
+
+    async function pingAllWispServers() {
+      const allServers = getAllWispServers();
+      allServers.forEach(async (server, index) => {
+        const pill = document.getElementById(`wisp-latency-${index}`);
+        if (!pill) return;
+        const dot = pill.querySelector(".latency-dot");
+        const text = pill.querySelector(".latency-text");
+        text.textContent = "...";
+        dot.className = "latency-dot";
+
+        const res = await pingWisp(server.url, 2500);
+        if (res.success) {
+          dot.className = "latency-dot online";
+          text.textContent = `${res.latency}ms`;
+        } else {
+          dot.className = "latency-dot offline";
+          text.textContent = "Offline";
+        }
+      });
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       renderThemes("all");
+      renderWispSettings();
+      setTimeout(pingAllWispServers, 300);
+
+      const customNameInput = document.getElementById("customWispNameInput");
+      const customUrlInput = document.getElementById("customWispUrlInput");
+      if (customNameInput) {
+        customNameInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") addCustomWispServer();
+        });
+      }
+      if (customUrlInput) {
+        customUrlInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") addCustomWispServer();
+        });
+      }
 
       const savedPanicKey = localStorage.getItem("athyx_panic_key") || "";
       const savedPanicUrl = localStorage.getItem("athyx_panic_url") || "https://www.google.com";
