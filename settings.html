@@ -634,6 +634,29 @@
       <div class="theme-grid" id="themeGrid"></div>
     </div>
 
+    <!-- NAVIGATION & DOCK SETTINGS -->
+    <div class="section-card">
+      <div class="section-top">
+        <div class="section-icon-box" style="color: var(--accent);">
+          <i class="fa-solid fa-table-cells-large"></i>
+        </div>
+        <div>
+          <h2 class="section-title">Navigation & Selection Bar</h2>
+          <p class="section-desc">Customize the floating navigation selection bar appearance</p>
+        </div>
+      </div>
+
+      <div class="setting-row no-border">
+        <div class="setting-info">
+          <span class="setting-title">Compact Mode (Icons Only)</span>
+          <span class="setting-desc">Remove text labels from the selection bar for a sleek, compact icon-only dock</span>
+        </div>
+        <div class="toggle-switch" id="compactDockToggle" onclick="toggleCompactDock()" role="switch" aria-checked="false">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ABOUT BLANK -->
     <div class="section-card">
       <div class="section-top">
@@ -987,6 +1010,23 @@
       }
     }
 
+    function toggleCompactDock() {
+      const toggle = document.getElementById('compactDockToggle');
+      const current = localStorage.getItem('athyx_compact_dock') === 'true';
+      const next = !current;
+      localStorage.setItem('athyx_compact_dock', next.toString());
+      toggle.classList.toggle('active', next);
+      toggle.setAttribute('aria-checked', next.toString());
+
+      try {
+        if (window.parent) {
+          window.parent.postMessage({ action: "athyx_compact_dock_change", compact: next }, "*");
+        }
+      } catch(e) {}
+
+      showToast(next ? "Compact selection bar enabled (Icons only)" : "Compact selection bar disabled");
+    }
+
     function toggleAutoAboutBlank() {
       const toggle = document.getElementById('autoAbToggle');
       const current = localStorage.getItem('athyx_auto_about_blank') === 'true';
@@ -1031,6 +1071,13 @@
       if (toggle) {
         toggle.classList.toggle("active", autoAb);
         toggle.setAttribute("aria-checked", autoAb.toString());
+      }
+
+      const compactDock = localStorage.getItem("athyx_compact_dock") === "true";
+      const compactToggle = document.getElementById("compactDockToggle");
+      if (compactToggle) {
+        compactToggle.classList.toggle("active", compactDock);
+        compactToggle.setAttribute("aria-checked", compactDock.toString());
       }
     });
   </script>

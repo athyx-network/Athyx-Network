@@ -213,6 +213,22 @@
       margin: 0 4px;
     }
 
+    /* Compact Dock Mode (Icons Only) */
+    .dock-wrapper.compact-dock {
+      padding: 5px;
+      gap: 2px;
+    }
+    .dock-wrapper.compact-dock .dock-item {
+      padding: 9px 13px;
+      gap: 0;
+    }
+    .dock-wrapper.compact-dock .dock-item span {
+      display: none !important;
+    }
+    .dock-wrapper.compact-dock .dock-item i {
+      font-size: 16px;
+    }
+
     /* Mobile responsiveness */
     @media (max-width: 680px) {
       .dock-wrapper {
@@ -247,24 +263,24 @@
 
   <!-- Floating Navigation Dock -->
   <div class="dock-wrapper" id="dockNav" role="navigation" aria-label="Main Navigation">
-    <button class="dock-item active" data-tab="home" onclick="navigate('home')">
+    <button class="dock-item active" data-tab="home" onclick="navigate('home')" title="Home">
       <i class="fa-solid fa-house"></i>
       <span>Home</span>
     </button>
-    <button class="dock-item" data-tab="games" onclick="navigate('games')">
+    <button class="dock-item" data-tab="games" onclick="navigate('games')" title="Games">
       <i class="fa-solid fa-gamepad"></i>
       <span>Games</span>
     </button>
-    <button class="dock-item" data-tab="apps" onclick="navigate('apps')">
+    <button class="dock-item" data-tab="apps" onclick="navigate('apps')" title="Apps">
       <i class="fa-solid fa-shapes"></i>
       <span>Apps</span>
     </button>
-    <button class="dock-item" data-tab="proxy" onclick="navigate('proxy')">
+    <button class="dock-item" data-tab="proxy" onclick="navigate('proxy')" title="Proxy">
       <i class="fa-solid fa-shield-halved"></i>
       <span>Proxy</span>
     </button>
     <div class="dock-separator"></div>
-    <button class="dock-item" data-tab="settings" onclick="navigate('settings')">
+    <button class="dock-item" data-tab="settings" onclick="navigate('settings')" title="Settings">
       <i class="fa-solid fa-sliders"></i>
       <span>Settings</span>
     </button>
@@ -300,6 +316,11 @@
       dockToggleBtn.title = "Show selection bar";
     }
 
+    // Restore saved compact dock state (icons only)
+    if (localStorage.getItem("athyx_compact_dock") === "true") {
+      dockNav.classList.add("compact-dock");
+    }
+
     // Routes definition
     const routes = {
       home: () => "homepage.html?v=" + Date.now(),
@@ -332,6 +353,8 @@
       if (event.data) {
         if (event.data.action === "navigate") {
           navigate(event.data.tab);
+        } else if (event.data.action === "athyx_compact_dock_change") {
+          dockNav.classList.toggle("compact-dock", Boolean(event.data.compact));
         } else if (event.data.action === "athyx_game_active") {
           if (event.data.active) {
             dockNav.style.display = "none";
