@@ -9,18 +9,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="themes.css">
+  <script src="themes.js"></script>
 
   <style>
     :root {
-      --bg: #09090b;
-      --surface: #121215;
-      --surface-hover: #18181d;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.18);
-      --text: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --text-dim: #71717a;
-      --accent: #3b82f6;
+      color-scheme: dark;
+      --bg: #0c0406;
+      --surface: #190a0e;
+      --surface-hover: #251016;
+      --border: rgba(244, 63, 94, 0.16);
+      --border-hover: rgba(244, 63, 94, 0.32);
+      --text: #fff1f2;
+      --text-muted: #fecdd3;
+      --text-dim: #f43f5e;
+      --accent: #f43f5e;
+      --accent-dim: rgba(244, 63, 94, 0.18);
+      --accent-glow: rgba(244, 63, 94, 0.45);
     }
 
     * {
@@ -42,7 +47,7 @@
       top: 0;
       left: 0;
       right: 0;
-      background: rgba(12, 12, 15, 0.88);
+      background: var(--surface);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
@@ -110,25 +115,34 @@
       font-size: 13px;
       color: var(--text-dim);
       pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    .search-wrapper:focus-within i.search-icon {
+      color: var(--accent);
     }
 
     #searchBox {
       width: 100%;
-      background: #16161a;
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 8px 32px 8px 34px;
       font-size: 13.5px;
-      color: #fff;
+      color: var(--text);
       font-family: inherit;
       outline: none;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    #searchBox::placeholder {
+      color: var(--text-dim);
+    }
+
     #searchBox:focus {
-      border-color: rgba(255, 255, 255, 0.25);
-      background: #1a1a20;
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+      border-color: var(--accent);
+      background: var(--surface-hover);
+      box-shadow: 0 0 0 2px var(--accent-dim);
     }
 
     .clear-search-btn {
@@ -140,10 +154,11 @@
       font-size: 13px;
       cursor: pointer;
       display: none;
+      transition: color 0.2s ease;
     }
 
     .clear-search-btn:hover {
-      color: #fff;
+      color: var(--accent);
     }
 
     /* Main Container */
@@ -151,51 +166,6 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 24px 28px 120px;
-    }
-
-    /* Filter Chips Bar */
-    .filters-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 18px;
-      margin-bottom: 6px;
-      scrollbar-width: none;
-    }
-
-    .filters-bar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .filter-chip {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 6px 14px;
-      border-radius: 9999px;
-      font-size: 12.5px;
-      font-weight: 500;
-      cursor: pointer;
-      font-family: inherit;
-      white-space: nowrap;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .filter-chip:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
-      border-color: var(--border-hover);
-    }
-
-    .filter-chip.active {
-      background: #ffffff;
-      color: #09090b;
-      border-color: #ffffff;
-      font-weight: 600;
     }
 
     /* Games Grid */
@@ -313,12 +283,13 @@
     }
 
     .fav-btn.active {
-      color: #eab308;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
     }
 
     .fav-btn:hover {
       transform: scale(1.15);
-      color: #eab308;
+      color: #ffffff;
     }
 
     .game-info {
@@ -369,76 +340,76 @@
       z-index: 99999;
       display: none;
       flex-direction: column;
+      overflow: hidden;
     }
 
     #gameStage.show {
       display: flex;
     }
 
-    .stage-header {
-      height: 48px;
-      background: #111114;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      z-index: 2;
+    #gameStage::-webkit-scrollbar,
+    #gameStageIframe::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
     }
 
-    .stage-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    body.game-active {
+      overflow: hidden !important;
     }
 
-    .stage-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    body.game-active::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
     }
 
-    .stage-btn {
-      background: #1e1e24;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 5px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 500;
+    /* Floating Quit Button */
+    .stage-quit-btn {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 100000;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(18, 18, 22, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f43f5e;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-family: inherit;
-      transition: all 0.2s;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      outline: none;
+      opacity: 0.85;
     }
 
-    .stage-btn:hover {
-      background: #27272e;
-      color: #fff;
-    }
-
-    .stage-btn-close {
-      background: rgba(239, 68, 68, 0.15);
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #ef4444;
-    }
-
-    .stage-btn-close:hover {
+    .stage-quit-btn:hover {
+      opacity: 1;
       background: #ef4444;
-      color: #fff;
+      border-color: #ef4444;
+      color: #ffffff;
+      transform: scale(1.08);
+      box-shadow: 0 10px 28px -2px rgba(239, 68, 68, 0.5);
+    }
+
+    .stage-quit-btn:active {
+      transform: scale(0.95);
     }
 
     #gameStageIframe {
-      flex: 1;
+      position: absolute;
+      inset: 0;
       width: 100%;
-      height: calc(100% - 48px);
+      height: 100%;
       border: none;
       background: #000;
+      overflow: hidden;
     }
 
     /* Loading modal */
@@ -511,25 +482,6 @@
 
   <!-- Main Content Area -->
   <main class="main-content">
-    <!-- Category Filter Chips -->
-    <div class="filters-bar">
-      <button class="filter-chip active" data-filter="all" onclick="setCategory('all')">
-        <i class="fa-solid fa-border-all"></i> All Games
-      </button>
-      <button class="filter-chip" data-filter="favorites" onclick="setCategory('favorites')">
-        <i class="fa-solid fa-star" style="color:#eab308;"></i> Favorites
-      </button>
-      <button class="filter-chip" data-filter="action" onclick="setCategory('action')">
-        <i class="fa-solid fa-fire"></i> Action
-      </button>
-      <button class="filter-chip" data-filter="classic" onclick="setCategory('classic')">
-        <i class="fa-solid fa-dice"></i> Classics & Retro
-      </button>
-      <button class="filter-chip" data-filter="casual" onclick="setCategory('casual')">
-        <i class="fa-solid fa-cube"></i> Casual & Puzzle
-      </button>
-    </div>
-
     <!-- Games Grid -->
     <div id="gamesGrid">
       <div class="state-message">
@@ -541,18 +493,10 @@
 
   <!-- Fullscreen Game Stage Player -->
   <div id="gameStage">
-    <div class="stage-header">
-      <div class="stage-title">
-        <i class="fa-solid fa-gamepad" style="color:var(--accent);"></i>
-        <span id="activeGameTitle">Game Name</span>
-      </div>
-      <div class="stage-controls">
-        <button class="stage-btn" onclick="reloadActiveGame()" title="Reload game"><i class="fa-solid fa-rotate-right"></i> Reload</button>
-        <button class="stage-btn" onclick="toggleStageFullscreen()" title="Toggle fullscreen"><i class="fa-solid fa-expand"></i> Fullscreen</button>
-        <button class="stage-btn stage-btn-close" onclick="closeActiveGame()" title="Exit (Esc)"><i class="fa-solid fa-xmark"></i> Close</button>
-      </div>
-    </div>
-    <iframe id="gameStageIframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
+    <button class="stage-quit-btn" onclick="closeActiveGame()" title="Quit Game (Esc)" aria-label="Quit Game">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <iframe id="gameStageIframe" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated" scrolling="no"></iframe>
   </div>
 
   <!-- Loading Modal Indicator -->
@@ -576,46 +520,64 @@
     const clearSearchBtn = document.getElementById("clearSearchBtn");
     const gameStage = document.getElementById("gameStage");
     const gameStageIframe = document.getElementById("gameStageIframe");
-    const activeGameTitle = document.getElementById("activeGameTitle");
     const loadingModal = document.getElementById("loadingModal");
     const loadingModalText = document.getElementById("loadingModalText");
 
     // Fallback list of games in athyx-network/game-library
     const fallbackGames = [
-      { "name": "Angry Birds", "path": "Angry Birds.html", "icon": "icons/angry_birds.png", "category": "casual" },
-      { "name": "Bad Piggies", "path": "Bad Piggies.html", "icon": "icons/bad_piggies.png", "category": "casual" },
-      { "name": "Baldi's Basics", "path": "Baldis Basics.html", "icon": "icons/baldis_basics.png", "category": "action" },
-      { "name": "Basketball Stars", "path": "Basketball Stars.html", "icon": "icons/basketball_stars.png", "category": "action" },
-      { "name": "Block Blast", "path": "Block Blast.html", "icon": "icons/block_blast.png", "category": "casual" },
-      { "name": "Bowmasters", "path": "Bow Masters.html", "icon": "icons/bow_masters.png", "category": "action" },
-      { "name": "Brawl Stars", "path": "Brawl Stars.html", "icon": "icons/brawl_stars.png", "category": "action" },
-      { "name": "Cluster Rush", "path": "Cluster Rush.html", "icon": "icons/cluster_rush.png", "category": "action" },
-      { "name": "Cookie Clicker", "path": "Cookie Clicker.html", "icon": "icons/cookie_clicker.png", "category": "casual" },
-      { "name": "Crossy Road", "path": "Crossy Road.html", "icon": "icons/crossy_road.png", "category": "casual" },
-      { "name": "DOOM", "path": "Doom.html", "icon": "icons/doom.png", "category": "classic" },
-      { "name": "Five Nights at Epstein's", "path": "Five Nights At Epsteins.html", "icon": "icons/five_nights_at_epsteins.png", "category": "action" },
-      { "name": "Five Nights at Freddy's", "path": "Five Nights At Freddys.html", "icon": "icons/fnaf1.png", "category": "action" },
-      { "name": "Five Nights at Freddy's 2", "path": "Five Nights At Freddys 2.html", "icon": "icons/fnaf2.png", "category": "action" },
-      { "name": "Geometry Dash", "path": "Geometry Dash.html", "icon": "icons/geometry_dash.svg", "category": "action" },
-      { "name": "Chrome Dino", "path": "Google Dino.html", "icon": "icons/google_dino.png", "category": "classic" },
-      { "name": "Granny", "path": "Granny.html", "icon": "icons/granny.png", "category": "action" },
-      { "name": "Helix Jump", "path": "Helix Jump.html", "icon": "icons/helix_jump.png", "category": "casual" },
-      { "name": "Hypper Sandbox", "path": "Hypper Sandbox.html", "icon": "icons/hypper_sandbox.png", "category": "casual" },
-      { "name": "Minecraft", "path": "Minecraft.html", "icon": "icons/minecraft.png", "category": "classic" },
-      { "name": "Moto X3M", "path": "Moto X3m.html", "icon": "icons/moto_x3m.png", "category": "action" },
-      { "name": "Obby 99% Will Lose", "path": "Obby 99% will lose.html", "icon": "icons/obby.png", "category": "casual" },
-      { "name": "OvO", "path": "OvO.html", "icon": "icons/ovo.png", "category": "action" },
-      { "name": "Plants vs. Zombies", "path": "Plants VS Zombies.html", "icon": "icons/pvz.png", "category": "classic" },
-      { "name": "Raldi's Crackhouse", "path": "Raldis Crackhouse.html", "icon": "icons/raldis_crackhouse.png", "category": "action" },
-      { "name": "Retro Bowl", "path": "Retro Bowl.html", "icon": "icons/retro_bowl.png", "category": "classic" },
-      { "name": "Snow Rider 3D", "path": "Snow Rider.html", "icon": "icons/snow_rider.png", "category": "action" },
-      { "name": "Subway Surfers: St. Petersburg", "path": "Subway Surfers: St .Petersburg.html", "icon": "icons/subway_surfers.png", "category": "action" },
-      { "name": "Wordle", "path": "Wordle.html", "icon": "icons/wordle.png", "category": "casual" }
+      { "name": "2048", "path": "2048.html", "icon": "icons/2048.png" },
+      { "name": "Angry Birds", "path": "Angry Birds.html", "icon": "icons/angry_birds.png" },
+      { "name": "Bad Piggies", "path": "Bad Piggies.html", "icon": "icons/bad_piggies.png" },
+      { "name": "Baldi's Basics", "path": "Baldis Basics.html", "icon": "icons/baldis_basics.png" },
+      { "name": "Baldi's Basics: Ultra Decompile", "path": "Baldi Ultra Decompile.html", "icon": "icons/baldi_ultra_decompile.png" },
+      { "name": "Basketball Stars", "path": "Basketball Stars.html", "icon": "icons/basketball_stars.png" },
+      { "name": "Block Blast", "path": "Block Blast.html", "icon": "icons/block_blast.png" },
+      { "name": "Bloxorz", "path": "Bloxorz.html", "icon": "icons/bloxorz.png" },
+      { "name": "Bowmasters", "path": "Bow Masters.html", "icon": "icons/bow_masters.png" },
+      { "name": "Brawl Stars", "path": "Brawl Stars.html", "icon": "icons/brawl_stars.png" },
+      { "name": "Chrome Dino", "path": "Google Dino.html", "icon": "icons/google_dino.png" },
+      { "name": "Cluster Rush", "path": "Cluster Rush.html", "icon": "icons/cluster_rush.png" },
+      { "name": "Cookie Clicker", "path": "Cookie Clicker.html", "icon": "icons/cookie_clicker.png" },
+      { "name": "Crossy Road", "path": "Crossy Road.html", "icon": "icons/crossy_road.png" },
+      { "name": "Doodle Jump", "path": "Doodle Jump.html", "icon": "icons/doodle_jump.png" },
+      { "name": "DOOM", "path": "Doom.html", "icon": "icons/doom.png" },
+      { "name": "Drift Boss", "path": "Drift Boss.html", "icon": "icons/drift_boss.png" },
+      { "name": "Duck Life", "path": "Duck Life.html", "icon": "icons/duck_life.png" },
+      { "name": "Five Nights at Epstein's", "path": "Five Nights At Epsteins.html", "icon": "icons/five_nights_at_epsteins.png" },
+      { "name": "Five Nights at Freddy's", "path": "Five Nights At Freddys.html", "icon": "icons/fnaf1.png" },
+      { "name": "Five Nights at Freddy's 2", "path": "Five Nights At Freddys 2.html", "icon": "icons/fnaf2.png" },
+      { "name": "Geometry Dash", "path": "Geometry Dash.html", "icon": "icons/geometry_dash.svg" },
+      { "name": "Granny", "path": "Granny.html", "icon": "icons/granny.png" },
+      { "name": "Helix Jump", "path": "Helix Jump.html", "icon": "icons/helix_jump.png" },
+      { "name": "Hypper Sandbox", "path": "Hypper Sandbox.html", "icon": "icons/hypper_sandbox.png" },
+      { "name": "Just Fall.LOL", "path": "Just Fall.lol.html", "icon": "icons/just_fall.png" },
+      { "name": "Minecraft", "path": "Minecraft.html", "icon": "icons/minecraft.png" },
+      { "name": "Moto X3M", "path": "Moto X3m.html", "icon": "icons/moto_x3m.png" },
+      { "name": "Obby 99% Will Lose", "path": "Obby 99% will lose.html", "icon": "icons/obby.png" },
+      { "name": "OvO", "path": "OvO.html", "icon": "icons/ovo.png" },
+      { "name": "Paper.io 2", "path": "Paper.io.html", "icon": "icons/paper_io.png" },
+      { "name": "Plants vs. Zombies", "path": "Plants VS Zombies.html", "icon": "icons/pvz.png" },
+      { "name": "Raldi's Crackhouse", "path": "Raldis Crackhouse.html", "icon": "icons/raldis_crackhouse.png" },
+      { "name": "Red Ball 4", "path": "Red Ball 4.html", "icon": "icons/red_ball_4.png" },
+      { "name": "Retro Bowl", "path": "Retro Bowl.html", "icon": "icons/retro_bowl.png" },
+      { "name": "Riddle School", "path": "Riddle School.html", "icon": "icons/riddle_school.png" },
+      { "name": "Riddle School 2", "path": "Riddle School 2.html", "icon": "icons/riddle_school_2.png" },
+      { "name": "Riddle School 3", "path": "Riddle School 3.html", "icon": "icons/riddle_school_3.png" },
+      { "name": "Slope 2", "path": "Slope 2.html", "icon": "icons/slope_2.png" },
+      { "name": "Snow Rider 3D", "path": "Snow Rider.html", "icon": "icons/snow_rider.png" },
+      { "name": "Subway Surfers: St. Petersburg", "path": "Subway Surfers: St .Petersburg.html", "icon": "icons/subway_surfers.png" },
+      { "name": "Super Mario Bros", "path": "Super Mario Bross.html", "icon": "icons/super_mario_bros.png" },
+      { "name": "Tag", "path": "Tag.html", "icon": "icons/tag.png" },
+      { "name": "The Impossible Quiz", "path": "Impossible Quiz.html", "icon": "icons/impossible_quiz.png" },
+      { "name": "The World's Hardest Game", "path": "World's Hardest Game.html", "icon": "icons/worlds_hardest_game.png" },
+      { "name": "Tomb of the Mask", "path": "Tomb Of The Mask.html", "icon": "icons/tomb_of_the_mask.png" },
+      { "name": "Undertale Yellow", "path": "Undertale Yellow.html", "icon": "icons/undertale_yellow.png" },
+      { "name": "Wordle", "path": "Wordle.html", "icon": "icons/wordle.png" }
     ];
 
     async function fetchGameLibrary() {
       try {
-        const res = await fetch(GAMES_JSON_URL);
+        const res = await fetch(GAMES_JSON_URL + "?v=" + Date.now(), { cache: "no-cache" });
         if (!res.ok) throw new Error("Could not load games.json");
         allGames = await res.json();
       } catch (err) {
@@ -638,36 +600,9 @@
       renderGames();
     }
 
-    function setCategory(cat) {
-      currentFilter = cat;
-      document.querySelectorAll(".filter-chip").forEach(btn => {
-        btn.classList.toggle("active", btn.getAttribute("data-filter") === cat);
-      });
-      renderGames();
-    }
-
     function getFilteredGames() {
       const query = searchBox.value.trim().toLowerCase();
       let list = allGames.filter(g => g.name.toLowerCase().includes(query));
-
-      if (currentFilter === "favorites") {
-        list = list.filter(g => favorites.includes(g.name));
-      } else if (currentFilter !== "all") {
-        list = list.filter(g => {
-          const cat = (g.category || "").toLowerCase();
-          const name = g.name.toLowerCase();
-          if (currentFilter === "action") {
-            return cat === "action" || name.includes("rush") || name.includes("fnaf") || name.includes("five nights") || name.includes("moto") || name.includes("dash") || name.includes("brawl") || name.includes("stars") || name.includes("rider");
-          }
-          if (currentFilter === "classic") {
-            return cat === "classic" || name.includes("doom") || name.includes("minecraft") || name.includes("retro") || name.includes("dino") || name.includes("plants") || name.includes("wordle");
-          }
-          if (currentFilter === "casual") {
-            return cat === "casual" || name.includes("cookie") || name.includes("blast") || name.includes("jump") || name.includes("birds") || name.includes("piggies") || name.includes("crossy") || name.includes("baldi") || name.includes("obby");
-          }
-          return true;
-        });
-      }
 
       // Sort favorites first
       list.sort((a, b) => {
@@ -729,15 +664,242 @@
       loadingModal.classList.add("show");
 
       const gameUrl = REPO_BASE + encodeURI(game.path);
+      const gameBaseFolder = gameUrl.substring(0, gameUrl.lastIndexOf('/') + 1);
 
       try {
         const res = await fetch(gameUrl);
         if (!res.ok) throw new Error("Status " + res.status);
-        const html = await res.text();
+        let html = await res.text();
 
-        activeGameTitle.textContent = game.name;
-        gameStageIframe.srcdoc = html;
+        document.body.classList.add("game-active");
+
+        // Extract base href if one is already defined in the HTML
+        const baseMatch = html.match(/<base\s+[^>]*href=["']([^"']+)["']/i);
+        const resolvedBase = baseMatch ? baseMatch[1] : gameBaseFolder;
+        const absoluteBase = resolvedBase.endsWith('/') ? resolvedBase : resolvedBase + '/';
+
+        // Pre-replace relative streamingAssetsUrl in HTML
+        html = html.replace(/streamingAssetsUrl\s*:\s*(["'])(?!https?:\/\/)(.*?)\1/gi, (match, quote, relPath) => {
+          const abs = absoluteBase + relPath.replace(/^(\.\/|\/)/, '');
+          return `streamingAssetsUrl: "${abs}"`;
+        });
+
+        // Unity WebGL & Modern Browser URL Compatibility Shim
+        const unityShim = `
+<script>
+(function() {
+  const resolvedBase = ${JSON.stringify(resolvedBase)};
+  const absoluteBase = ${JSON.stringify(absoluteBase)};
+
+  try {
+    Object.defineProperty(Document.prototype, 'URL', { get: function() { return resolvedBase; }, configurable: true });
+    Object.defineProperty(Document.prototype, 'documentURI', { get: function() { return resolvedBase; }, configurable: true });
+  } catch(e) {}
+  try {
+    Object.defineProperty(document, 'URL', { get: function() { return resolvedBase; }, configurable: true });
+    Object.defineProperty(document, 'documentURI', { get: function() { return resolvedBase; }, configurable: true });
+  } catch(e) {}
+
+  let _origCreateUnityInstance = window.createUnityInstance;
+  Object.defineProperty(window, 'createUnityInstance', {
+    get: function() {
+      if (!_origCreateUnityInstance) return undefined;
+      return function(canvas, config, onProgress) {
+        if (config) {
+          if (config.streamingAssetsUrl && !/^https?:\\/\\//i.test(config.streamingAssetsUrl)) {
+            config.streamingAssetsUrl = absoluteBase + config.streamingAssetsUrl.replace(/^(\\.\\/|\\/)/, '');
+          }
+        }
+        return _origCreateUnityInstance.call(this, canvas, config, onProgress);
+      };
+    },
+    set: function(fn) {
+      _origCreateUnityInstance = fn;
+    },
+    configurable: true
+  });
+
+  let _origUnityLoader = window.UnityLoader;
+  Object.defineProperty(window, 'UnityLoader', {
+    get: function() { return _origUnityLoader; },
+    set: function(val) {
+      _origUnityLoader = val;
+      if (val && typeof val.instantiate === 'function') {
+        const origInst = val.instantiate;
+        val.instantiate = function(container, url, params) {
+          if (typeof url === 'string' && !/^https?:\\/\\//i.test(url)) {
+            url = absoluteBase + url.replace(/^(\\.\\/|\\/)/, '');
+          }
+          return origInst.call(this, container, url, params);
+        };
+      }
+    },
+    configurable: true
+  });
+
+  const OrigURL = window.URL;
+  class PatchedURL extends OrigURL {
+    constructor(url, base) {
+      let targetBase = base;
+      if (!targetBase || targetBase === 'about:srcdoc' || targetBase === 'about:blank' || (typeof targetBase === 'string' && (targetBase.startsWith('blob:') || targetBase.startsWith('about:')))) {
+        targetBase = absoluteBase;
+      }
+      try {
+        super(url, targetBase);
+      } catch(err) {
+        try {
+          super(url, absoluteBase);
+        } catch(e2) {
+          super(url);
+        }
+      }
+    }
+  }
+  window.URL = PatchedURL;
+})();
+<\/script>`;
+
+        // Auto-Scaler & Compatibility Injection
+        const autoScalerShim = `
+<style>
+html, body {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+* {
+  scrollbar-width: none !important;
+}
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+#gameContainer, #unity-container, #canvas-container, #c2canvasdiv, #player, .game-container {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  inset: 0 !important;
+}
+canvas, #gameContainer canvas, #unity-canvas, canvas#canvas {
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  object-fit: contain !important;
+  margin: auto !important;
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+}
+</style>
+<script>
+(function() {
+  function autoScaleGame() {
+    try {
+      const canvases = document.querySelectorAll('canvas');
+      const containers = document.querySelectorAll('#gameContainer, #unity-container, #canvas-container, #c2canvasdiv, #player, .game-container');
+      
+      containers.forEach(function(el) {
+        el.style.setProperty('width', '100vw', 'important');
+        el.style.setProperty('height', '100vh', 'important');
+        el.style.setProperty('max-width', '100vw', 'important');
+        el.style.setProperty('max-height', '100vh', 'important');
+        el.style.setProperty('display', 'flex', 'important');
+        el.style.setProperty('align-items', 'center', 'important');
+        el.style.setProperty('justify-content', 'center', 'important');
+        el.style.setProperty('overflow', 'hidden', 'important');
+        el.style.setProperty('margin', '0', 'important');
+        el.style.setProperty('padding', '0', 'important');
+        el.style.setProperty('position', 'absolute', 'important');
+        el.style.setProperty('inset', '0', 'important');
+      });
+
+      canvases.forEach(function(canvas) {
+        const nativeW = canvas.width || parseFloat(canvas.getAttribute('width')) || 960;
+        const nativeH = canvas.height || parseFloat(canvas.getAttribute('height')) || 600;
+        const aspect = (nativeW && nativeH) ? (nativeW / nativeH) : (16 / 9);
+
+        const winW = window.innerWidth || document.documentElement.clientWidth;
+        const winH = window.innerHeight || document.documentElement.clientHeight;
+        const winAspect = winW / winH;
+
+        let scaleW, scaleH;
+        if (winAspect > aspect) {
+          scaleH = winH;
+          scaleW = Math.round(scaleH * aspect);
+        } else {
+          scaleW = winW;
+          scaleH = Math.round(scaleW / aspect);
+        }
+
+        canvas.style.setProperty('width', scaleW + 'px', 'important');
+        canvas.style.setProperty('height', scaleH + 'px', 'important');
+        canvas.style.setProperty('max-width', '100vw', 'important');
+        canvas.style.setProperty('max-height', '100vh', 'important');
+        canvas.style.setProperty('object-fit', 'contain', 'important');
+        canvas.style.setProperty('position', 'relative', 'important');
+        canvas.style.setProperty('top', 'auto', 'important');
+        canvas.style.setProperty('left', 'auto', 'important');
+        canvas.style.setProperty('transform', 'none', 'important');
+        canvas.style.setProperty('margin', 'auto', 'important');
+        canvas.style.setProperty('display', 'block', 'important');
+      });
+    } catch(e) {}
+  }
+
+  window.addEventListener('resize', autoScaleGame);
+  window.addEventListener('orientationchange', autoScaleGame);
+  window.addEventListener('DOMContentLoaded', autoScaleGame);
+  window.addEventListener('load', function() {
+    autoScaleGame();
+    [50, 150, 300, 600, 1000, 2000, 3500, 5000].forEach(function(delay) {
+      setTimeout(autoScaleGame, delay);
+    });
+  });
+
+  if (window.MutationObserver) {
+    var observer = new MutationObserver(function() {
+      autoScaleGame();
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
+  }
+})();
+<\/script>`;
+
+        // Inject base tag if not present
+        const baseTag = baseMatch ? '' : `<base href="${gameBaseFolder}">`;
+        const headInjection = baseTag + autoScalerShim + unityShim;
+
+        let cleanHtml;
+        if (/<head[^>]*>/i.test(html)) {
+          cleanHtml = html.replace(/<head[^>]*>/i, match => match + headInjection);
+        } else if (/<html[^>]*>/i.test(html)) {
+          cleanHtml = html.replace(/<html[^>]*>/i, match => match + `<head>${headInjection}</head>`);
+        } else {
+          cleanHtml = `<head>${headInjection}</head>` + html;
+        }
+
+        gameStageIframe.srcdoc = cleanHtml;
         gameStage.classList.add("show");
+
+        // Inform parent window to hide UI dock while playing
+        try {
+          window.parent.postMessage({ action: "athyx_game_active", active: true }, "*");
+        } catch(e) {}
       } catch (err) {
         console.error("Failed to launch game:", err);
         alert(`Could not launch "${game.name}". Please check your internet connection.`);
@@ -754,6 +916,13 @@
       gameStage.classList.remove("show");
       gameStageIframe.srcdoc = "";
       activeGameObj = null;
+      document.body.classList.remove("game-active");
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      try {
+        window.parent.postMessage({ action: "athyx_game_active", active: false }, "*");
+      } catch(e) {}
     }
 
     function toggleStageFullscreen() {

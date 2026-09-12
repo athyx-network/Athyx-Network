@@ -9,18 +9,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="themes.css">
+  <script src="themes.js"></script>
 
   <style>
     :root {
-      --bg: #09090b;
-      --surface: #121215;
-      --surface-hover: #18181d;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.18);
-      --text: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --text-dim: #71717a;
-      --accent: #3b82f6;
+      color-scheme: dark;
+      --bg: #0c0406;
+      --surface: #190a0e;
+      --surface-hover: #251016;
+      --border: rgba(244, 63, 94, 0.16);
+      --border-hover: rgba(244, 63, 94, 0.32);
+      --text: #fff1f2;
+      --text-muted: #fecdd3;
+      --text-dim: #f43f5e;
+      --accent: #f43f5e;
+      --accent-dim: rgba(244, 63, 94, 0.18);
+      --accent-glow: rgba(244, 63, 94, 0.45);
     }
 
     * {
@@ -42,7 +47,7 @@
       top: 0;
       left: 0;
       right: 0;
-      background: rgba(12, 12, 15, 0.88);
+      background: var(--surface);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
@@ -86,6 +91,7 @@
       border-radius: 9999px;
     }
 
+    /* Search Box */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -100,25 +106,34 @@
       font-size: 13px;
       color: var(--text-dim);
       pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    .search-wrapper:focus-within i.search-icon {
+      color: var(--accent);
     }
 
     #searchBox {
       width: 100%;
-      background: #16161a;
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 8px 32px 8px 34px;
       font-size: 13.5px;
-      color: #fff;
+      color: var(--text);
       font-family: inherit;
       outline: none;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    #searchBox::placeholder {
+      color: var(--text-dim);
+    }
+
     #searchBox:focus {
-      border-color: rgba(255, 255, 255, 0.25);
-      background: #1a1a20;
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+      border-color: var(--accent);
+      background: var(--surface-hover);
+      box-shadow: 0 0 0 2px var(--accent-dim);
     }
 
     .clear-btn {
@@ -130,10 +145,11 @@
       font-size: 13px;
       cursor: pointer;
       display: none;
+      transition: color 0.2s ease;
     }
 
     .clear-btn:hover {
-      color: #fff;
+      color: var(--accent);
     }
 
     /* Main Container */
@@ -283,7 +299,7 @@
       font-size: 32px;
     }
 
-    /* Fullscreen App Stage */
+    /*     /* App Stage (Fullscreen Viewer) */
     #appStage {
       position: fixed;
       inset: 0;
@@ -291,10 +307,28 @@
       z-index: 99999;
       display: none;
       flex-direction: column;
+      overflow: hidden;
     }
 
     #appStage.show {
       display: flex;
+    }
+
+    #appStage::-webkit-scrollbar,
+    #appStageIframe::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    body.app-active {
+      overflow: hidden !important;
+    }
+
+    body.app-active::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
     }
 
     .stage-header {
@@ -313,54 +347,52 @@
       font-weight: 600;
       color: #fff;
       display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stage-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stage-btn {
-      background: #1e1e24;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 5px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 500;
+    /* Floating Quit Button */
+    .stage-quit-btn {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 100000;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(18, 18, 22, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f43f5e;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-family: inherit;
-      transition: all 0.2s;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      outline: none;
+      opacity: 0.85;
     }
 
-    .stage-btn:hover {
-      background: #27272e;
-      color: #fff;
-    }
-
-    .stage-btn-close {
-      background: rgba(239, 68, 68, 0.15);
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #ef4444;
-    }
-
-    .stage-btn-close:hover {
+    .stage-quit-btn:hover {
+      opacity: 1;
       background: #ef4444;
-      color: #fff;
+      border-color: #ef4444;
+      color: #ffffff;
+      transform: scale(1.08);
+      box-shadow: 0 10px 28px -2px rgba(239, 68, 68, 0.5);
+    }
+
+    .stage-quit-btn:active {
+      transform: scale(0.95);
     }
 
     #appStageIframe {
-      flex: 1;
+      position: absolute;
+      inset: 0;
       width: 100%;
-      height: calc(100% - 48px);
+      height: 100%;
       border: none;
       background: #000;
+      overflow: hidden;
     }
 
     /* Loading modal */
@@ -439,18 +471,10 @@
 
   <!-- Fullscreen App Player -->
   <div id="appStage">
-    <div class="stage-header">
-      <div class="stage-title">
-        <i class="fa-solid fa-shapes" style="color:var(--accent);"></i>
-        <span id="activeAppTitle">Application</span>
-      </div>
-      <div class="stage-controls">
-        <button class="stage-btn" onclick="reloadActiveApp()" title="Reload application"><i class="fa-solid fa-rotate-right"></i> Reload</button>
-        <button class="stage-btn" onclick="toggleStageFullscreen()" title="Toggle fullscreen"><i class="fa-solid fa-expand"></i> Fullscreen</button>
-        <button class="stage-btn stage-btn-close" onclick="closeActiveApp()" title="Exit (Esc)"><i class="fa-solid fa-xmark"></i> Close</button>
-      </div>
-    </div>
-    <iframe id="appStageIframe" allow="autoplay; fullscreen; gamepad; focus-without-user-activation *"></iframe>
+    <button class="stage-quit-btn" onclick="closeActiveApp()" title="Quit App (Esc)" aria-label="Quit App">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <iframe id="appStageIframe" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated" scrolling="no"></iframe>
   </div>
 
   <!-- Loading Modal Indicator -->
@@ -477,7 +501,6 @@
     const clearBtn = document.getElementById("clearBtn");
     const appStage = document.getElementById("appStage");
     const appStageIframe = document.getElementById("appStageIframe");
-    const activeAppTitle = document.getElementById("activeAppTitle");
     const loadingModal = document.getElementById("loadingModal");
     const loadingModalText = document.getElementById("loadingModalText");
 
@@ -534,9 +557,20 @@
         if (!response.ok) throw new Error("Status " + response.status);
         const html = await response.text();
 
-        activeAppTitle.textContent = app.name;
-        appStageIframe.srcdoc = html;
+        document.body.classList.add("app-active");
+
+        // Hide scrollbars inside app iframe srcdoc
+        const hideScrollCss = `<style>html, body { overflow: hidden !important; margin: 0; padding: 0; width: 100%; height: 100%; } *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }</style>`;
+        const cleanHtml = html.includes("<head>")
+          ? html.replace("<head>", "<head>" + hideScrollCss)
+          : hideScrollCss + html;
+
+        appStageIframe.srcdoc = cleanHtml;
         appStage.classList.add("show");
+
+        try {
+          window.parent.postMessage({ action: "athyx_game_active", active: true }, "*");
+        } catch(e) {}
       } catch (err) {
         console.error("Failed to load app:", err);
         alert(`Failed to load ${app.name}.`);
@@ -553,6 +587,13 @@
       appStage.classList.remove("show");
       appStageIframe.srcdoc = "";
       activeAppObj = null;
+      document.body.classList.remove("app-active");
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      try {
+        window.parent.postMessage({ action: "athyx_game_active", active: false }, "*");
+      } catch(e) {}
     }
 
     function toggleStageFullscreen() {

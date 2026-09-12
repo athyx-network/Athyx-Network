@@ -21,19 +21,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="themes.css">
+  <script src="themes.js"></script>
 
   <link rel="icon" type="image/x-icon" href="https://cdn.jsdelivr.net/gh/HyperFloppik/Ethyrnal-s-Arcade-v2.3@main/web-app-manifest-512x512.ico">
 
   <style>
     :root {
-      --bg-base: #09090b;
-      --dock-bg: rgba(18, 18, 22, 0.85);
-      --dock-border: rgba(255, 255, 255, 0.08);
-      --dock-btn-hover: rgba(255, 255, 255, 0.07);
-      --dock-btn-active: rgba(255, 255, 255, 0.12);
-      --text-main: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --accent: #3b82f6;
+      color-scheme: dark;
+      --bg-base: #0c0406;
+      --surface: #190a0e;
+      --surface-hover: #251016;
+      --surface-active: #35161f;
+      --dock-bg: rgba(25, 10, 14, 0.88);
+      --dock-border: rgba(244, 63, 94, 0.2);
+      --dock-btn-hover: rgba(244, 63, 94, 0.14);
+      --dock-btn-active: rgba(244, 63, 94, 0.25);
+      --text-main: #fff1f2;
+      --text-muted: #fecdd3;
+      --accent: #f43f5e;
+      --accent-dim: rgba(244, 63, 94, 0.18);
+      --accent-glow: rgba(244, 63, 94, 0.45);
     }
 
     * {
@@ -45,20 +53,13 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: var(--bg-base);
+      background: 
+        linear-gradient(135deg, var(--accent-dim) 0%, rgba(0, 0, 0, 0) 55%),
+        linear-gradient(180deg, var(--surface-active) 0%, var(--surface) 40%, var(--bg-base) 100%);
+      background-color: var(--bg-base);
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       overflow: hidden;
       color: var(--text-main);
-    }
-
-    /* Background texture */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
     }
 
     /* Iframe stage */
@@ -70,8 +71,8 @@
       height: 100%;
       border: none;
       z-index: 1;
-      background: var(--bg-base);
-      transition: opacity 0.15s ease;
+      background: transparent;
+      transition: opacity 0.15s ease, background 0.3s ease;
     }
 
     /* Floating Navigation Dock */
@@ -95,6 +96,67 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
       gap: 4px;
       user-select: none;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .dock-wrapper.dock-hidden {
+      transform: translate(-50%, calc(100% + 40px));
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Small Bottom-Right Dock Toggle Button */
+    .dock-toggle-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1001;
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: var(--dock-bg);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--dock-border);
+      box-shadow: 
+        0 12px 30px -8px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      outline: none;
+    }
+
+    .dock-toggle-btn:hover {
+      color: var(--text-main);
+      background: var(--dock-btn-hover);
+      border-color: var(--accent-dim);
+      transform: scale(1.08);
+      box-shadow: 0 14px 34px -6px rgba(0, 0, 0, 0.7), 0 0 16px var(--accent-dim);
+    }
+
+    .dock-toggle-btn:active {
+      transform: scale(0.94);
+    }
+
+    .dock-toggle-btn i {
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+    }
+
+    .dock-toggle-btn.dock-collapsed {
+      color: var(--accent);
+      border-color: var(--accent-dim);
+      background: var(--dock-btn-active);
+    }
+
+    .dock-toggle-btn.dock-collapsed i {
+      transform: rotate(180deg);
     }
 
     .dock-item {
@@ -135,19 +197,19 @@
     .dock-item.active {
       color: #ffffff;
       background: var(--dock-btn-active);
-      border-color: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      border-color: var(--accent-dim);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
       font-weight: 600;
     }
 
     .dock-item.active i {
-      color: #ffffff;
+      color: var(--accent);
     }
 
     .dock-separator {
       width: 1px;
       height: 20px;
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--dock-border);
       margin: 0 4px;
     }
 
@@ -157,6 +219,14 @@
         bottom: 16px;
         padding: 5px;
         gap: 2px;
+      }
+      .dock-toggle-btn {
+        bottom: 16px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+        border-radius: 11px;
       }
       .dock-item {
         padding: 9px 12px;
@@ -200,19 +270,43 @@
     </button>
   </div>
 
-  <iframe id="contentFrame" title="Athyx Content"></iframe>
+  <!-- Bottom Right Dock Toggle Button -->
+  <button class="dock-toggle-btn" id="dockToggleBtn" aria-label="Toggle Selection Bar" title="Toggle selection bar">
+    <i class="fa-solid fa-chevron-down" id="dockToggleIcon"></i>
+  </button>
+
+  <iframe id="contentFrame" title="Athyx Content" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated"></iframe>
 
   <script>
     const iframe = document.getElementById("contentFrame");
     const dockNav = document.getElementById("dockNav");
+    const dockToggleBtn = document.getElementById("dockToggleBtn");
+
+    function toggleDock() {
+      const isHidden = dockNav.classList.toggle("dock-hidden");
+      dockToggleBtn.classList.toggle("dock-collapsed", isHidden);
+      dockToggleBtn.setAttribute("aria-expanded", String(!isHidden));
+      dockToggleBtn.title = isHidden ? "Show selection bar" : "Hide selection bar";
+      localStorage.setItem("athyx_dock_hidden", isHidden ? "true" : "false");
+    }
+
+    dockToggleBtn.addEventListener("click", toggleDock);
+
+    // Restore saved dock state
+    if (localStorage.getItem("athyx_dock_hidden") === "true") {
+      dockNav.classList.add("dock-hidden");
+      dockToggleBtn.classList.add("dock-collapsed");
+      dockToggleBtn.setAttribute("aria-expanded", "false");
+      dockToggleBtn.title = "Show selection bar";
+    }
 
     // Routes definition
     const routes = {
-      home: "homepage.html",
-      games: "g.html",
-      apps: "apps.html",
+      home: () => "homepage.html?v=" + Date.now(),
+      games: () => "g.html?v=" + Date.now(),
+      apps: () => "apps.html?v=" + Date.now(),
       proxy: () => window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'scramjet/index.html',
-      settings: "settings.html"
+      settings: () => "settings.html?v=" + Date.now()
     };
 
     function setActiveTab(tabKey) {
@@ -233,11 +327,29 @@
       setActiveTab(tabKey);
     }
 
-    // Global navigation listener for child frames
+    // Global message listener for child frames
     window.addEventListener("message", (event) => {
-      if (event.data && event.data.action === "navigate") {
-        navigate(event.data.tab);
+      if (event.data) {
+        if (event.data.action === "navigate") {
+          navigate(event.data.tab);
+        } else if (event.data.action === "athyx_game_active") {
+          if (event.data.active) {
+            dockNav.style.display = "none";
+            dockToggleBtn.style.display = "none";
+          } else {
+            dockNav.style.display = "";
+            dockToggleBtn.style.display = "flex";
+          }
+        }
       }
+    });
+
+    // Forward current theme to iframe on load
+    iframe.addEventListener("load", () => {
+      try {
+        const themeId = localStorage.getItem("athyx_theme") || "crimson";
+        iframe.contentWindow.postMessage({ action: "athyx_theme_change", themeId }, "*");
+      } catch(e) {}
     });
 
     // Apply Cloaking from storage

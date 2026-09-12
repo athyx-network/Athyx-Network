@@ -24,7 +24,9 @@
         import * as BareMux from "https://cdn.jsdelivr.net/npm/@mercuryworkshop/bare-mux/dist/index.mjs";
         window.BareMux = BareMux;
     </script>
+    <link rel="stylesheet" href="../themes.css">
     <link rel="stylesheet" href="style.css">
+    <script src="../themes.js"></script>
     <script src="./script.js" defer></script>
 </head>
 
@@ -34,7 +36,7 @@
     <div class="wisp-settings-modal hidden" id="wisp-settings-modal">
         <div class="settings-card">
             <div class="settings-header">
-                <h2><i class="fa-solid fa-sliders" style="color:#3b82f6;"></i> Proxy Settings</h2>
+                <h2><i class="fa-solid fa-sliders" style="color:var(--accent);"></i> Proxy Settings</h2>
                 <button class="close-btn" id="close-wisp-modal" title="Close"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="settings-content">

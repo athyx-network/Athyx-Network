@@ -8,18 +8,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="themes.css">
+  <script src="themes.js"></script>
 
   <style>
     :root {
-      --bg: #09090b;
-      --surface: #121215;
-      --surface-hover: #18181c;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.16);
-      --text: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --text-dim: #71717a;
-      --accent: #3b82f6;
+      color-scheme: dark;
+      --bg: #0c0406;
+      --surface: #190a0e;
+      --surface-hover: #251016;
+      --surface-active: #35161f;
+      --border: rgba(244, 63, 94, 0.16);
+      --border-hover: rgba(244, 63, 94, 0.32);
+      --text: #fff1f2;
+      --text-muted: #fecdd3;
+      --text-dim: #f43f5e;
+      --accent: #f43f5e;
+      --accent-dim: rgba(244, 63, 94, 0.18);
+      --accent-glow: rgba(244, 63, 94, 0.45);
     }
 
     * {
@@ -30,7 +36,11 @@
 
     body {
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
+      background: 
+        linear-gradient(135deg, var(--accent-dim) 0%, rgba(0, 0, 0, 0) 55%),
+        linear-gradient(180deg, var(--surface-active) 0%, var(--surface) 40%, var(--bg) 100%);
+      background-color: var(--bg);
+      background-attachment: fixed;
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -40,20 +50,6 @@
       padding: 40px 20px 100px;
       position: relative;
       overflow-x: hidden;
-    }
-
-    /* Subtle ambient lighting */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 700px;
-      height: 400px;
-      background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.07) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
     }
 
     .container {
@@ -89,7 +85,7 @@
     .search-box {
       display: flex;
       align-items: center;
-      background: rgba(18, 18, 22, 0.95);
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 6px 10px 6px 18px;
@@ -100,11 +96,11 @@
     }
 
     .search-box:focus-within {
-      border-color: rgba(255, 255, 255, 0.25);
+      border-color: var(--accent);
       box-shadow: 
         0 16px 36px -10px rgba(0, 0, 0, 0.8),
-        0 0 0 2px rgba(255, 255, 255, 0.08);
-      background: #151519;
+        0 0 0 2px var(--accent-dim);
+      background: var(--surface-hover);
     }
 
     .search-box i.search-icon {
@@ -112,10 +108,11 @@
       font-size: 16px;
       margin-right: 12px;
       transition: color 0.2s;
+      cursor: pointer;
     }
 
     .search-box:focus-within i.search-icon {
-      color: #fff;
+      color: var(--accent);
     }
 
     .search-box input {
@@ -123,7 +120,7 @@
       background: transparent;
       border: none;
       outline: none;
-      color: #fff;
+      color: var(--text);
       font-family: inherit;
       font-size: 15px;
       padding: 10px 0;
@@ -134,9 +131,9 @@
     }
 
     .search-btn {
-      background: #27272a;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #f4f4f5;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      color: var(--text);
       padding: 8px 14px;
       border-radius: 10px;
       font-size: 12px;
@@ -150,7 +147,8 @@
     }
 
     .search-btn:hover {
-      background: #3f3f46;
+      background: var(--accent);
+      border-color: var(--accent);
       color: #fff;
     }
 
@@ -191,9 +189,9 @@
     }
 
     .chip:hover {
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--surface-hover);
       color: #fff;
-      border-color: var(--border-hover);
+      border-color: var(--accent);
       transform: translateY(-1px);
     }
 
