@@ -265,7 +265,7 @@ scramjet.addEventListener("request", async (e) => {
         if (!scramjet.client) {
             const connection = new BareMux.BareMuxConnection(basePath + "bareworker.js");
             await connection.setTransport("https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport@2.1.28/dist/index.mjs", [{ wisp: wispConfig.wispurl }]);
-            scramjet.client = connection;
+            scramjet.client = new BareMux.BareClient();
         }
 
         const MAX_RETRIES = 2;
