@@ -63,48 +63,16 @@
       padding: 14px 28px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       gap: 16px;
       z-index: 100;
-    }
-
-    .brand-section {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .brand-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-title i {
-      color: var(--accent);
-      font-size: 18px;
-    }
-
-    .count-pill {
-      font-size: 12px;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 3px 10px;
-      border-radius: 9999px;
     }
 
     
     .search-wrapper {
       position: relative;
       width: 100%;
-      max-width: 320px;
+      max-width: 500px;
       display: flex;
       align-items: center;
     }
@@ -440,14 +408,6 @@
 
   
   <header id="topBar">
-    <div class="brand-section">
-      <div class="brand-title">
-        <i class="fa-solid fa-shapes"></i>
-        <span>Apps Hub</span>
-      </div>
-      <span class="count-pill" id="appCountPill">6 Apps</span>
-    </div>
-
     <div class="search-wrapper">
       <i class="fa-solid fa-magnifying-glass search-icon"></i>
       <input type="text" id="searchBox" placeholder="Search apps..." autocomplete="off" spellcheck="false">
@@ -519,7 +479,7 @@
       );
 
       grid.innerHTML = "";
-      countPill.textContent = `${filtered.length} Apps`;
+      if (countPill) countPill.textContent = `${filtered.length} Apps`;
 
       if (filtered.length === 0) {
         grid.innerHTML = `
