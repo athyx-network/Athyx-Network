@@ -131,132 +131,118 @@
 
     
     .main-content {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 32px 28px 120px;
+      padding: 24px 28px 120px;
     }
 
-    .hero-header {
-      margin-bottom: 28px;
-    }
-
-    .hero-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: #fff;
-      margin-bottom: 6px;
-    }
-
-    .hero-desc {
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    
     .apps-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
       gap: 18px;
     }
 
     .app-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
+      border-radius: 16px;
+      overflow: hidden;
       cursor: pointer;
       display: flex;
       flex-direction: column;
-      gap: 14px;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
+      user-select: none;
     }
 
     .app-card:hover {
       transform: translateY(-4px);
       background: var(--surface-hover);
       border-color: var(--border-hover);
-      box-shadow: 0 16px 32px -10px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 16px 30px -10px rgba(0, 0, 0, 0.7);
     }
 
-    .app-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .app-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      object-fit: cover;
+    .thumb-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
       background: #18181c;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 2px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transition: transform 0.25s ease;
-    }
-
-    .app-card:hover .app-icon {
-      transform: scale(1.06);
-    }
-
-    .app-tag {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-dim);
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      padding: 3px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .app-details {
+      overflow: hidden;
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      align-items: center;
+      justify-content: center;
     }
 
-    .app-name {
-      font-family: 'Outfit', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
+    .app-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .app-desc {
-      font-size: 12.5px;
+    .app-card:hover .app-thumb {
+      transform: scale(1.08);
+    }
+
+    .thumb-fallback {
+      font-size: 36px;
       color: var(--text-dim);
-      line-height: 1.4;
     }
 
-    .app-action {
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .play-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      color: #09090b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transform: scale(0.85);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      padding-left: 2px;
+    }
+
+    .app-card:hover .play-overlay {
+      opacity: 1;
+    }
+
+    .app-card:hover .play-icon {
+      transform: scale(1);
+    }
+
+    .app-info {
+      padding: 12px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: auto;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      font-size: 12px;
+      gap: 6px;
+    }
+
+    .app-title {
+      font-size: 13.5px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: #f4f4f5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
     }
 
-    .app-card:hover .app-action {
+    .app-card:hover .app-title {
       color: #fff;
-    }
-
-    .app-action i {
-      font-size: 11px;
-      transition: transform 0.2s;
-    }
-
-    .app-card:hover .app-action i {
-      transform: translateX(3px);
     }
 
     
@@ -417,10 +403,6 @@
 
   
   <main class="main-content">
-    <div class="hero-header">
-      <h1 class="hero-title">Applications & Tools</h1>
-    </div>
-
     <div class="apps-grid" id="appsGrid"></div>
   </main>
 
@@ -498,16 +480,15 @@
         const iconUrl = rawIcon ? (rawIcon + (rawIcon.includes("?") ? "&" : "?") + "t=" + Date.now()) : "";
 
         card.innerHTML = `
-          <div class="app-top">
-            <img class="app-icon" src="${iconUrl}" alt="${app.name}" loading="lazy">
-            <span class="app-tag">${app.tag}</span>
+          <div class="thumb-wrapper">
+            ${iconUrl ? `<img class="app-thumb" src="${iconUrl}" alt="${app.name}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">` : ""}
+            <i class="fa-solid fa-shapes thumb-fallback" style="${iconUrl ? 'display:none;' : ''}"></i>
+            <div class="play-overlay">
+              <div class="play-icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+            </div>
           </div>
-          <div class="app-details">
-            <div class="app-name">${app.name}</div>
-          </div>
-          <div class="app-action">
-            <span>Launch App</span>
-            <i class="fa-solid fa-arrow-right"></i>
+          <div class="app-info">
+            <span class="app-title" title="${app.name}">${app.name}</span>
           </div>
         `;
 
