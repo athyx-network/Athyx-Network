@@ -254,6 +254,40 @@ self.addEventListener("fetch", (event) => {
     })());
 });
 
+function sanitizeHeadersForHttp2(headers) {
+    if (!headers) return {};
+    const sanitized = {};
+    const forbiddenHeaders = new Set([
+        'connection',
+        'keep-alive',
+        'proxy-connection',
+        'transfer-encoding',
+        'upgrade',
+        'http2-settings',
+        'proxy-authorization',
+        'proxy-authenticate',
+        'host'
+    ]);
+
+    const entries = headers instanceof Headers
+        ? Array.from(headers.entries())
+        : Array.isArray(headers)
+        ? headers
+        : Object.entries(headers);
+
+    for (const [key, value] of entries) {
+        if (!key || typeof key !== 'string') continue;
+        const lower = key.toLowerCase().trim();
+        if (forbiddenHeaders.has(lower)) continue;
+        if (lower.startsWith(':')) continue;
+        if (lower === 'te' && String(value).toLowerCase().trim() !== 'trailers') continue;
+        if (value !== undefined && value !== null) {
+            sanitized[key] = String(value);
+        }
+    }
+    return sanitized;
+}
+
 scramjet.addEventListener("request", async (e) => {
     e.response = (async () => {
         await configReadyPromise;
@@ -268,33 +302,40 @@ scramjet.addEventListener("request", async (e) => {
             scramjet.client = new BareMux.BareClient();
         }
 
+        const reqHeaders = sanitizeHeadersForHttp2(e.requestHeaders);
+        const fetchOptions = {
+            method: e.method || "GET",
+            headers: reqHeaders,
+            credentials: "include",
+            mode: e.mode === "cors" ? e.mode : "same-origin",
+            cache: e.cache || "default",
+            redirect: "manual"
+        };
+        if (e.body && e.method !== 'GET' && e.method !== 'HEAD') {
+            fetchOptions.body = e.body;
+            fetchOptions.duplex = "half";
+        }
+
         const MAX_RETRIES = 2;
         let lastErr;
 
         for (let i = 0; i <= MAX_RETRIES; i++) {
             try {
-                return await scramjet.client.fetch(e.url, {
-                    method: e.method,
-                    body: e.body,
-                    headers: e.requestHeaders,
-                    credentials: "include",
-                    mode: e.mode === "cors" ? e.mode : "same-origin",
-                    cache: e.cache,
-                    redirect: "manual",
-                    duplex: "half",
-                });
+                return await scramjet.client.fetch(e.url, fetchOptions);
             } catch (err) {
                 lastErr = err;
                 const errMsg = err.message.toLowerCase();
                 const isRetryable = errMsg.includes("connect") ||
                     errMsg.includes("eof") ||
                     errMsg.includes("handshake") ||
-                    errMsg.includes("reset");
+                    errMsg.includes("reset") ||
+                    errMsg.includes("http2") ||
+                    errMsg.includes("protocol");
 
-                if (!isRetryable || i === MAX_RETRIES || e.method !== 'GET') break;
+                if (!isRetryable || i === MAX_RETRIES) break;
 
                 console.warn(`Scramjet retry ${i + 1}/${MAX_RETRIES} for ${e.url} due to: ${err.message}`);
-                await new Promise(r => setTimeout(r, 500 * (i + 1)));
+                await new Promise(r => setTimeout(r, 400 * (i + 1)));
             }
         }
 
