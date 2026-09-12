@@ -837,8 +837,8 @@
           <!-- Site Title / Tab Disguise Row -->
           <div class="setting-row" data-search-keys="site title disguise tab icon cloak google drive classroom docs canvas">
             <div class="setting-info">
-              <span class="setting-title">Site Title</span>
-              <span class="setting-desc">This setting allows you to change the site's tab title and icon.</span>
+              <span class="setting-title">Tab Cloaker</span>
+              <span class="setting-desc">Disguise the site by changing its tab title and favicon to appear as another site.</span>
             </div>
             <div class="setting-control" style="position: relative;">
               <button class="dropdown-pill-btn" id="siteTitleDropdownBtn" onclick="toggleSiteTitleDropdown()">
@@ -902,62 +902,7 @@
             </div>
           </div>
 
-          <!-- Open about:blank on startup Row -->
-          <div class="setting-row" data-search-keys="open about:blank on startup launch popup unblock tab cloaking">
-            <div class="setting-info">
-              <span class="setting-title">Open about:blank on startup</span>
-              <span class="setting-desc">When enabled, the about:blank tab opens automatically when you visit.</span>
-            </div>
-            <div class="setting-control">
-              <div class="toggle-switch" id="autoAbToggle" onclick="toggleAutoAboutBlank()" role="switch" aria-checked="false">
-                <div class="toggle-knob"></div>
-              </div>
-            </div>
-          </div>
 
-          <!-- Panic Key Row -->
-          <div class="setting-row" data-search-keys="panic key enable emergency redirect hotkey">
-            <div class="setting-info">
-              <span class="setting-title">Panic Key</span>
-              <span class="setting-desc">Enable or disable the panic key option.</span>
-            </div>
-            <div class="setting-control">
-              <div class="toggle-switch" id="panicKeyToggle" onclick="togglePanicKey()" role="switch" aria-checked="true">
-                <div class="toggle-knob"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Panic Shortcut Configuration Row -->
-          <div class="setting-row expanded" data-search-keys="panic shortcut keybind safe url redirect google">
-            <div class="setting-row-top">
-              <div class="setting-info">
-                <span class="setting-title">Panic Shortcut</span>
-                <span class="setting-desc">Set a keybind/shortcut that redirects you to a page when pressed.</span>
-              </div>
-            </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 4px;">
-              <div class="key-recorder-box">
-                <input type="text" id="panicKeyInput" class="input-field" placeholder="Press key..." readonly style="width: 110px; text-align: center; font-weight: 600;">
-                <button class="btn-action btn-secondary" id="recordKeyBtn" onclick="toggleKeyRecording()"><i class="fa-solid fa-keyboard"></i> <span id="recordKeyText">Record Key</span></button>
-              </div>
-              <input type="text" id="panicUrlInput" class="input-field" placeholder="https://www.google.com" style="flex: 1; min-width: 200px;">
-              <button class="btn-action btn-primary" onclick="savePanicSettings()"><i class="fa-solid fa-check"></i> Save</button>
-              <button class="btn-action btn-secondary" onclick="resetPanicSettings()">Clear</button>
-            </div>
-          </div>
-
-          <!-- Manual Launchers Row -->
-          <div class="setting-row" data-search-keys="launch about:blank now svg cloak download launcher">
-            <div class="setting-info">
-              <span class="setting-title">Alternative Cloak Launchers</span>
-              <span class="setting-desc">Instantly spawn an unblocked about:blank frame or launch via SVG.</span>
-            </div>
-            <div class="setting-control">
-              <button class="btn-action btn-secondary" onclick="openAboutBlank()"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open About:Blank</button>
-              <button class="btn-action btn-secondary" onclick="openSvgCloak()"><i class="fa-solid fa-code"></i> SVG Cloak</button>
-            </div>
-          </div>
 
         </div>
       </section>
