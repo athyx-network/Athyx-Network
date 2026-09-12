@@ -1,11 +1,83 @@
 
 
+const JSDELIVR_WISP_URL = "https://cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/wisp.txt";
 const DEFAULT_WISP = window.SITE_CONFIG?.defaultWisp ?? "wss://lunarrr.eminescusm.ro/w/";
-const WISP_SERVERS = [
-    { name: "Lunarr Wisp", url: "wss://lunarrr.eminescusm.ro/w/" },
+let WISP_SERVERS = [
+    { name: "Escala Humana Wisp", url: "wss://math.soyescalahumana.cl/wisp/" },
+    { name: "Gressvik BMX Wisp", url: "wss://school.gressvikbmx.no/wisp/" },
+    { name: "Lervs Wisp", url: "wss://eyes.lervs.ro/wisp/" },
+    { name: "SimplySweet Wisp", url: "wss://sp2.simplysweetcakesoc.com/wisp/" },
+    { name: "TribeOfTwo Wisp", url: "wss://keep.tribeoftwo.com/wisp/" },
+    { name: "BitDS Wisp", url: "wss://secure.bitds.eu/wisp/" },
+    { name: "Sahur Wisp", url: "wss://sahur.anymor.org/wisp/" },
+    { name: "Baylib Wisp", url: "wss://new-server.baylib.top/connection/" },
+    { name: "Mercury Workshop Wisp", url: "wss://wisp.mercurywork.shop/" },
     { name: "Space Wisp", url: "wss://gointospace.app/wisp/" },
-    { name: "Mercury Workshop Wisp", url: "wss://wisp.mercurywork.shop/" }
+    { name: "Lunarr Wisp", url: "wss://lunarrr.eminescusm.ro/w/" }
 ];
+
+function formatWispName(url) {
+    try {
+        const host = new URL(url.replace(/^wss:\/\//i, 'https://').replace(/^ws:\/\//i, 'http://')).hostname;
+        if (host.includes('lunarrr')) return 'Lunarr Wisp';
+        if (host.includes('gointospace')) return 'Space Wisp';
+        if (host.includes('mercurywork')) return 'Mercury Workshop Wisp';
+        if (host.includes('bitds')) return 'BitDS Wisp';
+        if (host.includes('baylib')) return 'Baylib Wisp';
+        if (host.includes('tribeoftwo')) return 'TribeOfTwo Wisp';
+        if (host.includes('simplysweetcakesoc')) return 'SimplySweet Wisp';
+        if (host.includes('lervs')) return 'Lervs Wisp';
+        if (host.includes('gressvikbmx')) return 'Gressvik BMX Wisp';
+        if (host.includes('soyescalahumana')) return 'Escala Humana Wisp';
+        if (host.includes('anymor')) return 'Sahur Wisp';
+        const parts = host.split('.');
+        const label = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+        return label + ' Wisp';
+    } catch (e) {
+        return url;
+    }
+}
+
+async function loadWispServersFromTxt() {
+    const sources = [
+        JSDELIVR_WISP_URL,
+        'wisp.txt',
+        '../wisp.txt'
+    ];
+    for (const src of sources) {
+        try {
+            const res = await fetch(src + (src.includes('jsdelivr') ? '?v=' + Date.now() : ''));
+            if (!res.ok) continue;
+            const text = await res.text();
+            const lines = text.split(/\r?\n/);
+            const parsed = [];
+            const seen = new Set();
+            for (let line of lines) {
+                line = line.trim();
+                if (!line || line.startsWith('#') || !line.startsWith('ws')) continue;
+                if (!seen.has(line)) {
+                    seen.add(line);
+                    parsed.push({
+                        name: formatWispName(line),
+                        url: line
+                    });
+                }
+            }
+            if (parsed.length > 0) {
+                WISP_SERVERS = parsed;
+                return parsed;
+            }
+        } catch(e) {}
+    }
+    return null;
+}
+
+// Auto-load on background
+loadWispServersFromTxt().then(() => {
+    if (localStorage.getItem('wispAutoswitch') === 'true') {
+        initializeWithBestServer();
+    }
+});
 
 const currentSavedWisp = localStorage.getItem("proxServer");
 if (!currentSavedWisp || currentSavedWisp.includes("defschoolwork") || currentSavedWisp.includes("kutakutik") || currentSavedWisp.startsWith("https://lunarrr")) {
