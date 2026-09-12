@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="themes.css">
   <script src="themes.js"></script>
 
-  <link rel="icon" type="image/x-icon"
-    href="https://cdn.jsdelivr.net/gh/HyperFloppik/Ethyrnal-s-Arcade-v2.3@main/web-app-manifest-512x512.ico">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
 
   <style>
     :root {
@@ -406,7 +406,7 @@
       if (autoAB && isTop) {
         try {
           const title = localStorage.getItem("athyx_tab_title") || "Athyx Network";
-          const icon = localStorage.getItem("athyx_tab_icon") || "https://cdn.jsdelivr.net/gh/HyperFloppik/Ethyrnal-s-Arcade-v2.3@main/web-app-manifest-512x512.ico";
+          const icon = localStorage.getItem("athyx_tab_icon") || (window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + "favicon.png");
           const currentUrl = window.location.href;
           const win = window.open("about:blank", "_blank");
           if (win) {

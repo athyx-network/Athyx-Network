@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="themes.css">
   <script src="themes.js"></script>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="shortcut icon" href="favicon.ico">
 
   <style>
     :root {
@@ -1237,7 +1239,7 @@
       localStorage.removeItem("athyx_tab_title");
       localStorage.removeItem("athyx_tab_icon");
       const defaultTitle = "Athyx Network";
-      const defaultIcon = "https://cdn.jsdelivr.net/gh/HyperFloppik/Ethyrnal-s-Arcade-v2.3@main/web-app-manifest-512x512.ico";
+      const defaultIcon = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + "favicon.png";
       updateParentTab(defaultTitle, defaultIcon);
       showToast("Tab disguise reset to default");
     }
@@ -1283,7 +1285,7 @@
       }
       
       const title = localStorage.getItem('athyx_tab_title') || 'Athyx Network';
-      const icon = localStorage.getItem('athyx_tab_icon') || 'https://cdn.jsdelivr.net/gh/HyperFloppik/Ethyrnal-s-Arcade-v2.3@main/web-app-manifest-512x512.ico';
+      const icon = localStorage.getItem('athyx_tab_icon') || (window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'favicon.png');
 
       const doc = win.document;
       doc.open();
