@@ -3,9 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <title>Athyx Arcade</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -512,14 +509,6 @@
     const REPO_BASE = "https://cdn.jsdelivr.net/gh/athyx-network/game-library@main/";
     const GAMES_JSON_URL = REPO_BASE + "games.json";
 
-    function withNoCache(url) {
-      if (!url || typeof url !== "string") return url;
-      if (url.startsWith("data:") || url.startsWith("blob:") || url.startsWith("javascript:")) return url;
-      if (url.includes("_nc=")) return url;
-      const sep = url.includes("?") ? "&" : "?";
-      return url + sep + "_nc=" + Date.now();
-    }
-
     let allGames = [];
     let currentFilter = "all";
     let activeGameObj = null;
@@ -588,14 +577,7 @@
 
     async function fetchGameLibrary() {
       try {
-        const res = await fetch(withNoCache(GAMES_JSON_URL), {
-          cache: "no-store",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache",
-            "Expires": "0"
-          }
-        });
+        const res = await fetch(GAMES_JSON_URL + "?v=" + Date.now(), { cache: "no-cache" });
         if (!res.ok) throw new Error("Could not load games.json");
         allGames = await res.json();
       } catch (err) {
@@ -648,8 +630,7 @@
 
       list.forEach(game => {
         const isFav = favorites.includes(game.name);
-        const rawIcon = game.icon ? (game.icon.startsWith("http") ? game.icon : REPO_BASE + encodeURI(game.icon)) : "";
-        const iconUrl = rawIcon ? withNoCache(rawIcon) : "";
+        const iconUrl = game.icon ? (game.icon.startsWith("http") ? game.icon : REPO_BASE + encodeURI(game.icon)) : "";
 
         const card = document.createElement("div");
         card.className = "game-card";
@@ -686,14 +667,7 @@
       const gameBaseFolder = gameUrl.substring(0, gameUrl.lastIndexOf('/') + 1);
 
       try {
-        const res = await fetch(withNoCache(gameUrl), {
-          cache: "no-store",
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache",
-            "Expires": "0"
-          }
-        });
+        const res = await fetch(gameUrl);
         if (!res.ok) throw new Error("Status " + res.status);
         let html = await res.text();
 
@@ -709,119 +683,6 @@
           const abs = absoluteBase + relPath.replace(/^(\.\/|\/)/, '');
           return `streamingAssetsUrl: "${abs}"`;
         });
-
-        // Rewrite static src and href in HTML to append cache-busters
-        const nowTimestamp = Date.now();
-        html = html.replace(/(<script\b[^>]*?\bsrc=["'])([^"']+)(["'][^>]*>)/gi, (m, p1, p2, p3) => {
-          if (p2.startsWith('data:') || p2.startsWith('blob:') || p2.includes('_nc=')) return m;
-          return `${p1}${p2}${p2.includes('?') ? '&' : '?'}_nc=${nowTimestamp}${p3}`;
-        });
-        html = html.replace(/(<link\b[^>]*?\bhref=["'])([^"']+)(["'][^>]*>)/gi, (m, p1, p2, p3) => {
-          if (p2.startsWith('data:') || p2.startsWith('blob:') || p2.includes('_nc=')) return m;
-          return `${p1}${p2}${p2.includes('?') ? '&' : '?'}_nc=${nowTimestamp}${p3}`;
-        });
-        html = html.replace(/(<(?:img|audio|video|source|iframe)\b[^>]*?\bsrc=["'])([^"']+)(["'][^>]*>)/gi, (m, p1, p2, p3) => {
-          if (p2.startsWith('data:') || p2.startsWith('blob:') || p2.includes('_nc=')) return m;
-          return `${p1}${p2}${p2.includes('?') ? '&' : '?'}_nc=${nowTimestamp}${p3}`;
-        });
-
-        // Cache Buster & Network Shim
-        const noCacheShim = `
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<script>
-(function() {
-  function appendNoCacheParam(url) {
-    if (!url || typeof url !== 'string') return url;
-    if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('javascript:')) return url;
-    if (url.includes('_nc=')) return url;
-    var sep = url.indexOf('?') !== -1 ? '&' : '?';
-    return url + sep + '_nc=' + Date.now();
-  }
-
-  // Intercept window.fetch
-  if (window.fetch) {
-    var _origFetch = window.fetch;
-    window.fetch = function(input, init) {
-      init = init || {};
-      init.cache = 'no-store';
-      if (!init.headers) {
-        init.headers = {};
-      }
-      if (init.headers instanceof Headers) {
-        init.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-        init.headers.set('Pragma', 'no-cache');
-      } else if (Array.isArray(init.headers)) {
-        init.headers.push(['Cache-Control', 'no-cache, no-store, must-revalidate']);
-        init.headers.push(['Pragma', 'no-cache']);
-      } else {
-        init.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
-        init.headers['Pragma'] = 'no-cache';
-      }
-
-      if (typeof input === 'string') {
-        input = appendNoCacheParam(input);
-      } else if (input instanceof Request) {
-        var newReqUrl = appendNoCacheParam(input.url);
-        if (newReqUrl !== input.url) {
-          input = new Request(newReqUrl, input);
-        }
-      }
-      return _origFetch.call(this, input, init);
-    };
-  }
-
-  // Intercept XMLHttpRequest
-  if (window.XMLHttpRequest) {
-    var _origOpen = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-      if (typeof url === 'string') {
-        url = appendNoCacheParam(url);
-      }
-      var res = _origOpen.call(this, method, url, async !== false, user, password);
-      try {
-        this.setRequestHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        this.setRequestHeader('Pragma', 'no-cache');
-      } catch(e) {}
-      return res;
-    };
-  }
-
-  // Intercept Web Worker scripts
-  if (window.Worker) {
-    var _origWorker = window.Worker;
-    window.Worker = function(scriptURL, options) {
-      if (typeof scriptURL === 'string') {
-        scriptURL = appendNoCacheParam(scriptURL);
-      }
-      return new _origWorker(scriptURL, options);
-    };
-  }
-
-  // Intercept dynamic DOM script / media / link insertions
-  ['HTMLScriptElement', 'HTMLLinkElement', 'HTMLImageElement', 'HTMLAudioElement', 'HTMLVideoElement', 'HTMLSourceElement', 'HTMLIFrameElement'].forEach(function(elemName) {
-    if (window[elemName]) {
-      var proto = window[elemName].prototype;
-      var prop = (elemName === 'HTMLLinkElement') ? 'href' : 'src';
-      var descriptor = Object.getOwnPropertyDescriptor(proto, prop);
-      if (descriptor && descriptor.set) {
-        var origSet = descriptor.set;
-        Object.defineProperty(proto, prop, {
-          set: function(val) {
-            if (typeof val === 'string' && val) {
-              val = appendNoCacheParam(val);
-            }
-            return origSet.call(this, val);
-          },
-          get: descriptor.get,
-          configurable: true
-        });
-      }
-    }
-  });
-})();
-<\/script>`;
 
         // Unity WebGL & Modern Browser URL Compatibility Shim
         const unityShim = `
@@ -1021,7 +882,7 @@ canvas, #gameContainer canvas, #unity-canvas, canvas#canvas {
 
         // Inject base tag if not present
         const baseTag = baseMatch ? '' : `<base href="${gameBaseFolder}">`;
-        const headInjection = baseTag + noCacheShim + autoScalerShim + unityShim;
+        const headInjection = baseTag + autoScalerShim + unityShim;
 
         let cleanHtml;
         if (/<head[^>]*>/i.test(html)) {
