@@ -248,7 +248,7 @@ self.addEventListener("fetch", (event) => {
     })());
 });
 
-function sanitizeHeadersForHttp2(headers, targetUrl) {
+function sanitizeHeadersForHttp2(headers) {
     if (!headers) return {};
     const sanitized = {};
     const forbiddenHeaders = new Set([
@@ -280,59 +280,7 @@ function sanitizeHeadersForHttp2(headers, targetUrl) {
         }
     }
 
-    // Modern Chrome User-Agent and client hints to prevent bot detection
-    if (!sanitized['user-agent'] && !sanitized['User-Agent']) {
-        sanitized['user-agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
-    }
-    if (!sanitized['sec-ch-ua']) {
-        sanitized['sec-ch-ua'] = '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"';
-        sanitized['sec-ch-ua-mobile'] = '?0';
-        sanitized['sec-ch-ua-platform'] = '"Windows"';
-    }
-    if (!sanitized['accept-language']) {
-        sanitized['accept-language'] = 'en-US,en;q=0.9';
-    }
-
-    if (targetUrl) {
-        try {
-            const u = new URL(targetUrl);
-            sanitized['origin'] = u.origin;
-            if (!sanitized['referer'] && !sanitized['Referer']) {
-                sanitized['referer'] = u.origin + '/';
-            }
-        } catch {}
-    }
-
     return sanitized;
-}
-
-function cleanResponseHeaders(rawHeaders) {
-    const headers = new Headers();
-    const stripHeaders = [
-        'content-security-policy',
-        'content-security-policy-report-only',
-        'x-frame-options',
-        'cross-origin-embedder-policy',
-        'cross-origin-opener-policy',
-        'cross-origin-resource-policy'
-    ];
-
-    if (rawHeaders) {
-        const entries = rawHeaders instanceof Headers
-            ? Array.from(rawHeaders.entries())
-            : Array.isArray(rawHeaders)
-            ? rawHeaders
-            : Object.entries(rawHeaders);
-
-        for (const [key, value] of entries) {
-            const lower = key.toLowerCase().trim();
-            if (stripHeaders.includes(lower)) continue;
-            headers.append(key, value);
-        }
-    }
-
-    headers.set('access-control-allow-origin', '*');
-    return headers;
 }
 
 async function ensureClient(wispUrl) {
@@ -357,7 +305,7 @@ scramjet.addEventListener("request", async (e) => {
             await ensureClient(wispConfig.wispurl);
         }
 
-        const reqHeaders = sanitizeHeadersForHttp2(e.requestHeaders, e.url);
+        const reqHeaders = sanitizeHeadersForHttp2(e.requestHeaders);
         const fetchOptions = {
             method: e.method || "GET",
             headers: reqHeaders,
@@ -378,14 +326,7 @@ scramjet.addEventListener("request", async (e) => {
             try {
                 const response = await scramjet.client.fetch(e.url, fetchOptions);
                 updateServerHealth(wispConfig.wispurl, true);
-
-                // Strip CSP/Frame-Busting headers while preserving body stream & status
-                const cleanedHeaders = cleanResponseHeaders(response.headers);
-                return new Response(response.body, {
-                    status: response.status,
-                    statusText: response.statusText,
-                    headers: cleanedHeaders
-                });
+                return response;
             } catch (err) {
                 lastErr = err;
                 const errMsg = (err.message || "").toLowerCase();
