@@ -705,8 +705,8 @@
           return `streamingAssetsUrl: "${abs}"`;
         });
 
-        // Unity WebGL & Modern Browser URL Compatibility Shim
-        const unityShim = `
+        // Engine Compatibility & Modern Browser Shim
+        const engineShim = `
 <script>
 (function() {
   const resolvedBase = ${JSON.stringify(resolvedBase)};
@@ -721,6 +721,79 @@
     Object.defineProperty(document, 'documentURI', { get: function() { return resolvedBase; }, configurable: true });
   } catch(e) {}
 
+  // Scirra Construct 3 & 2 RuntimeInterface shim (prevents Construct from defaulting to file:/// due to origin === "null")
+  try {
+    let _origRuntimeInterface = self.RuntimeInterface;
+    Object.defineProperty(self, 'RuntimeInterface', {
+      get: function() { return _origRuntimeInterface; },
+      set: function(Cls) {
+        if (typeof Cls === 'function') {
+          _origRuntimeInterface = class PatchedRuntimeInterface extends Cls {
+            constructor(opts) {
+              opts = opts || {};
+              opts.runtimeBaseUrl = absoluteBase;
+              super(opts);
+              this._runtimeBaseUrl = absoluteBase;
+            }
+          };
+        } else {
+          _origRuntimeInterface = Cls;
+        }
+      },
+      configurable: true
+    });
+  } catch(e) {}
+
+  // Fetch interceptor to resolve file:/// and relative paths against absoluteBase
+  if (window.fetch) {
+    const origFetch = window.fetch;
+    window.fetch = function(input, init) {
+      if (typeof input === 'string') {
+        if (input.startsWith('file:///')) {
+          input = absoluteBase + input.replace(/^file:\\/\\/\\/?/, '');
+        } else if (input.startsWith('/') && !input.startsWith('//')) {
+          input = absoluteBase + input.replace(/^\\//, '');
+        } else if (!/^https?:\\/\\//i.test(input) && !input.startsWith('data:') && !input.startsWith('blob:') && !input.startsWith('javascript:')) {
+          input = absoluteBase + input.replace(/^(\\.\\/)/, '');
+        }
+      } else if (input instanceof Request) {
+        let url = input.url;
+        if (url.startsWith('file:///')) {
+          url = absoluteBase + url.replace(/^file:\\/\\/\\/?/, '');
+          input = new Request(url, input);
+        } else if (url.startsWith('about:')) {
+          url = absoluteBase + url.replace(/^about:[^/]*\\/?/, '');
+          input = new Request(url, input);
+        }
+      }
+      return origFetch.call(this, input, init);
+    };
+  }
+
+  // Web Worker interceptor to support cross-origin CDN & sandboxed workers
+  if (window.Worker) {
+    const OrigWorker = window.Worker;
+    window.Worker = function(url, opts) {
+      let targetUrl = url;
+      if (typeof targetUrl === 'string') {
+        if (targetUrl.startsWith('file:///')) {
+          targetUrl = absoluteBase + targetUrl.replace(/^file:\\/\\/\\/?/, '');
+        } else if (!/^https?:\\/\\//i.test(targetUrl) && !targetUrl.startsWith('blob:') && !targetUrl.startsWith('data:')) {
+          targetUrl = absoluteBase + targetUrl.replace(/^(\\.\\/|\\/)/, '');
+        }
+        if (/^https?:\\/\\//i.test(targetUrl) && !targetUrl.startsWith(location.origin)) {
+          try {
+            const blobCode = "importScripts(" + JSON.stringify(targetUrl) + ");";
+            const blobUrl = URL.createObjectURL(new Blob([blobCode], { type: 'application/javascript' }));
+            return new OrigWorker(blobUrl, opts);
+          } catch(errBlob) {}
+        }
+      }
+      return new OrigWorker(targetUrl, opts);
+    };
+  }
+
+  // Unity WebGL compatibility
   let _origCreateUnityInstance = window.createUnityInstance;
   Object.defineProperty(window, 'createUnityInstance', {
     get: function() {
@@ -809,7 +882,7 @@ iframe {
 
         // Inject base tag if not present
         const baseTag = baseMatch ? '' : `<base href="${gameBaseFolder}">`;
-        const headInjection = baseTag + defaultStyleShim + unityShim;
+        const headInjection = baseTag + defaultStyleShim + engineShim;
 
         let cleanHtml;
         if (/<head[^>]*>/i.test(html)) {
