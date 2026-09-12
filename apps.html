@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Apps Hub &bull; Athyx Network</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -484,6 +487,14 @@
   </div>
 
   <script>
+    function withNoCache(url) {
+      if (!url || typeof url !== "string") return url;
+      if (url.startsWith("data:") || url.startsWith("blob:") || url.startsWith("javascript:")) return url;
+      if (url.includes("_nc=")) return url;
+      const sep = url.includes("?") ? "&" : "?";
+      return url + sep + "_nc=" + Date.now();
+    }
+
     const apps = [
       { name: "TurboWarp", file: "turbowarp.html", icon: "icons/turbowarp.png", tag: "Creative" },
       { name: "Silk Interactive", file: "silk.html", icon: "icons/silk.png", tag: "Art & Math" },
@@ -530,7 +541,7 @@
 
         card.innerHTML = `
           <div class="app-top">
-            <img class="app-icon" src="${app.icon}" alt="${app.name}" loading="lazy">
+            <img class="app-icon" src="${withNoCache(app.icon)}" alt="${app.name}" loading="lazy">
             <span class="app-tag">${app.tag}</span>
           </div>
           <div class="app-details">
@@ -553,17 +564,25 @@
       loadingModal.classList.add("show");
 
       try {
-        const response = await fetch(`apps/${app.file}`);
+        const response = await fetch(withNoCache(`apps/${app.file}`), {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+          }
+        });
         if (!response.ok) throw new Error("Status " + response.status);
         const html = await response.text();
 
         document.body.classList.add("app-active");
 
-        // Hide scrollbars inside app iframe srcdoc
+        // Hide scrollbars & inject no-cache meta inside app iframe srcdoc
+        const noCacheMeta = `<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">`;
         const hideScrollCss = `<style>html, body { overflow: hidden !important; margin: 0; padding: 0; width: 100%; height: 100%; } *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }</style>`;
         const cleanHtml = html.includes("<head>")
-          ? html.replace("<head>", "<head>" + hideScrollCss)
-          : hideScrollCss + html;
+          ? html.replace("<head>", "<head>" + noCacheMeta + hideScrollCss)
+          : "<head>" + noCacheMeta + hideScrollCss + "</head>" + html;
 
         appStageIframe.srcdoc = cleanHtml;
         appStage.classList.add("show");
