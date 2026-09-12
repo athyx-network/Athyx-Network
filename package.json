@@ -1,0 +1,24 @@
+{
+    "name": "athyx-network",
+    "version": "1.0.0",
+    "description": "Athyx Network Cloaked SVG",
+    "main": "app.svg",
+    "files": [
+        "app.svg",
+        "index.html",
+        "homepage.html",
+        "g.html",
+        "apps.html",
+        "settings.html",
+        "themes.css",
+        "themes.js",
+        "scramjet"
+    ],
+    "keywords": [
+        "athyx",
+        "proxy",
+        "svg"
+    ],
+    "author": "Athyx Network",
+    "license": "MIT"
+}
