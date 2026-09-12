@@ -33,24 +33,13 @@
                 </div>
                 
                 <div class="modal-body">
-                    <div class="wisp-section">
-                        <h4>Current WISP URL</h4>
-                        <div class="current-wisp-display">
-                            <code class="wisp-url-display" id="current-wisp-url"></code>
-                        </div>
-                    </div>
+                    <span id="current-wisp-url" style="display:none;"></span>
+                    <span id="wisp-status-indicator" style="display:none;"></span>
+                    <span id="wisp-status-text" style="display:none;"></span>
 
-                                   <div class="wisp-section">
-                        <h4>Available WISP URLs</h4>
+                    <div class="wisp-section" style="margin-top: 0;">
                         <div class="predefined-wisps" id="dynamic-wisps-container">
                             <div class="wisp-status" id="wisp-loading-status">Loading WISP servers...</div>
-                        </div>
-                    </div>
-
-                    <div class="wisp-section">
-                        <div class="wisp-status" id="wisp-status">
-                            <span class="status-indicator" id="wisp-status-indicator"></span>
-                            <span class="status-text" id="wisp-status-text">Ready to configure</span>
                         </div>
                     </div>
                 </div>
