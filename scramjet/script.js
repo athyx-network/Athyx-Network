@@ -20,6 +20,25 @@ var basePath = window.basePath;
 // Declare scramjet globally so it can be used by createTab and other functions
 let scramjet;
 
+let blockedSitesList = [];
+async function loadBlockedSites() {
+    try {
+        const response = await fetch(basePath + '../blockedsite.txt');
+        if (response.ok) {
+            const text = await response.text();
+            blockedSitesList = text.split('\n').map(line => {
+                const parts = line.split(' - ');
+                if (parts.length >= 2) {
+                    return { domain: parts[0].trim(), reason: parts.slice(1).join(' - ').trim() };
+                }
+                return null;
+            }).filter(item => item !== null);
+        }
+    } catch (e) {
+        console.warn('Could not load blockedsite.txt', e);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async function () {
     basePath = location.pathname.replace(/[^/]*$/, '');
     window.basePath = basePath;
@@ -96,6 +115,16 @@ function createTab(makeActive = true) {
     frame.addEventListener("urlchange", (e) => {
         if (!e.url || e.url === "about:blank")
             return;
+            
+        try {
+            const urlObj = new URL(e.url);
+            const blockedMatch = blockedSitesList.find(b => urlObj.hostname.includes(b.domain) || b.domain.includes(urlObj.hostname));
+            if (blockedMatch) {
+                frame.go(basePath + 'blocked.html?reason=' + encodeURIComponent(blockedMatch.reason));
+                return;
+            }
+        } catch(err) {}
+        
         tab.url = e.url;
         tab.loading = true;
         tab.progress = 10;
@@ -373,6 +402,9 @@ async function initializeBrowser() {
     // Check for hash parameters after initialization
     await checkHashParameters();
 
+    // Load blocked sites list
+    await loadBlockedSites();
+
     // Initialize WISP events after UI is created
     initializeWISPEvents();
 }
@@ -488,7 +520,12 @@ function handleSubmit(url = null) {
 
     // Final validation check
     try {
-        new URL(inputUrl);
+        const urlObj = new URL(inputUrl);
+        const blockedMatch = blockedSitesList.find(b => urlObj.hostname.includes(b.domain) || b.domain.includes(urlObj.hostname));
+        if (blockedMatch) {
+            activeTab.frame.go(basePath + 'blocked.html?reason=' + encodeURIComponent(blockedMatch.reason));
+            return;
+        }
     } catch {
         inputUrl = 'https://search.brave.com/search?q=' + encodeURIComponent(inputUrl);
     }

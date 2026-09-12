@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Site Blocked</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../themes.css">
+  <script src="../themes.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0c0406;
+      --surface: #190a0e;
+      --surface-hover: #251016;
+      --surface-active: #35161f;
+      --border: rgba(244, 63, 94, 0.16);
+      --border-hover: rgba(244, 63, 94, 0.32);
+      --text: #fff1f2;
+      --text-muted: #fecdd3;
+      --text-dim: #f43f5e;
+      --accent: #f43f5e;
+      --accent-dim: rgba(244, 63, 94, 0.18);
+      --accent-glow: rgba(244, 63, 94, 0.45);
+      --accent-hover: #e11d48;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 60px;
+      max-width: 600px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.02);
+      animation: popIn 0.6s ease;
+    }
+
+    .icon-container {
+      font-size: 4rem;
+      color: var(--accent);
+      margin-bottom: 24px;
+      text-shadow: 0 0 25px var(--accent-glow);
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.5rem;
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-weight: 700;
+      background: linear-gradient(180deg, #ffffff 30%, var(--text-muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .reason-box {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .reason-label {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .reason-text {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon-container">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <h1>Site Blocked</h1>
+    <p>This website has been blocked by your network administrator.</p>
+    
+    <div class="reason-box">
+      <div class="reason-label">Reason for block</div>
+      <div class="reason-text" id="reasonText">This site is not permitted.</div>
+    </div>
+    
+    <a href="#" class="btn" onclick="goBack(event)"><i class="fa-solid fa-arrow-left"></i> Go Back</a>
+  </div>
+
+  <script>
+    function goBack(e) {
+      e.preventDefault();
+      if (window.parent && window.parent !== window) {
+        window.history.back();
+      } else {
+        window.history.back();
+      }
+    }
+
+    // Extract reason from URL query params
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const reason = urlParams.get('reason');
+      if (reason) {
+        document.getElementById('reasonText').textContent = decodeURIComponent(reason);
+      }
+    });
+  </script>
+</body>
+</html>
