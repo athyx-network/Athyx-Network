@@ -567,7 +567,7 @@
       { "name": "Snow Rider 3D", "path": "Snow Rider.html", "icon": "icons/snow_rider.png" },
       { "name": "Subway Surfers: St. Petersburg", "path": "Subway Surfers: St .Petersburg.html", "icon": "icons/subway_surfers.png" },
       { "name": "Super Mario Bros", "path": "Super Mario Bross.html", "icon": "icons/super_mario_bros.png" },
-      { "name": "Tag", "path": "Tag.html", "icon": "icons/tag.png" },
+      { "name": "Tag", "path": "tag/index.html", "icon": "icons/tag.png" },
       { "name": "The Impossible Quiz", "path": "Impossible Quiz.html", "icon": "icons/impossible_quiz.png" },
       { "name": "The World's Hardest Game", "path": "World's Hardest Game.html", "icon": "icons/worlds_hardest_game.png" },
       { "name": "Tomb of the Mask", "path": "Tomb Of The Mask.html", "icon": "icons/tomb_of_the_mask.png" },
@@ -664,13 +664,33 @@
       loadingModalText.textContent = `Loading ${game.name}...`;
       loadingModal.classList.add("show");
 
-      const gameUrl = REPO_BASE + encodeURI(game.path);
-      const gameBaseFolder = gameUrl.substring(0, gameUrl.lastIndexOf('/') + 1);
+      let gameUrl = REPO_BASE + encodeURI(game.path);
+      let gameBaseFolder = gameUrl.substring(0, gameUrl.lastIndexOf('/') + 1);
 
       try {
         const res = await fetch(gameUrl);
         if (!res.ok) throw new Error("Status " + res.status);
         let html = await res.text();
+
+        // If the HTML is an iframe wrapper (e.g. <iframe src="tag/index.html">), unwrap and fetch the inner HTML directly
+        // This prevents jsDelivr's "content-type: text/plain" header from causing browsers to render raw code in inner iframes
+        const iframeMatch = html.match(/<iframe\b[^>]*?\bsrc=["']([^"']+\.html(?:\?[^"']*)?)["']/i);
+        if (iframeMatch && iframeMatch[1]) {
+          let nestedUrl = iframeMatch[1];
+          if (!/^https?:\/\//i.test(nestedUrl)) {
+            nestedUrl = gameBaseFolder + nestedUrl.replace(/^(\.\/|\/)/, '');
+          }
+          try {
+            const nestedRes = await fetch(nestedUrl);
+            if (nestedRes.ok) {
+              html = await nestedRes.text();
+              gameUrl = nestedUrl;
+              gameBaseFolder = gameUrl.substring(0, gameUrl.lastIndexOf('/') + 1);
+            }
+          } catch(errNested) {
+            console.warn("Could not unwrap nested iframe HTML:", errNested);
+          }
+        }
 
         document.body.classList.add("game-active");
 
