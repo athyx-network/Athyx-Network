@@ -588,6 +588,16 @@
       }
       countPill.textContent = `${allGames.length} Games`;
       renderGames();
+
+      const autoLaunch = sessionStorage.getItem("athyx_launch_game");
+      if (autoLaunch) {
+        sessionStorage.removeItem("athyx_launch_game");
+        try {
+          const gameObj = JSON.parse(autoLaunch);
+          const found = allGames.find(g => g.name === gameObj.name || g.path === gameObj.path) || gameObj;
+          setTimeout(() => launchGame(found), 150);
+        } catch(e) {}
+      }
     }
 
     function toggleFavorite(gameName, e) {
