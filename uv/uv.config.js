@@ -30,6 +30,7 @@
             return decodeURIComponent(u);
         },
         handler: (basePath ? basePath : '') + '/uv/uv.handler.js',
+        client: (basePath ? basePath : '') + '/uv/uv.client.js',
         bundle: (basePath ? basePath : '') + '/uv/uv.bundle.js',
         config: (basePath ? basePath : '') + '/uv/uv.config.js',
         sw: (basePath ? basePath : '') + '/uv/uv.sw.js',
