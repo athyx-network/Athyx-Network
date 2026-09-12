@@ -630,7 +630,8 @@
 
       list.forEach(game => {
         const isFav = favorites.includes(game.name);
-        const iconUrl = game.icon ? (game.icon.startsWith("http") ? game.icon : REPO_BASE + encodeURI(game.icon)) : "";
+        const rawIcon = game.icon ? (game.icon.startsWith("http") ? game.icon : REPO_BASE + encodeURI(game.icon)) : "";
+        const iconUrl = rawIcon ? (rawIcon + (rawIcon.includes("?") ? "&" : "?") + "t=" + Date.now()) : "";
 
         const card = document.createElement("div");
         card.className = "game-card";

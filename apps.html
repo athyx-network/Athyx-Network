@@ -527,10 +527,11 @@
       filtered.forEach(app => {
         const card = document.createElement("div");
         card.className = "app-card";
+        const iconUrl = app.icon ? (app.icon + (app.icon.includes("?") ? "&" : "?") + "t=" + Date.now()) : "";
 
         card.innerHTML = `
           <div class="app-top">
-            <img class="app-icon" src="${app.icon}" alt="${app.name}" loading="lazy">
+            <img class="app-icon" src="${iconUrl}" alt="${app.name}" loading="lazy">
             <span class="app-tag">${app.tag}</span>
           </div>
           <div class="app-details">
