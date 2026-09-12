@@ -392,6 +392,8 @@
 
 
     window.addEventListener("keydown", (e) => {
+      const panicEnabled = localStorage.getItem("athyx_panic_enabled") !== "false";
+      if (!panicEnabled) return;
       const panicKey = localStorage.getItem("athyx_panic_key");
       const panicUrl = localStorage.getItem("athyx_panic_url") || "https://www.google.com";
       if (panicKey && (e.key === panicKey || e.code === panicKey)) {
