@@ -660,24 +660,68 @@
     window.fetch = function(input, init) {
       if (typeof input === 'string') {
         if (input.startsWith('file:///')) {
-          input = absoluteBase + input.replace(/^file:\\/\\/\\/?/, '');
+          input = absoluteBase + input.replace(/^file:\/\/\/?/, '');
         } else if (input.startsWith('/') && !input.startsWith('//')) {
-          input = absoluteBase + input.replace(/^\\//, '');
-        } else if (!/^https?:\\/\\//i.test(input) && !input.startsWith('data:') && !input.startsWith('blob:') && !input.startsWith('javascript:')) {
-          input = absoluteBase + input.replace(/^(\\.\\/)/, '');
+          input = absoluteBase + input.replace(/^\//, '');
+        } else if (!/^https?:\/\//i.test(input) && !input.startsWith('data:') && !input.startsWith('blob:') && !input.startsWith('javascript:')) {
+          input = absoluteBase + input.replace(/^(\.\/)/, '');
         }
       } else if (input instanceof Request) {
         let url = input.url;
         if (url.startsWith('file:///')) {
-          url = absoluteBase + url.replace(/^file:\\/\\/\\/?/, '');
+          url = absoluteBase + url.replace(/^file:\/\/\/?/, '');
           input = new Request(url, input);
         } else if (url.startsWith('about:')) {
-          url = absoluteBase + url.replace(/^about:[^/]*\\/?/, '');
+          url = absoluteBase + url.replace(/^about:[^/]*\/?/, '');
           input = new Request(url, input);
         }
       }
       return origFetch.call(this, input, init);
     };
+  }
+
+  // XMLHttpRequest interceptor to resolve relative paths against absoluteBase (vital for Unity WebGL .wasm & .data files)
+  if (window.XMLHttpRequest) {
+    const origOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+      if (typeof url === 'string') {
+        if (url.startsWith('file:///')) {
+          url = absoluteBase + url.replace(/^file:\/\/\/?/, '');
+        } else if (url.startsWith('/') && !url.startsWith('//')) {
+          url = absoluteBase + url.replace(/^\//, '');
+        } else if (!/^https?:\/\//i.test(url) && !url.startsWith('data:') && !url.startsWith('blob:')) {
+          url = absoluteBase + url.replace(/^(\.\/)/, '');
+        }
+      }
+      return origOpen.call(this, method, url, async, user, password);
+    };
+  }
+
+  // WebAssembly instantiate / instantiateStreaming polyfill for Unity WebGL / WASM compatibility
+  if (window.WebAssembly) {
+    if (WebAssembly.instantiateStreaming) {
+      const origInstantiateStreaming = WebAssembly.instantiateStreaming;
+      WebAssembly.instantiateStreaming = async function(source, imports) {
+        try {
+          const res = await Promise.resolve(source);
+          const contentType = res.headers && res.headers.get('content-type');
+          if (res.ok && contentType && contentType.toLowerCase().includes('application/wasm')) {
+            return await origInstantiateStreaming.call(WebAssembly, Promise.resolve(res), imports);
+          }
+          const bytes = await res.arrayBuffer();
+          return await WebAssembly.instantiate(bytes, imports);
+        } catch(err) {
+          console.warn("WebAssembly.instantiateStreaming failed, falling back to arrayBuffer:", err);
+          try {
+            const res = await Promise.resolve(source);
+            const bytes = await res.arrayBuffer();
+            return await WebAssembly.instantiate(bytes, imports);
+          } catch(err2) {
+            throw err2;
+          }
+        }
+      };
+    }
   }
 
   // Web Worker interceptor to support cross-origin CDN & sandboxed workers
@@ -687,11 +731,11 @@
       let targetUrl = url;
       if (typeof targetUrl === 'string') {
         if (targetUrl.startsWith('file:///')) {
-          targetUrl = absoluteBase + targetUrl.replace(/^file:\\/\\/\\/?/, '');
-        } else if (!/^https?:\\/\\//i.test(targetUrl) && !targetUrl.startsWith('blob:') && !targetUrl.startsWith('data:')) {
-          targetUrl = absoluteBase + targetUrl.replace(/^(\\.\\/|\\/)/, '');
+          targetUrl = absoluteBase + targetUrl.replace(/^file:\/\/\/?/, '');
+        } else if (!/^https?:\/\//i.test(targetUrl) && !targetUrl.startsWith('blob:') && !targetUrl.startsWith('data:')) {
+          targetUrl = absoluteBase + targetUrl.replace(/^(\.\/|\/)/, '');
         }
-        if (/^https?:\\/\\//i.test(targetUrl) && !targetUrl.startsWith(location.origin)) {
+        if (/^https?:\/\//i.test(targetUrl) && !targetUrl.startsWith(location.origin)) {
           try {
             const blobCode = "importScripts(" + JSON.stringify(targetUrl) + ");";
             const blobUrl = URL.createObjectURL(new Blob([blobCode], { type: 'application/javascript' }));
@@ -709,10 +753,13 @@
     get: function() {
       if (!_origCreateUnityInstance) return undefined;
       return function(canvas, config, onProgress) {
-        if (config) {
-          if (config.streamingAssetsUrl && !/^https?:\\/\\//i.test(config.streamingAssetsUrl)) {
-            config.streamingAssetsUrl = absoluteBase + config.streamingAssetsUrl.replace(/^(\\.\\/|\\/)/, '');
-          }
+        if (config && typeof config === 'object') {
+          const keysToResolve = ['dataUrl', 'frameworkUrl', 'codeUrl', 'wasmCodeUrl', 'wasmFrameworkUrl', 'symbolsUrl', 'streamingAssetsUrl', 'memoryUrl'];
+          keysToResolve.forEach(key => {
+            if (config[key] && typeof config[key] === 'string' && !/^https?:\/\//i.test(config[key]) && !config[key].startsWith('blob:') && !config[key].startsWith('data:')) {
+              config[key] = absoluteBase + config[key].replace(/^(\.\/|\/)/, '');
+            }
+          });
         }
         return _origCreateUnityInstance.call(this, canvas, config, onProgress);
       };
@@ -731,8 +778,16 @@
       if (val && typeof val.instantiate === 'function') {
         const origInst = val.instantiate;
         val.instantiate = function(container, url, params) {
-          if (typeof url === 'string' && !/^https?:\\/\\//i.test(url)) {
-            url = absoluteBase + url.replace(/^(\\.\\/|\\/)/, '');
+          if (typeof url === 'string' && !/^https?:\/\//i.test(url)) {
+            url = absoluteBase + url.replace(/^(\.\/|\/)/, '');
+          }
+          if (params && typeof params === 'object') {
+            const keysToResolve = ['dataUrl', 'frameworkUrl', 'codeUrl', 'wasmCodeUrl', 'wasmFrameworkUrl', 'symbolsUrl', 'streamingAssetsUrl', 'memoryUrl'];
+            keysToResolve.forEach(key => {
+              if (params[key] && typeof params[key] === 'string' && !/^https?:\/\//i.test(params[key])) {
+                params[key] = absoluteBase + params[key].replace(/^(\.\/|\/)/, '');
+              }
+            });
           }
           return origInst.call(this, container, url, params);
         };
