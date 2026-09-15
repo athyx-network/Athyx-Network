@@ -275,9 +275,13 @@
       <i class="fa-solid fa-shapes"></i>
       <span>Apps</span>
     </button>
-    <button class="dock-item" data-tab="proxy" onclick="navigate('proxy')" title="Proxy">
-      <i class="fa-solid fa-shield-halved"></i>
-      <span>Proxy</span>
+    <button class="dock-item" data-tab="proxy" onclick="navigate('proxy')" title="Browser">
+      <i class="fa-solid fa-server"></i>
+      <span>Browser</span>
+    </button>
+    <button class="dock-item" data-tab="movies" onclick="navigate('movies')" title="Movies">
+      <i class="fa-solid fa-film"></i>
+      <span>Movies</span>
     </button>
     <div class="dock-separator"></div>
     <button class="dock-item" data-tab="settings" onclick="navigate('settings')" title="Settings">
@@ -327,6 +331,7 @@
       home: () => "homepage.html?v=" + Date.now(),
       games: () => "g.html?v=" + Date.now(),
       apps: () => "apps.html?v=" + Date.now(),
+      movies: () => window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'scramjet/index.html#https://moviex.athyx.workers.dev/',
       proxy: () => window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'scramjet/index.html',
       settings: () => "settings.html?v=" + Date.now()
     };

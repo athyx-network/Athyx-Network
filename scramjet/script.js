@@ -558,13 +558,11 @@ async function loadWispServers() {
                 const name = urlObj.hostname;
                 
                 wispOption.innerHTML = `
-                    <div class="wisp-option-header">
-                        <span class="wisp-option-name">${name}</span>
-                        <button class="wisp-option-btn" data-action="select-wisp">Select</button>
-                    </div>
-                    <div class="wisp-option-url">${url}</div>
-                    <div class="wisp-option-description">Loaded from wisp.txt</div>
-                `;
+  <div class="wisp-option-name">${name}</div>
+  <div class="wisp-option-url">${url}</div>
+  <div class="wisp-option-description">Loaded from wisp.txt</div>
+  <button class="btn btn-primary wisp-option-btn" data-action="select-wisp">Select</button>
+`;
                 container.appendChild(wispOption);
             });
             
@@ -650,6 +648,49 @@ function selectWispUrl(url) {
     updateApplyButton();
 }
 
+// Automatically select the fastest reachable WISP server
+async function autoSelectFastestWisp() {
+    const container = document.getElementById('dynamic-wisps-container');
+    if (!container) return;
+    const options = Array.from(container.querySelectorAll('.wisp-option')).map(o => o.dataset.url);
+    let bestUrl = null;
+    let bestTime = Infinity;
+    for (const url of options) {
+        const start = performance.now();
+        try {
+            await new Promise((resolve, reject) => {
+                const ws = new WebSocket(url);
+                const timeout = setTimeout(() => {
+                    ws.close();
+                    reject();
+                }, 3000);
+                ws.onopen = () => {
+                    clearTimeout(timeout);
+                    ws.close();
+                    resolve();
+                };
+                ws.onerror = () => {
+                    clearTimeout(timeout);
+                    reject();
+                };
+            });
+            const duration = performance.now() - start;
+            if (duration < bestTime) {
+                bestTime = duration;
+                bestUrl = url;
+            }
+        } catch (e) {
+            // ignore failed connection
+        }
+    }
+    if (bestUrl) {
+        selectWispUrl(bestUrl);
+        applyWispSettings();
+    } else {
+        alert('No reachable WISP servers found.');
+    }
+}
+
 function applyWispSettings() {
     const newWispUrl = document.getElementById('current-wisp-url').textContent;
 
@@ -688,6 +729,9 @@ function applyWispSettings() {
 function updateWispStatus(type, message) {
     const indicator = document.getElementById('wisp-status-indicator');
     const text = document.getElementById('wisp-status-text');
+
+    // Guard: elements may not exist in simplified modal
+    if (!indicator || !text) return;
 
     // Reset classes
     indicator.className = 'status-indicator';
@@ -742,6 +786,15 @@ function initializeWISPEvents() {
     });
 
     document.getElementById('apply-wisp-btn').addEventListener('click', applyWispSettings);
+
+    // Auto-select fastest WISP button
+    
+    // Auto-select fastest WISP button
+    document.getElementById('auto-wisp-switch').addEventListener('change', (e) => {
+    if (e.target.checked) {
+        autoSelectFastestWisp();
+    }
+});
 
     // Close modal when clicking outside
     document.getElementById('wisp-settings-modal').addEventListener('click', (e) => {
