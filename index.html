@@ -22,7 +22,7 @@
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="themes.css">
-  <script src="themes.js"></script>
+  <script src="themes.js?v=2"></script>
 
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="shortcut icon" href="favicon.ico">
@@ -55,10 +55,10 @@
     body {
       width: 100%;
       height: 100%;
-      background:
-        linear-gradient(135deg, var(--accent-dim) 0%, rgba(0, 0, 0, 0) 55%),
-        linear-gradient(180deg, var(--surface-active) 0%, var(--surface) 40%, var(--bg-base) 100%);
       background-color: var(--bg-base);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.075) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      background-attachment: fixed;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       overflow: hidden;
       color: var(--text-main);
@@ -340,8 +340,8 @@
       home: () => "homepage.html?v=" + Date.now(),
       games: () => "g.html?v=" + Date.now(),
       apps: () => "apps.html?v=" + Date.now(),
-      movies: () => window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'scramjet/index.html#https://moviex.athyx.workers.dev/',
-      proxy: () => window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'scramjet/index.html',
+      movies: () => window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'scramjet/index.html?v=' + Date.now() + '#https://moviex.athyx.workers.dev/',
+      proxy: () => window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'scramjet/index.html?v=' + Date.now(),
       settings: () => "settings.html?v=" + Date.now()
     };
 
@@ -378,6 +378,8 @@
             dockNav.style.display = "";
             dockToggleBtn.style.display = "flex";
           }
+        } else if (event.data.action === "athyx_cloak_change") {
+          updateTabTitleAndIcon(event.data.title, event.data.icon);
         }
       }
     });
@@ -394,13 +396,12 @@
     function updateTabTitleAndIcon(title, icon) {
       if (title) document.title = title;
       if (icon) {
-        let link = document.querySelector("link[rel*='icon']");
-        if (!link) {
-          link = document.createElement("link");
-          link.rel = "icon";
-          document.head.appendChild(link);
-        }
-        link.href = icon;
+        document.querySelectorAll("link[rel*='icon']").forEach(link => link.remove());
+        
+        let newLink = document.createElement("link");
+        newLink.rel = "icon";
+        newLink.href = icon;
+        document.head.appendChild(newLink);
       }
     }
 
@@ -412,29 +413,6 @@
     if (savedTitle || savedIcon) {
       updateTabTitleAndIcon(savedTitle || defaultSiteTitle, savedIcon || defaultSiteIcon);
     }
-
-    // Auto Cloak on tab switch (blur / focus)
-    window.addEventListener("blur", () => {
-      const autoCloak = localStorage.getItem("athyx_auto_cloak") === "true";
-      if (autoCloak) {
-        const cloakTitle = localStorage.getItem("athyx_tab_title") || "Google Classroom";
-        const cloakIcon = localStorage.getItem("athyx_tab_icon") || "https://ssl.gstatic.com/classroom/favicon.png";
-        updateTabTitleAndIcon(cloakTitle, cloakIcon);
-      }
-    });
-
-    window.addEventListener("focus", () => {
-      const autoCloak = localStorage.getItem("athyx_auto_cloak") === "true";
-      if (autoCloak) {
-        const customTitle = localStorage.getItem("athyx_tab_title");
-        const customIcon = localStorage.getItem("athyx_tab_icon");
-        // If the user hasn't explicitly set a permanent custom disguise, restore to Athyx
-        const currentSelectedPreset = localStorage.getItem("athyx_preset_selected");
-        if (!currentSelectedPreset || currentSelectedPreset === "default") {
-          updateTabTitleAndIcon(defaultSiteTitle, defaultSiteIcon);
-        }
-      }
-    });
 
 
     window.addEventListener("keydown", (e) => {
@@ -495,6 +473,7 @@
     navigate("home");
   </script>
 
+  <script src="particle.js"></script>
 </body>
 
 </html>

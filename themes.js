@@ -1,4 +1,45 @@
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
 
+function generateCustomTheme(hexColor) {
+  const rgb = hexToRgb(hexColor);
+  if (!rgb) return null;
+
+  const r = rgb.r, g = rgb.g, b = rgb.b;
+  return {
+    id: hexColor,
+    name: "Custom Theme",
+    category: "Custom",
+    vars: {
+      "--bg": "#09090b",
+      "--bg-base": "#09090b",
+      "--surface": "#121215",
+      "--surface-hover": "#18181c",
+      "--surface-active": "#222228",
+      "--border": `rgba(${r}, ${g}, ${b}, 0.16)`,
+      "--border-hover": `rgba(${r}, ${g}, ${b}, 0.32)`,
+      "--border-light": `rgba(${r}, ${g}, ${b}, 0.22)`,
+      "--text": "#ffffff",
+      "--text-main": "#ffffff",
+      "--text-muted": "#a1a1aa",
+      "--text-dim": hexColor,
+      "--accent": hexColor,
+      "--accent-dim": `rgba(${r}, ${g}, ${b}, 0.18)`,
+      "--accent-glow": `rgba(${r}, ${g}, ${b}, 0.45)`,
+      "--accent-hover": hexColor,
+      "--dock-bg": "rgba(18, 18, 22, 0.85)",
+      "--dock-border": `rgba(${r}, ${g}, ${b}, 0.2)`,
+      "--dock-btn-hover": `rgba(${r}, ${g}, ${b}, 0.14)`,
+      "--dock-btn-active": `rgba(${r}, ${g}, ${b}, 0.25)`
+    }
+  };
+}
 
 const ATHYX_THEMES = [
   {
@@ -351,6 +392,10 @@ const AthyxThemeEngine = {
   },
 
   getThemeById: (id) => {
+    if (id && id.startsWith("#")) {
+      const customTheme = generateCustomTheme(id);
+      if (customTheme) return customTheme;
+    }
     return ATHYX_THEMES.find(t => t.id === id) || ATHYX_THEMES.find(t => t.id === "crimson") || ATHYX_THEMES[0];
   },
 

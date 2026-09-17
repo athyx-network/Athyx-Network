@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="themes.css">
-  <script src="themes.js"></script>
+  <script src="themes.js?v=2"></script>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="shortcut icon" href="favicon.ico">
 
@@ -38,7 +38,10 @@
 
     html, body {
       min-height: 100%;
-      background: var(--bg);
+      background-color: var(--bg);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.075) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+      background-attachment: fixed;
       color: var(--text);
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
@@ -299,42 +302,97 @@
       height: 0 !important;
     }
 
-    
-    .stage-quit-btn {
+    /* Game FAB */
+    .game-fab-container {
       position: fixed;
-      top: 16px;
-      right: 16px;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
       z-index: 100000;
-      width: 40px;
-      height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .game-fab-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: absolute;
+      right: 64px;
+      background: rgba(15, 15, 20, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 12px;
       border-radius: 12px;
-      background: rgba(18, 18, 22, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #f43f5e;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: -8px 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .game-fab-container:hover .game-fab-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    .game-fab-main {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 20px;
       cursor: pointer;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      outline: none;
-      opacity: 0.85;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
-    .stage-quit-btn:hover {
-      opacity: 1;
-      background: #ef4444;
-      border-color: #ef4444;
-      color: #ffffff;
-      transform: scale(1.08);
-      box-shadow: 0 10px 28px -2px rgba(239, 68, 68, 0.5);
+    .game-fab-main:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
     }
 
-    .stage-quit-btn:active {
-      transform: scale(0.95);
+    .game-fab-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 140px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      color: #e0e0e0;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      text-align: left;
+    }
+
+    .game-fab-btn i {
+      width: 16px;
+      text-align: center;
+    }
+
+    .game-fab-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .game-fab-btn.danger:hover {
+      background: rgba(255, 60, 60, 0.2);
+      color: #ff4444;
     }
 
     #gameStageIframe {
@@ -421,9 +479,25 @@
 
   
   <div id="gameStage">
-    <button class="stage-quit-btn" onclick="closeActiveGame()" title="Quit Game (Esc)" aria-label="Quit Game">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
+    <div class="game-fab-container">
+      <button class="game-fab-main" title="Game Options">
+        <i class="fa-solid fa-gamepad"></i>
+      </button>
+      <div class="game-fab-menu">
+        <button class="game-fab-btn" onclick="openGameInNewTab()" title="Open in New Tab">
+          <i class="fa-solid fa-external-link-alt"></i>
+          <span>New Tab</span>
+        </button>
+        <button class="game-fab-btn" onclick="toggleStageFullscreen()" title="Fullscreen">
+          <i class="fa-solid fa-expand"></i>
+          <span>Fullscreen</span>
+        </button>
+        <button class="game-fab-btn danger" onclick="closeActiveGame()" title="Close Game (Esc)">
+          <i class="fa-solid fa-xmark"></i>
+          <span>Close Game</span>
+        </button>
+      </div>
+    </div>
     <iframe id="gameStageIframe" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; cross-origin-isolated" scrolling="no"></iframe>
   </div>
 
@@ -449,6 +523,26 @@
     const gameStageIframe = document.getElementById("gameStageIframe");
     const loadingModal = document.getElementById("loadingModal");
     const loadingModalText = document.getElementById("loadingModalText");
+    let loadingQuotes = ["Loading the matrix...", "Stealth mode engaged.", "Bypassing restrictions..."];
+
+    fetch("https://cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/quotes.txt?t=" + Date.now())
+      .then(res => {
+        if (!res.ok) throw new Error("Network error");
+        return res.text();
+      })
+      .then(text => {
+        const quotes = text.split(/\r?\n/).map(q => q.trim()).filter(q => q.length > 0);
+        if (quotes.length > 0) loadingQuotes = quotes;
+      })
+      .catch(() => {
+        fetch("quotes.txt?t=" + Date.now())
+          .then(res => res.text())
+          .then(text => {
+            const quotes = text.split(/\r?\n/).map(q => q.trim()).filter(q => q.length > 0);
+            if (quotes.length > 0) loadingQuotes = quotes;
+          })
+          .catch(e => console.log(e));
+      });
 
     
     const fallbackGames = [
@@ -511,6 +605,7 @@
         console.warn("Using fallback game database:", err);
         allGames = fallbackGames;
       }
+      allGames.sort((a, b) => a.name.localeCompare(b.name));
       if (countPill) countPill.textContent = `${allGames.length} Games`;
       renderGames();
 
@@ -534,7 +629,26 @@
       const list = getFilteredGames();
       gridEl.innerHTML = "";
 
-      if (list.length === 0) {
+      const query = searchBox.value.trim().toLowerCase();
+      if (!query || "suggest games".includes(query)) {
+        const suggestCard = document.createElement("div");
+        suggestCard.className = "game-card";
+        suggestCard.innerHTML = `
+          <div class="thumb-wrapper" style="display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03);">
+            <i class="fa-solid fa-plus thumb-fallback" style="font-size: 32px; color: var(--accent);"></i>
+            <div class="play-overlay">
+              <div class="play-icon"><i class="fa-solid fa-external-link-alt"></i></div>
+            </div>
+          </div>
+          <div class="game-info">
+            <span class="game-title" title="Suggest Games">Suggest Games</span>
+          </div>
+        `;
+        suggestCard.onclick = () => window.open("https://docs.google.com/forms/d/e/1FAIpQLSdL9_nG0Twn0JoQOLUiizFwpvoc8hk0JmDhCcnnRnTz7FMSaA/viewform?usp=publish-editor", "_blank");
+        gridEl.appendChild(suggestCard);
+      }
+
+      if (list.length === 0 && !gridEl.hasChildNodes()) {
         gridEl.innerHTML = `
           <div class="state-message">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -572,7 +686,8 @@
 
     async function launchGame(game) {
       activeGameObj = game;
-      loadingModalText.textContent = `Loading ${game.name}...`;
+      const randomQuote = loadingQuotes[Math.floor(Math.random() * loadingQuotes.length)];
+      loadingModalText.textContent = `${randomQuote} (Loading ${game.name}...)`;
       loadingModal.classList.add("show");
 
       let gameUrl = REPO_BASE + encodeURI(game.path);
@@ -859,13 +974,30 @@ iframe {
           cleanHtml = `<head>${headInjection}</head>` + html;
         }
 
-        gameStageIframe.srcdoc = cleanHtml;
-        gameStage.classList.add("show");
-
+        window.lastGameHtml = cleanHtml;
         
-        try {
-          window.parent.postMessage({ action: "athyx_game_active", active: true }, "*");
-        } catch(e) {}
+        const launchMode = localStorage.getItem("athyx_game_launch_mode") === "about:blank" ? "about:blank" : "iframe";
+
+        if (launchMode === "about:blank") {
+          gameStageIframe.removeAttribute("srcdoc");
+          gameStageIframe.src = "about:blank";
+          gameStage.classList.add("show");
+          
+          gameStageIframe.contentWindow.document.open();
+          gameStageIframe.contentWindow.document.write(cleanHtml);
+          gameStageIframe.contentWindow.document.close();
+          
+          try {
+            window.parent.postMessage({ action: "athyx_game_active", active: true }, "*");
+          } catch(e) {}
+        } else {
+          gameStageIframe.removeAttribute("src");
+          gameStageIframe.srcdoc = cleanHtml;
+          gameStage.classList.add("show");
+          try {
+            window.parent.postMessage({ action: "athyx_game_active", active: true }, "*");
+          } catch(e) {}
+        }
       } catch (err) {
         console.error("Failed to launch game:", err);
         alert(`Could not launch "${game.name}". Please check your internet connection.`);
@@ -889,6 +1021,40 @@ iframe {
       try {
         window.parent.postMessage({ action: "athyx_game_active", active: false }, "*");
       } catch(e) {}
+    }
+    function openGameInNewTab() {
+      try {
+        const title = localStorage.getItem("athyx_tab_title") || "Athyx Network";
+        const icon = localStorage.getItem("athyx_tab_icon") || "https://ssl.gstatic.com/classroom/favicon.png";
+        
+        let content = "";
+        if (gameStageIframe.src && gameStageIframe.src !== "about:blank" && !gameStageIframe.src.startsWith("blob:")) {
+           window.open(gameStageIframe.src, "_blank");
+           closeActiveGame();
+           return;
+        } else if (window.lastGameHtml) {
+           content = window.lastGameHtml;
+        } else {
+           content = gameStageIframe.srcdoc || "";
+        }
+        
+        const win = window.open("about:blank", "_blank");
+        if (win) {
+          win.document.open();
+          win.document.write(content);
+          win.document.close();
+          const link = win.document.createElement("link");
+          link.rel = "icon";
+          link.href = icon;
+          win.document.head.appendChild(link);
+          win.document.title = title;
+          closeActiveGame();
+        } else {
+          alert("Popup blocked! Please allow popups for this site.");
+        }
+      } catch (e) {
+        console.error("Failed to open game in new tab", e);
+      }
     }
 
     function toggleStageFullscreen() {
@@ -923,5 +1089,6 @@ iframe {
     fetchGameLibrary();
   </script>
 
+  <script src="particle.js"></script>
 </body>
 </html>

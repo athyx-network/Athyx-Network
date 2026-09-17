@@ -13,21 +13,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="themes.css">
-  <script src="themes.js"></script>
+  <script src="themes.js?v=2"></script>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="shortcut icon" href="favicon.ico">
 
   <style>
     :root {
       color-scheme: dark;
+      /* Shared / Fallback variables before themes load */
+      --sidebar-width: 280px;
       --bg: #0b0f17;
-      --sidebar-bg: rgba(15, 21, 33, 0.75);
-      --card-bg: rgba(18, 25, 38, 0.72);
+      --sidebar-bg: rgba(11, 13, 17, 0.85);
+      --card-bg: rgba(255, 255, 255, 0.04);
       --surface: #141c2b;
       --surface-hover: #1c263a;
       --surface-active: #25334d;
-      --border: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.06);
       --border-hover: rgba(255, 255, 255, 0.16);
+      
+      --accent: #0ea5e9;
+      --accent-dim: rgba(56, 189, 248, 0.15);
+      --accent-glow: rgba(56, 189, 248, 0.35);
       --border-light: rgba(255, 255, 255, 0.12);
       --text: #f1f5f9;
       --text-muted: #94a3b8;
@@ -36,7 +42,7 @@
       --accent-dim: rgba(56, 189, 248, 0.15);
       --accent-glow: rgba(56, 189, 248, 0.35);
       --accent-hover: #0ea5e9;
-      --nav-active-bg: #223047;
+      --nav-active-bg: rgba(255, 255, 255, 0.12);
       --nav-active-text: #ffffff;
       --toggle-off: #334155;
       --toggle-on: #ffffff;
@@ -596,6 +602,49 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
+    .segmented-control {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+    .segment-highlighter {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      background: var(--accent);
+      border-radius: 6px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 0;
+    }
+    .segmented-control[data-mode="iframe"] .segment-highlighter {
+      transform: translateX(0);
+    }
+    .segmented-control[data-mode="about:blank"] .segment-highlighter {
+      transform: translateX(100%);
+    }
+    .segmented-control .segment {
+      padding: 6px 12px;
+      font-size: 13px;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: monospace;
+      transition: color 0.3s ease;
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    .segmented-control .segment.active {
+      color: #fff;
+      font-weight: 600;
+    }
+
     /* Wisp Proxy Server Cards */
     .wisp-server-list {
       display: flex;
@@ -889,20 +938,31 @@
             </div>
           </div>
 
-          <!-- Auto Cloak Row -->
-          <div class="setting-row" data-search-keys="auto cloak switch tabs blur disguise hidden">
+          <!-- Open in about:blank -->
+          <div class="setting-row" data-search-keys="open about blank popup hide history">
             <div class="setting-info">
-              <span class="setting-title">Auto Cloak</span>
-              <span class="setting-desc">Automatically apply the selected cloak when you switch tabs, restore original when you return.</span>
+              <span class="setting-title">Open in about:blank</span>
+              <span class="setting-desc">Instantly open this entire proxy site in an isolated about:blank window to hide it from history.</span>
             </div>
             <div class="setting-control">
-              <div class="toggle-switch" id="autoCloakToggle" onclick="toggleAutoCloak()" role="switch" aria-checked="false">
-                <div class="toggle-knob"></div>
-              </div>
+              <button class="primary-btn" onclick="openSiteInAboutBlank()" style="padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; background: var(--accent); color: #fff; transition: opacity 0.2s;">Open <i class="fa-solid fa-external-link-alt" style="margin-left: 6px;"></i></button>
             </div>
           </div>
 
-
+          <!-- Game Launch Mode -->
+          <div class="setting-row" data-search-keys="game launch mode open about:blank iframe srcdoc">
+            <div class="setting-info">
+              <span class="setting-title">Game/App Launch Method</span>
+              <span class="setting-desc">Choose how the internal player mounts game code.</span>
+            </div>
+            <div class="setting-control">
+              <div class="segmented-control" id="gameLaunchSegmented" data-mode="iframe">
+                <div class="segment-highlighter"></div>
+                <div class="segment" id="seg-srcdoc" onclick="setGameLaunchMode('iframe')">about:srcdoc</div>
+                <div class="segment" id="seg-blank" onclick="setGameLaunchMode('about:blank')">about:blank</div>
+              </div>
+            </div>
+          </div>
 
         </div>
       </section>
@@ -911,31 +971,16 @@
       <section class="tab-section" id="section-customize" style="display: none;">
         <div class="settings-card">
           
-          <!-- Themes Header -->
-          <div class="setting-row">
-            <div class="setting-info">
-              <span class="setting-title">Themes & Colors</span>
-              <span class="setting-desc">Choose from our curated collection of color themes.</span>
+          <!-- Theme Color Picker -->
+          <div class="setting-row" data-search-keys="theme color custom picker accent" style="flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 16px; padding: 24px;">
+            <div class="setting-info" style="align-items: center;">
+              <span class="setting-title" style="font-size: 16px;">Custom Theme Color</span>
+              <span class="setting-desc">Pick an accent color to dynamically generate a custom dark theme.</span>
             </div>
-            <div class="setting-control">
-              <span class="dropdown-pill-btn" style="cursor: default;">
-                <span id="activeThemeName">Crimson</span>
-              </span>
+            <div class="setting-control" style="justify-content: center; width: 100%;">
+              <input type="color" id="themeColorPicker" title="Choose your custom theme color" style="cursor: pointer; width: 64px; height: 64px; padding: 0; border: none; border-radius: 12px; background: none;" onchange="selectCustomTheme(this.value)" oninput="selectCustomTheme(this.value)">
             </div>
           </div>
-
-          <!-- Theme Filter Pills -->
-          <div class="theme-category-pills" id="themeCategoryPills">
-            <button class="theme-cat-btn active" data-cat="all" onclick="filterThemes('all')">All</button>
-            <button class="theme-cat-btn" data-cat="Dark" onclick="filterThemes('Dark')">Dark</button>
-            <button class="theme-cat-btn" data-cat="Cyberpunk" onclick="filterThemes('Cyberpunk')">Cyberpunk</button>
-            <button class="theme-cat-btn" data-cat="Cozy" onclick="filterThemes('Cozy')">Cozy & Pastel</button>
-            <button class="theme-cat-btn" data-cat="Neon" onclick="filterThemes('Neon')">Neon</button>
-            <button class="theme-cat-btn" data-cat="Monochrome" onclick="filterThemes('Monochrome')">Monochrome</button>
-          </div>
-
-          <!-- Theme Grid -->
-          <div class="theme-grid" id="themeGrid"></div>
 
           <!-- Compact Dock Mode -->
           <div class="setting-row" data-search-keys="compact mode navigation dock selection bar icons">
@@ -948,7 +993,19 @@
                 <div class="toggle-knob"></div>
               </div>
             </div>
+            <!-- Flying Particles Mode -->
+          <div class="setting-row" data-search-keys="flying particles background animation">
+            <div class="setting-info">
+              <span class="setting-title">Flying Particles</span>
+              <span class="setting-desc">Enable background flying particles animation.</span>
+            </div>
+            <div class="setting-control">
+              <div class="toggle-switch" id="flyingParticlesToggle" onclick="toggleFlyingParticles()" role="switch" aria-checked="false">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
           </div>
+        </div>
 
         </div>
       </section>
@@ -1194,14 +1251,47 @@
       showToast(`Custom tab disguise applied!`);
     }
 
-    function toggleAutoCloak() {
-      const toggle = document.getElementById("autoCloakToggle");
-      const current = localStorage.getItem("athyx_auto_cloak") === "true";
-      const next = !current;
-      localStorage.setItem("athyx_auto_cloak", next.toString());
-      toggle.classList.toggle("active", next);
-      toggle.setAttribute("aria-checked", next.toString());
-      showToast(next ? "Auto Cloak enabled on tab switch" : "Auto Cloak disabled");
+    function openSiteInAboutBlank() {
+      try {
+        const title = localStorage.getItem("athyx_tab_title") || "Athyx Network";
+        const icon = localStorage.getItem("athyx_tab_icon") || "https://ssl.gstatic.com/classroom/favicon.png";
+        
+        let url;
+        try {
+           url = window.top.location.href;
+        } catch(e) {
+           url = window.location.origin;
+        }
+        
+        const win = window.open("about:blank", "_blank");
+        if (win) {
+          win.document.write(`
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <title>${title}</title>
+                <link rel="icon" href="${icon}">
+                <style>
+                  body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0b0f17; }
+                  iframe { border: none; width: 100%; height: 100%; }
+                </style>
+              </head>
+              <body>
+                <iframe src="${url}"></iframe>
+              </body>
+            </html>
+          `);
+          win.document.close();
+          
+          try {
+            window.top.close();
+          } catch(e) {}
+        } else {
+          alert("Popup blocked! Please allow popups for this site.");
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     function toggleAutoAboutBlank() {
@@ -1345,107 +1435,47 @@
     }
 
     // Themes
-    let currentThemeFilter = "all";
-
-    function renderThemes(category = "all") {
+    function selectCustomTheme(colorHex) {
       if (!window.AthyxThemeEngine) return;
-      const themeGrid = document.getElementById("themeGrid");
-      if (!themeGrid) return;
-
-      const themes = AthyxThemeEngine.getThemes();
-      const currentThemeId = AthyxThemeEngine.getStoredThemeId();
-
-      const filtered = category === "all"
-        ? themes
-        : category === "Cozy"
-          ? themes.filter(t => t.category === "Cozy" || t.category === "Pastel" || t.category === "Aesthetic")
-          : themes.filter(t => t.category.toLowerCase() === category.toLowerCase());
-
-      themeGrid.innerHTML = "";
-
-      filtered.forEach(theme => {
-        const isActive = theme.id === currentThemeId;
-        const card = document.createElement("div");
-        card.className = `theme-card ${isActive ? "active" : ""}`;
-        card.setAttribute("data-theme-id", theme.id);
-        card.onclick = () => selectTheme(theme.id);
-
-        const v = theme.vars;
-        const bg = v["--bg"];
-        const surface = v["--surface"];
-        const accent = v["--accent"];
-        const text = v["--text"];
-
-        card.innerHTML = `
-          <div class="theme-preview-box" style="background: ${bg}; border-color: ${v["--border"]};">
-            <div class="theme-mock-topbar">
-              <div class="theme-mock-dots">
-                <span class="theme-mock-dot" style="background:${accent}"></span>
-                <span class="theme-mock-dot" style="background:${surface}"></span>
-                <span class="theme-mock-dot" style="background:${v["--text-dim"]}"></span>
-              </div>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:10px; color:${text}; font-weight:600;">${theme.name}</span>
-              <span style="width:8px; height:8px; border-radius:50%; background:${accent}; box-shadow:0 0 4px ${accent};"></span>
-            </div>
-          </div>
-          <div class="theme-card-titles">
-            <span class="theme-card-name">${theme.name}</span>
-            <div class="theme-swatches">
-              <span class="swatch-circle" style="background:${bg};"></span>
-              <span class="swatch-circle" style="background:${surface};"></span>
-              <span class="swatch-circle" style="background:${accent};"></span>
-            </div>
-          </div>
-        `;
-        themeGrid.appendChild(card);
-      });
-
-      const activeObj = AthyxThemeEngine.getThemeById(currentThemeId);
-      const activeThemeNameEl = document.getElementById("activeThemeName");
-      if (activeObj && activeThemeNameEl) {
-        activeThemeNameEl.textContent = activeObj.name;
-      }
-    }
-
-    function selectTheme(themeId) {
-      if (!window.AthyxThemeEngine) return;
-      AthyxThemeEngine.applyTheme(themeId);
-      const theme = AthyxThemeEngine.getThemeById(themeId);
-
-      document.querySelectorAll(".theme-card").forEach(c => {
-        c.classList.toggle("active", c.getAttribute("data-theme-id") === themeId);
-      });
-
-      const activeThemeNameEl = document.getElementById("activeThemeName");
-      if (theme && activeThemeNameEl) activeThemeNameEl.textContent = theme.name;
-      showToast(`Theme changed to "${theme.name}"`);
-    }
-
-    function filterThemes(category) {
-      currentThemeFilter = category;
-      document.querySelectorAll(".theme-cat-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.getAttribute("data-cat") === category);
-      });
-      renderThemes(category);
+      AthyxThemeEngine.applyTheme(colorHex);
     }
 
     function toggleCompactDock() {
-      const toggle = document.getElementById('compactDockToggle');
-      const current = localStorage.getItem('athyx_compact_dock') === 'true';
+      const toggle = document.getElementById("compactDockToggle");
+      const isActive = toggle.classList.toggle("active");
+      toggle.setAttribute("aria-checked", isActive.toString());
+      localStorage.setItem("athyx_compact_dock", isActive ? "true" : "false");
+
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ action: "athyx_compact_dock_change", compact: isActive }, "*");
+      }
+      showToast(isActive ? "Compact dock enabled" : "Compact dock disabled");
+    }
+
+    function setGameLaunchMode(mode) {
+      localStorage.setItem("athyx_game_launch_mode", mode);
+      document.getElementById("gameLaunchSegmented").setAttribute("data-mode", mode);
+      document.getElementById("seg-srcdoc").classList.toggle("active", mode !== "about:blank");
+      document.getElementById("seg-blank").classList.toggle("active", mode === "about:blank");
+      showToast("Game launch mode: " + mode);
+    }
+
+    function toggleFlyingParticles() {
+      const toggle = document.getElementById('flyingParticlesToggle');
+      const current = localStorage.getItem('athyx_flying_particles') === 'true';
       const next = !current;
-      localStorage.setItem('athyx_compact_dock', next.toString());
+      localStorage.setItem('athyx_flying_particles', next.toString());
       toggle.classList.toggle('active', next);
       toggle.setAttribute('aria-checked', next.toString());
 
       try {
-        if (window.parent) {
-          window.parent.postMessage({ action: "athyx_compact_dock_change", compact: next }, "*");
+        window.postMessage({ action: "athyx_flying_particles_change", active: next }, "*");
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ action: "athyx_flying_particles_change", active: next }, "*");
         }
       } catch(e) {}
 
-      showToast(next ? "Compact dock enabled" : "Compact dock disabled");
+      showToast(next ? "Flying particles enabled" : "Flying particles disabled");
     }
 
     // Wisp Management
@@ -1671,13 +1701,7 @@
       // Set proxy engine default to scramjet
       localStorage.setItem("proxyEngine", "scramjet");
 
-      // Auto Cloak toggle state
-      const autoCloak = localStorage.getItem("athyx_auto_cloak") === "true";
-      const autoCloakToggle = document.getElementById("autoCloakToggle");
-      if (autoCloakToggle) {
-        autoCloakToggle.classList.toggle("active", autoCloak);
-        autoCloakToggle.setAttribute("aria-checked", autoCloak.toString());
-      }
+      localStorage.setItem("proxyEngine", "scramjet");
 
       // Auto about:blank toggle state
       const autoAb = localStorage.getItem("athyx_auto_about_blank") === "true";
@@ -1703,6 +1727,25 @@
         compactToggle.setAttribute("aria-checked", compactDock.toString());
       }
 
+      // Flying Particles state
+      const flyingParticles = localStorage.getItem("athyx_flying_particles") === "true";
+      const particlesToggle = document.getElementById("flyingParticlesToggle");
+      if (particlesToggle) {
+        particlesToggle.classList.toggle("active", flyingParticles);
+        particlesToggle.setAttribute("aria-checked", flyingParticles.toString());
+      }
+
+      // Game Launch Mode state
+      const launchMode = localStorage.getItem("athyx_game_launch_mode") === "about:blank" ? "about:blank" : "iframe";
+      const segContainer = document.getElementById("gameLaunchSegmented");
+      const segSrcdoc = document.getElementById("seg-srcdoc");
+      const segBlank = document.getElementById("seg-blank");
+      if (segContainer && segSrcdoc && segBlank) {
+        segContainer.setAttribute("data-mode", launchMode);
+        segSrcdoc.classList.toggle("active", launchMode !== "about:blank");
+        segBlank.classList.toggle("active", launchMode === "about:blank");
+      }
+
       // Panic Inputs
       const savedPanicKey = localStorage.getItem("athyx_panic_key") || "";
       const savedPanicUrl = localStorage.getItem("athyx_panic_url") || "https://www.google.com";
@@ -1718,12 +1761,31 @@
         document.getElementById("siteTitleDropdownLabel").textContent = CLOAK_PRESETS[selectedPresetKey].name;
       }
 
-      // Render Themes & Wisps
-      renderThemes("all");
+      // Initialize Color Picker
+      const colorPicker = document.getElementById("themeColorPicker");
+      if (colorPicker && window.AthyxThemeEngine) {
+        const storedTheme = AthyxThemeEngine.getStoredThemeId();
+        let hex = "#f43f5e";
+        if (storedTheme && storedTheme.startsWith("#")) {
+          hex = storedTheme.trim().toLowerCase();
+          if (hex.length === 4) hex = "#" + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+          if (hex.length >= 7) hex = hex.substring(0, 7);
+        }
+        
+        const applyColor = () => {
+          colorPicker.value = hex;
+          colorPicker.setAttribute("value", hex);
+        };
+        applyColor();
+        setTimeout(applyColor, 50);
+      }
+
+      // Render Wisps
       renderWispSettings();
       setTimeout(pingAllWispServers, 400);
     });
   </script>
 
+  <script src="particle.js"></script>
 </body>
 </html>

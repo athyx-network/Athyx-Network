@@ -45,7 +45,10 @@ html,
     height: 100vh;
     margin: 0;
     padding: 0;
-    background: var(--bg);
+    background-color: var(--bg);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.075) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    background-attachment: fixed;
     overflow: hidden;
     color: var(--text);
     transition: background-color 0.25s ease, color 0.2s ease;

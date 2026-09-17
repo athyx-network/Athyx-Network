@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="themes.css">
-  <script src="themes.js"></script>
+  <script src="themes.js?v=2"></script>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="shortcut icon" href="favicon.ico">
 
@@ -38,10 +38,9 @@
 
     body {
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      background: 
-        linear-gradient(135deg, var(--accent-dim) 0%, rgba(0, 0, 0, 0) 55%),
-        linear-gradient(180deg, var(--surface-active) 0%, var(--surface) 40%, var(--bg) 100%);
       background-color: var(--bg);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.075) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
       background-attachment: fixed;
       color: var(--text);
       min-height: 100vh;
@@ -65,20 +64,24 @@
 
     
     .dork-box {
-      display: inline-flex;
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 20px;
-      padding: 12px 20px 12px 14px;
-      margin-bottom: 24px;
+      padding: 16px 20px;
       box-shadow: 
         0 10px 30px -8px rgba(0, 0, 0, 0.6),
         0 0 0 1px rgba(255, 255, 255, 0.02);
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      max-width: 480px;
-      text-align: left;
+      max-width: 280px;
+      text-align: center;
+      z-index: 50;
     }
 
     .dork-box:hover {
@@ -101,7 +104,8 @@
     .dork-box-content {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      align-items: center;
+      gap: 6px;
     }
 
     .dork-box-title {
@@ -110,9 +114,9 @@
       font-size: 15px;
       color: var(--text);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .dork-box-sub {
@@ -133,6 +137,24 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
       border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .dork-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 4px;
+    }
+
+    .dork-btn:hover {
+      background: var(--accent-hover);
+      transform: scale(1.05);
     }
 
     .title {
@@ -405,6 +427,17 @@
       background: #000;
     }
 
+    .home-quote {
+      text-align: center;
+      color: var(--text-dim, #9aa0a6);
+      font-style: italic;
+      margin-top: -16px;
+      margin-bottom: 32px;
+      font-size: 15px;
+      min-height: 20px;
+      z-index: 2;
+    }
+
     @media (max-width: 600px) {
       .title {
         font-size: 2.2rem;
@@ -431,13 +464,13 @@
       <img src="https://cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/hrmf.png" alt="hrmf">
       <div class="dork-box-content">
         <div class="dork-box-title">
-          <span>Find overweight dorks in your area</span>
-          <span class="dork-badge"><i class="fa-solid fa-location-dot"></i> Nearby</span>
+          <span>find dorks nearby</span>
         </div>
-        <span class="dork-box-sub">Connect with local dorks today!</span>
+        <button class="dork-btn">Discover</button>
       </div>
     </div>
     <h1 class="title">Welcome to Athyx Network</h1>
+    <p class="home-quote" id="homeQuote"></p>
 
     
     <div class="search-container">
@@ -571,7 +604,31 @@
     });
 
     renderPopularGames();
+
+    fetch("https://cdn.jsdelivr.net/gh/athyx-network/Athyx-Network@main/quotes.txt?t=" + Date.now())
+      .then(res => {
+        if (!res.ok) throw new Error("Network error");
+        return res.text();
+      })
+      .then(text => {
+        const quotes = text.split(/\r?\n/).map(q => q.trim()).filter(q => q.length > 0);
+        if (quotes.length > 0) {
+          document.getElementById("homeQuote").textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+        }
+      })
+      .catch(() => {
+        fetch("quotes.txt?t=" + Date.now())
+          .then(res => res.text())
+          .then(text => {
+            const quotes = text.split(/\r?\n/).map(q => q.trim()).filter(q => q.length > 0);
+            if (quotes.length > 0) {
+              document.getElementById("homeQuote").textContent = `"${quotes[Math.floor(Math.random() * quotes.length)]}"`;
+            }
+          })
+          .catch(e => console.log(e));
+      });
   </script>
 
+  <script src="particle.js"></script>
 </body>
 </html>

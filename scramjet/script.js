@@ -110,7 +110,7 @@ function createTab(makeActive = true) {
 
     updateLoadingBar(tab);
 
-    frame.frame.src = `${basePath}NT.html`;
+    frame.frame.src = `${basePath}NT.html?v=` + Date.now();
 
     frame.addEventListener("urlchange", (e) => {
         if (!e.url || e.url === "about:blank")
