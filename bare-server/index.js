@@ -2,7 +2,9 @@ import express from 'express';
 import { createBareServer } from '@tomphttp/bare-server-node';
 import { createServer } from 'node:http';
 
-const bareServer = createBareServer('/bare/');
+const bareServer = createBareServer('/bare/', {
+    connectionLimiter: { maxConnectionsPerIP: 100000 }
+});
 const app = express();
 
 app.get('/', (req, res) => {
