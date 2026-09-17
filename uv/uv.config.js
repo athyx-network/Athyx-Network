@@ -1,7 +1,7 @@
 /*global Ultraviolet*/
 self.__uv$config = {
     prefix: '/uv/service/',
-    bare: 'http://localhost:3000/bare/', // Local Private Bare Server
+    bare: 'https://athyx-network.onrender.com/bare/', // Remote Bare Server
     encodeUrl: Ultraviolet.codec.xor.encode,
     decodeUrl: Ultraviolet.codec.xor.decode,
     handler: '/uv/uv.handler.js',
