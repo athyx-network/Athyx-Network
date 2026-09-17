@@ -340,8 +340,16 @@
       home: () => "homepage.html?v=" + Date.now(),
       games: () => "g.html?v=" + Date.now(),
       apps: () => "apps.html?v=" + Date.now(),
-      movies: () => window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'scramjet/index.html?v=' + Date.now() + '#https://moviex.athyx.workers.dev/',
-      proxy: () => window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'scramjet/index.html?v=' + Date.now(),
+      movies: () => {
+        const engine = localStorage.getItem("proxyEngine") || "scramjet";
+        const path = engine === "ultraviolet" ? 'uv/index.html?v=' : 'scramjet/index.html?v=';
+        return window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + path + Date.now() + '#https://moviex.athyx.workers.dev/';
+      },
+      proxy: () => {
+        const engine = localStorage.getItem("proxyEngine") || "scramjet";
+        const path = engine === "ultraviolet" ? 'uv/index.html?v=' : 'scramjet/index.html?v=';
+        return window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + path + Date.now();
+      },
       settings: () => "settings.html?v=" + Date.now()
     };
 

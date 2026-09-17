@@ -623,10 +623,12 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       z-index: 0;
     }
-    .segmented-control[data-mode="iframe"] .segment-highlighter {
+    .segmented-control[data-mode="iframe"] .segment-highlighter,
+    .segmented-control[data-mode="scramjet"] .segment-highlighter {
       transform: translateX(0);
     }
-    .segmented-control[data-mode="about:blank"] .segment-highlighter {
+    .segmented-control[data-mode="about:blank"] .segment-highlighter,
+    .segmented-control[data-mode="ultraviolet"] .segment-highlighter {
       transform: translateX(100%);
     }
     .segmented-control .segment {
@@ -1015,6 +1017,20 @@
         <div class="settings-card">
           
 
+          <!-- Proxy Engine -->
+          <div class="setting-row" data-search-keys="proxy engine scramjet ultraviolet uv backend wisp">
+            <div class="setting-info">
+              <span class="setting-title">Proxy Engine</span>
+              <span class="setting-desc">Select the core proxy engine to use for routing traffic.</span>
+            </div>
+            <div class="setting-control">
+              <div class="segmented-control" id="proxyEngineSegmented" data-mode="scramjet">
+                <div class="segment-highlighter"></div>
+                <div class="segment active" id="seg-scramjet" onclick="setProxyEngine('scramjet')">Scramjet (Wisp)</div>
+                <div class="segment" id="seg-uv" onclick="setProxyEngine('ultraviolet')">Ultraviolet (Bare)</div>
+              </div>
+            </div>
+          </div>
 
           <!-- Auto-Switch on Failure -->
           <div class="setting-row" data-search-keys="auto switch failure proxy wisp fallback fast server">
@@ -1460,6 +1476,14 @@
       showToast("Game launch mode: " + mode);
     }
 
+    function setProxyEngine(engine) {
+      localStorage.setItem("proxyEngine", engine);
+      document.getElementById("proxyEngineSegmented").setAttribute("data-mode", engine);
+      document.getElementById("seg-scramjet").classList.toggle("active", engine === "scramjet");
+      document.getElementById("seg-uv").classList.toggle("active", engine === "ultraviolet");
+      showToast("Proxy engine: " + (engine === "scramjet" ? "Scramjet" : "Ultraviolet"));
+    }
+
     function toggleFlyingParticles() {
       const toggle = document.getElementById('flyingParticlesToggle');
       const current = localStorage.getItem('athyx_flying_particles') === 'true';
@@ -1698,10 +1722,20 @@
 
     // Initialize State
     window.addEventListener("DOMContentLoaded", () => {
-      // Set proxy engine default to scramjet
-      localStorage.setItem("proxyEngine", "scramjet");
-
-      localStorage.setItem("proxyEngine", "scramjet");
+      // Proxy Engine State
+      let savedEngine = localStorage.getItem("proxyEngine");
+      if (!savedEngine) {
+        savedEngine = "scramjet";
+        localStorage.setItem("proxyEngine", savedEngine);
+      }
+      const engineSegContainer = document.getElementById("proxyEngineSegmented");
+      const segScramjet = document.getElementById("seg-scramjet");
+      const segUv = document.getElementById("seg-uv");
+      if (engineSegContainer && segScramjet && segUv) {
+        engineSegContainer.setAttribute("data-mode", savedEngine);
+        segScramjet.classList.toggle("active", savedEngine === "scramjet");
+        segUv.classList.toggle("active", savedEngine === "ultraviolet");
+      }
 
       // Auto about:blank toggle state
       const autoAb = localStorage.getItem("athyx_auto_about_blank") === "true";

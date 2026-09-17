@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Athyx Network | UV Browser</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="../themes.css"/>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --surface: #141c2b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #38bdf8;
+    }
+    body { 
+      background-color: var(--bg); 
+      color: var(--text); 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      margin: 0; 
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      padding: 40px;
+      background: rgba(25, 30, 45, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 36px;
+      margin-bottom: 10px;
+      margin-top: 0;
+      color: #fff;
+    }
+    p {
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      font-size: 15px;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 6px 10px 6px 20px;
+      transition: all 0.2s ease;
+    }
+    .search-box:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+      background: rgba(0, 0, 0, 0.3);
+    }
+    .search-box i {
+      color: var(--text-muted);
+      font-size: 18px;
+    }
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 14px 16px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 16px;
+      outline: none;
+    }
+    .search-box input::placeholder {
+      color: var(--text-muted);
+    }
+    .status-text {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 50%;
+      border-top-color: var(--accent);
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <script src="/uv/uv.bundle.js"></script>
+  <script src="/uv/uv.config.js"></script>
+</head>
+<body>
+  
+  <div class="container" id="main-ui" style="display: none;">
+    <h1>Ultraviolet</h1>
+    <p>Secure, fast, and stealthy web proxy engine.</p>
+    
+    <form id="uv-form">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="uv-address" placeholder="Search the web or enter URL..." autocomplete="off">
+      </div>
+    </form>
+  </div>
+
+  <div id="loading" style="text-align: center;">
+    <div class="spinner"></div>
+    <span class="status-text" id="status">Initializing proxy engine...</span>
+  </div>
+
+  <script>
+    const statusText = document.getElementById('status');
+    const loadingDiv = document.getElementById('loading');
+    const mainUi = document.getElementById('main-ui');
+    const form = document.getElementById('uv-form');
+    const input = document.getElementById('uv-address');
+
+    function proxyUrl(url) {
+      if (!/^https?:\/\//i.test(url)) {
+        if (/^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/i.test(url)) {
+          url = "https://" + url;
+        } else {
+          url = "https://www.google.com/search?q=" + encodeURIComponent(url);
+        }
+      }
+      window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/uv/sw.js', { scope: __uv$config.prefix })
+        .then(() => {
+          let url = window.location.hash.substring(1);
+          if (url) {
+            url = decodeURIComponent(url);
+            proxyUrl(url);
+          } else {
+            // No URL provided, show the UI
+            loadingDiv.style.display = 'none';
+            mainUi.style.display = 'block';
+            input.focus();
+          }
+        })
+        .catch(err => {
+            statusText.innerText = "Failed to register service worker: " + err;
+            document.querySelector('.spinner').style.display = 'none';
+        });
+    } else {
+      statusText.innerText = "Service workers are not supported by your browser.";
+      document.querySelector('.spinner').style.display = 'none';
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (input.value.trim()) {
+        proxyUrl(input.value.trim());
+      }
+    });
+  </script>
+</body>
+</html>
